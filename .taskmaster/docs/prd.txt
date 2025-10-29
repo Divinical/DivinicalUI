@@ -1,0 +1,1057 @@
+# DivinicalUI - Product Requirements Document
+# Version: 1.0 (Midnight-Compliant)
+# Target: Best-in-class WoW UI addon focusing on action bars, performance, and aesthetics
+
+## PROJECT OVERVIEW
+
+### Vision
+Create a World of Warcraft UI addon that combines:
+- Bartender 4's action bar functionality with superior UX
+- ElvUI's completeness with better performance
+- GW2UI's aesthetic beauty with customization depth
+- 100% compliance with WoW Midnight expansion API restrictions
+
+### Core Value Propositions
+1. Easiest action bar setup in WoW (beat Bartender 4)
+2. Highest performance among full UI addons (beat ElvUI)
+3. Modern, beautiful aesthetic (match GW2UI)
+4. Complete UI replacement (everything in one addon)
+
+### Success Criteria
+- Launch: 10,000 downloads in 3 months
+- 4.5+ star rating on CurseForge
+- Known as "the action bar addon" in community
+- < 3MB memory footprint
+- < 0.5% CPU usage in combat
+
+---
+
+## PHASE 1: FOUNDATION (Week 1-2)
+
+### F1: Complete oUF Integration
+Priority: Critical
+Description: Properly embed and configure oUF framework for unit frame functionality
+
+Requirements:
+- Download oUF v11.x for The War Within
+- Extract all oUF files to Libs/oUF/ directory
+- Create proper oUF.xml load order
+- Implement oUF elements: health, power, auras, castbar, portrait, threat
+- Add oUF element tags for dynamic text formatting
+- Verify oUF callbacks function correctly
+- Test unit frame spawning for all frame types
+
+Acceptance Criteria:
+- Player frame displays with oUF
+- Target frame displays with oUF
+- No Lua errors on addon load
+- Health/power updates in real-time
+- Cast bars work correctly
+
+### F2: Professional Media Library
+Priority: Critical
+Description: Create complete media asset library for fonts, textures, and sounds
+
+Requirements:
+- Create Media/Fonts/ directory
+- Add fonts: Expressway, PT Sans Narrow, Roadway, Source Code Pro
+- Create Media/Textures/StatusBars/ directory
+- Add statusbar textures: Aluminium, Gradient, Smooth, Minimalistic
+- Create Media/Textures/Borders/ directory
+- Add border textures: Glow, Clean, Shadow
+- Create Media/Textures/Backdrops/ directory
+- Add backdrop textures: Solid, Gradient, Transparent
+- Create Media/Textures/Icons/ directory structure
+- Add class icons for all 13 classes
+- Add role icons: Tank, Healer, DPS
+- Add power type icons: Mana, Rage, Energy, Focus, Runic Power, etc.
+- Integrate LibSharedMedia for additional assets
+- Add notification sound (Media/Sounds/)
+
+Acceptance Criteria:
+- All fonts load without errors
+- All textures display correctly
+- SharedMedia integration works
+- Assets are accessible via DivinicalUI.Media API
+- File sizes are optimized (< 5MB total)
+
+### F3: Settings Panel Implementation
+Priority: Critical
+Description: Build complete settings interface using modern WoW Settings API
+
+Requirements:
+- Implement settings canvas using Blizzard Settings API (11.0+)
+- Create category system: General, Unit Frames, Raid/Party, Nameplates, Action Bars, Themes, Profiles, Advanced
+- Implement subcategories for each unit frame type
+- Add instant preview functionality (no /reload required)
+- Create profile management system (save, load, delete, rename)
+- Add preset profiles: Tank, Healer, DPS, PvP, Simple, Advanced
+- Implement search/filter functionality for settings
+- Add "Reset to Default" button per category
+- Add "Import/Export Profile" buttons
+- Create clear labels and tooltips for all settings
+- Implement color pickers with alpha support
+- Add sliders with value display
+- Add dropdowns for selection options
+- Add checkboxes for boolean options
+
+Acceptance Criteria:
+- Settings panel opens via /divinical or game menu
+- All categories and subcategories display correctly
+- Changes preview in real-time without /reload
+- Profile save/load works correctly
+- Preset profiles apply correctly
+- Search filters settings appropriately
+- No UI errors or visual glitches
+
+---
+
+## PHASE 2: CORE FEATURES (Week 3-4)
+
+### C1: Complete Unit Frame System
+Priority: Critical
+Description: Implement all 11 unit frame types with full customization
+
+C1.1: Player Frame
+Requirements:
+- Health bar with incoming heal prediction
+- Power bar with class-specific coloring
+- Alternative power bar (boss encounters)
+- Class power display (combo points, soul shards, holy power, chi, runes, etc.)
+- Cast bar with spell icon and interrupt shield indicator
+- Buff display with filtering options
+- Debuff display with filtering options
+- 3D portrait, 2D texture portrait, or class icon options
+- Combat indicator (sword icons)
+- Resting indicator (zzz)
+- PvP indicator (faction icon)
+- Role icon (tank/healer/dps)
+- Item level display
+- Level and name display
+- Health/power text (percentage, current, max, deficit)
+
+Acceptance Criteria:
+- All elements display correctly
+- Updates happen in real-time
+- No performance issues (< 0.1% CPU)
+- Fully customizable via settings
+- Works for all classes and specs
+
+C1.2: Target Frame
+Requirements:
+- All player frame features
+- Enemy cast bar with interrupt detection
+- Threat meter (percentage)
+- Quest icon indicator
+- Classification display (rare, elite, boss, world boss)
+- Enemy buff display with filtering
+- Enemy debuff display (show YOUR debuffs)
+- Target of target mini frame
+- Creature type display
+- NPC/player detection
+
+Acceptance Criteria:
+- All elements display correctly
+- Works for friendly and enemy targets
+- Threat meter accurate
+- Cast bar shows interrupt shield
+- Target of target updates correctly
+
+C1.3: Focus Frame
+Requirements:
+- Clone of target frame functionality
+- Focus target of target display
+- Independent positioning from target
+- Works in arena and PvP
+
+Acceptance Criteria:
+- Identical functionality to target frame
+- Updates when focus changes
+- No interference with target frame
+
+C1.4: Pet Frame
+Requirements:
+- Health and power bars
+- Pet name and level
+- Pet target frame
+- Pet happiness indicator (hunter classic)
+- Pet abilities with cooldown tracking
+
+Acceptance Criteria:
+- Works for all pet classes (hunter, warlock, mage, etc.)
+- Updates when pet changes
+- Pet target displays correctly
+
+C1.5: Party Frames
+Requirements:
+- Support 1-5 party members
+- Horizontal or vertical layout options
+- Role icons
+- Health bars with incoming heals
+- Power bars (optional)
+- Debuff highlighting for dispellable debuffs
+- Range-based opacity fading
+- Ready check icons
+- Resurrection indicator
+- Click-to-target functionality
+- Mouse-over casting support (Clique-style)
+- Group number display
+- Raid icons (skull, cross, etc.)
+
+Acceptance Criteria:
+- All 5 party members display
+- Updates in real-time
+- Dispellable debuffs highlighted
+- Range fading works (40 yards default)
+- Click casting works with Clique/similar addons
+
+C1.6: Raid Frames
+Requirements:
+- Support 1-40 raid members
+- Grid-style layout (8 groups x 5 members)
+- Role-based sorting (tanks -> healers -> dps)
+- Range-based opacity
+- Debuff highlighting with priority system
+- Incoming heals prediction (green bar)
+- Health deficit mode
+- Threat coloring option
+- Mana bars for healer role
+- Group indicators (1-8)
+- Raid icons
+- Click-casting integration
+- Separate layouts for 10/20/40 player raids
+- Group by role or by group number
+
+Acceptance Criteria:
+- Displays all raid members correctly
+- Performance acceptable for 40-player raids (< 1% CPU)
+- Sorting works correctly
+- Debuff priority system functional
+- Works with click-casting addons
+
+C1.7: Arena Frames
+Requirements:
+- Support 1-5 arena opponents
+- Trinket tracking (PvP trinket cooldown)
+- Diminishing returns tracker
+- Spec detection and display
+- Cast bar with interrupt tracking
+- Large, prominent display
+
+Acceptance Criteria:
+- Displays all arena opponents
+- Trinket cooldown accurate (2 minutes)
+- DR tracking works for stuns, fears, etc.
+- Spec detection accurate
+- Updates immediately when entering arena
+
+C1.8: Boss Frames
+Requirements:
+- Support 1-5 boss units
+- Large, prominent display
+- Important debuffs only (filterable)
+- Cast bars for all bosses
+- Alternative power bars
+- Threat indicators
+- Boss number display (1-5)
+
+Acceptance Criteria:
+- All boss frames display when boss units exist
+- Cast bars work for all bosses simultaneously
+- Threat accurate
+- Alternative power shown when available
+
+C1.9: Target of Target Frame
+Requirements:
+- Mini frame showing target's target
+- Health bar only (compact)
+- Name display
+- Updates in real-time
+
+Acceptance Criteria:
+- Displays target's target correctly
+- Essential for tanking (shows who boss is targeting)
+
+C1.10: Pet Target Frame
+Requirements:
+- Shows pet's current target
+- Compact display
+- Health and name
+
+Acceptance Criteria:
+- Updates when pet target changes
+- Works for all pet classes
+
+C1.11: Focus Target Frame
+Requirements:
+- Shows focus's current target
+- Compact display
+- Health and name
+
+Acceptance Criteria:
+- Updates when focus target changes
+- Useful for arena/PvP
+
+C1.12: Smart Buff/Debuff Filtering
+Requirements:
+- Automatic filtering based on player class
+- Automatic filtering based on player role
+- Automatic filtering based on content type (raid, dungeon, PvP)
+- Whitelist/blacklist system
+- Show only YOUR debuffs on enemies option
+- Show only dispellable debuffs option
+- Show boss debuffs always
+- Duration text on auras
+- Stack count on auras
+
+Acceptance Criteria:
+- Filtering reduces visual clutter
+- Important auras always shown
+- User can customize filters
+- Performance acceptable (< 100ms to filter)
+
+### C2: Action Bar System (KILLER FEATURE)
+Priority: Critical
+Description: Build the best action bar system in WoW, surpassing Bartender 4
+
+C2.1: Core Action Bars
+Requirements:
+- Main Action Bar (12 buttons, 1-12 keybinds)
+- Bottom Action Bars 2-6 (60 additional buttons)
+- Right Action Bars 1-2 (24 additional buttons, vertical)
+- Pet Action Bar (10 buttons)
+- Stance/Form Bar (4-6 buttons, class-specific)
+- Possess/Vehicle Bar (automatic display)
+- Micro Menu Bar (character, spells, talents, achievements, etc.)
+- Bag Bar (5 buttons: bags + reagent bag)
+- Extra Action Button (boss abilities)
+- Zone Action Button (zone-specific abilities)
+
+Acceptance Criteria:
+- All bars display correctly
+- All buttons function correctly
+- Keybinds work
+- No conflicts with Blizzard default bars
+
+C2.2: Positioning and Layout
+Requirements:
+- Full drag and drop positioning for each bar
+- Precise X/Y coordinate input
+- Scale slider (50% - 200%)
+- Button size customization (16px - 64px)
+- Spacing/padding between buttons (0-20px)
+- Rows and columns configuration per bar
+- Anchor point selection (9 anchor points)
+- Snap-to-grid option
+- Visual alignment helpers (guidelines when dragging)
+- Lock/unlock toggle to prevent accidental moves
+
+Acceptance Criteria:
+- Bars can be positioned anywhere on screen
+- Dragging feels smooth and responsive
+- Grid snapping works correctly
+- Alignment helpers appear when close to other elements
+- Lock prevents movement when enabled
+
+C2.3: Visibility System
+Requirements:
+- Show/hide in combat toggle
+- Show/hide with target toggle
+- Show/hide with focus toggle
+- Show/hide in vehicle toggle
+- Show/hide in stealth toggle
+- Show/hide in pet battle toggle
+- Show/hide by instance type (none, party, raid, arena, battleground)
+- Show/hide by specialization
+- Mouse-over fading with alpha control
+- Fade delay customization (0-5 seconds)
+- Combat fade in duration
+- Combat fade out duration
+
+Acceptance Criteria:
+- All visibility conditions work correctly
+- Fading is smooth and performant
+- No flickering when conditions change rapidly
+- Settings preview shows expected behavior
+
+C2.4: Button Customization
+Requirements:
+- Keybind display (show/hide, position, size, font)
+- Macro name display (show/hide, position, size)
+- Cooldown text (size, position, format: seconds, minutes)
+- Proc glow when spell becomes available (4 glow styles)
+- Range coloring (red when out of range)
+- Resource coloring (red when insufficient mana/energy/rage)
+- Button skins (8+ skin options)
+- Border customization (color, thickness)
+- Icon zoom (0% - 30%)
+- Icon padding
+- Stack count display (item charges, consumables)
+
+Acceptance Criteria:
+- All display options work correctly
+- Proc glow triggers appropriately
+- Range detection accurate
+- Resource cost detection accurate
+- Button skins apply cleanly
+
+C2.5: State Management
+Requirements:
+- Action bar paging in combat
+- Action bar paging in stealth
+- Action bar paging when mounted
+- Action bar paging with target
+- Action bar paging with modifier keys (shift/ctrl/alt)
+- Override bar handling (vehicle, possess, pet battles)
+- Custom page switching conditions
+- State indicator display (show which page is active)
+
+Acceptance Criteria:
+- Paging works for all classes and specs
+- Druid forms trigger correct pages
+- Rogue stealth triggers correct page
+- Warrior stances trigger correct pages
+- Override bars replace main bar automatically
+
+C2.6: Visual Bar Editor (INNOVATION)
+Requirements:
+- Click and drag bars with visible handles
+- Real-time preview (no /reload needed)
+- Snap-to-grid with customizable grid size
+- Visual alignment helpers (guidelines)
+- Undo/redo support (10 action history)
+- "Lock/Unlock All" button in UI
+- Edit mode toggle button visible on screen
+- Visual highlight of selected bar
+- Show/hide all bars button (for screenshot mode)
+
+Acceptance Criteria:
+- Edit mode accessible via button or command
+- Dragging is smooth and precise
+- Undo/redo works correctly
+- All changes save automatically
+- No /reload required for any changes
+
+C2.7: Setup Wizard and Presets (INNOVATION)
+Requirements:
+- First-time guided setup on addon load
+- Role selection: Tank, Healer, DPS, PvP
+- Resolution detection (1080p, 1440p, 4K)
+- Auto-positioning based on role and resolution
+- Class-specific preset adjustments
+- "Simple" mode: 1-2 bars only
+- "Advanced" mode: All bars enabled
+- One-click restore to default layout
+- Preview before applying preset
+- Skip wizard option for experienced users
+
+Acceptance Criteria:
+- Wizard appears on first addon load
+- Presets position bars appropriately for role
+- Resolution detection accurate
+- Presets can be reapplied later from settings
+- Skip option hides wizard permanently
+
+C2.8: Per-Button Customization (INNOVATION)
+Requirements:
+- Individual button size override
+- Individual button position adjustment within bar
+- Individual button visibility toggle
+- Custom button groups (visual separators)
+- Button priority ordering (important abilities highlighted)
+- Per-button glow rules
+- Custom button labels (rename abilities)
+- Button color overlays
+
+Acceptance Criteria:
+- Individual buttons can be customized
+- Button groups create visual separation
+- Priority highlighting works
+- Custom labels display correctly
+
+C2.9: Smart Features (INNOVATION)
+Requirements:
+- Auto-hide empty buttons option
+- Auto-sort buttons by: cooldown length, usage frequency, ability type
+- Visual charge counters for multi-charge abilities
+- Stack count display for charges
+- Enhanced proc detection (visual pulse)
+- Ready-state highlighting (ability just became usable)
+- Cooldown progress bars (alternative to spiral)
+- Global cooldown pulse effect
+
+Acceptance Criteria:
+- Auto-hide removes empty slots cleanly
+- Auto-sort maintains button positions logically
+- Charge counters accurate
+- Proc detection works for class procs
+- GCD pulse syncs with actual GCD
+
+C2.10: Profile System (INNOVATION)
+Requirements:
+- Save unlimited custom profiles
+- Per-character profiles
+- Per-class profiles
+- Account-wide profiles
+- Import profile from export string
+- Export individual bar configuration
+- Export full profile configuration
+- Share profiles via Discord/forums
+- Community preset library integration
+- Streamer/pro player profile imports
+- Auto-backup on profile change
+
+Acceptance Criteria:
+- Profiles save/load correctly
+- Export strings work cross-server
+- Import validates and applies correctly
+- Community library accessible from settings
+- Backups restore previous configurations
+
+C2.11: Performance Optimization
+Requirements:
+- Lazy loading (bars load only when needed)
+- Efficient update loops (only update visible bars)
+- Smart event handling (batched updates)
+- Memory pooling for button frames
+- Texture atlas for faster rendering
+- Target: 50% less memory than Bartender 4
+- Target: < 0.3% CPU in combat with all bars enabled
+
+Acceptance Criteria:
+- Memory usage < 2MB with all bars enabled
+- CPU usage < 0.3% in combat (measured via profiler)
+- No frame drops during ability spam
+- Addon loads in < 500ms
+
+### C3: Nameplate System
+Priority: High
+Description: Customizable nameplates for friendly and enemy units
+
+C3.1: Friendly Nameplates
+Requirements:
+- Health bars with percentage/value text
+- Role icons (tank, healer, dps)
+- Class coloring option
+- Guild name display option
+- Custom name format (name only, name + guild, name + title)
+- Range-based fading
+- Size and scale customization
+
+Acceptance Criteria:
+- Friendly nameplates display correctly
+- Class colors accurate
+- Role icons correct
+- Performance acceptable in 40-player raids
+
+C3.2: Enemy Nameplates
+Requirements:
+- Health bars with current health text
+- Cast bars with interrupt shield indicator
+- Important debuffs only (YOUR debuffs)
+- Threat coloring (tank mode vs DPS mode)
+- Class coloring for players
+- Quest indicators (yellow !)
+- Rare/elite indicators (silver dragon, gold dragon)
+- Execute range indicator (< 20% health, < 35% for execute classes)
+- Target highlighting (bright border)
+- Focus highlighting (different color border)
+- Personal resource display on target nameplate
+- Creature type display
+
+Acceptance Criteria:
+- Enemy nameplates display correctly
+- Cast bars sync with enemy casts
+- Threat coloring accurate
+- Execute range highlights at correct threshold
+- Target/focus highlighting distinct
+
+C3.3: Nameplate Customization
+Requirements:
+- Size and scale slider
+- Visibility distance (0-60 yards)
+- Stacking behavior (stack vertically, overlap)
+- Clickthrough option (can't click nameplates)
+- Combat-only display
+- Filter by name (hide specific mob names)
+- Show friendly class colors
+- Show enemy class colors
+- Show NPC names
+- Show player names
+- Fade non-target nameplates
+
+Acceptance Criteria:
+- All customization options work
+- Performance acceptable with many nameplates visible
+- Filtering hides correct nameplates
+- Clickthrough prevents accidental targeting
+
+### C4: Visual Information Display (Midnight-Compliant)
+Priority: Medium
+Description: Display buffs, debuffs, and cooldowns visually (no automation)
+
+C4.1: Personal Buff/Debuff Display
+Requirements:
+- Larger icons for important player buffs
+- Customizable icon positions (anchor to frame or fixed position)
+- Configurable icon sizes (16px - 64px)
+- Filter by buff/debuff type
+- Whitelist important buffs
+- Blacklist unimportant buffs
+- Stack count display
+- Duration text or cooldown spiral
+- Visual warning for missing buffs (flask, food, well fed)
+- Dispel highlighting for debuffs
+- Custom icon arrangements (grid, row, priority-based)
+
+Acceptance Criteria:
+- Icons display correctly
+- Filtering reduces clutter
+- Durations accurate
+- Missing buff warnings trigger correctly
+
+C4.2: Cooldown Display
+Requirements:
+- Icon-based cooldown tracking (visual only)
+- Group display by category (offensive, defensive, utility, movement, profession)
+- Ready notification (visual pulse when ready)
+- Remaining time text
+- Charge-based ability tracking (show 2/3 charges)
+- Customizable icon size and position
+- Show/hide on cooldown vs always show
+
+Acceptance Criteria:
+- All major cooldowns tracked
+- Grouping makes sense
+- Ready notification visible but not annoying
+- Charge tracking accurate
+
+C4.3: Resource Display
+Requirements:
+- Class-specific resource bars (combo points, soul shards, runes, chi, holy power, arcane charges)
+- Alternative power bars (boss encounters)
+- Configurable positioning (attached to player frame or standalone)
+- Visual thresholds (highlight at 5 combo points, 5 soul shards, etc.)
+- Color customization per resource type
+- Size and scale options
+
+Acceptance Criteria:
+- Resource displays for all classes
+- Updates in real-time
+- Thresholds trigger at correct values
+- Positioning flexible
+
+C4.4: Proc Indicators
+Requirements:
+- Visual-only proc tracking (no automation)
+- Button glow when ability becomes empowered
+- Screen edge glow for major procs
+- Customizable glow styles (pixel, auto cast, proc, blizzard)
+- Icon display for active procs
+- No conditional logic or automation
+
+Acceptance Criteria:
+- Procs detected correctly
+- Glows appear on correct buttons
+- No automation or decision-making
+- Performance acceptable (< 0.1% CPU)
+
+---
+
+## PHASE 3: ADVANCED FEATURES (Week 5-6)
+
+### A1: Theme System
+Priority: Medium
+Description: Multiple visual themes for the entire UI
+
+A1.1: Core Themes
+Requirements:
+- Default theme (dark, teal accents)
+- Classic theme (Blizzard blue)
+- Minimal theme (flat, monochrome)
+- GW2 theme (Guild Wars 2 style)
+- FFXIV theme (Final Fantasy XIV style)
+- Custom theme (user-editable)
+
+Acceptance Criteria:
+- All themes apply correctly
+- Themes affect all UI elements consistently
+- Theme switching requires no /reload
+
+A1.2: Theme Components
+Requirements:
+- Color scheme (50+ color definitions)
+- Texture set (statusbars, borders, backdrops)
+- Font set (main, number, header)
+- Layout preset (frame positions)
+- Export/import theme files
+
+Acceptance Criteria:
+- All components customizable
+- Themes save/load correctly
+- Theme files shareable
+
+### A2: Minimap Enhancement
+Priority: Medium
+Description: Customizable minimap with modern features
+
+Requirements:
+- Shape options (square, circle, rounded square)
+- Size and scale (50% - 200%)
+- Combat fade option
+- Zoom in/out buttons
+- Calendar button
+- Tracking button (find herbs, ore, etc.)
+- Dungeon difficulty indicator
+- Mail indicator
+- Clock (12hr/24hr/server time/local time)
+- Coordinates display (X, Y, zone name)
+- Gathering node tracker integration
+- Position anywhere on screen
+- Mouse wheel zoom
+
+Acceptance Criteria:
+- All shape options work
+- Buttons function correctly
+- Coordinates accurate
+- Performance acceptable
+
+### A3: Bag System
+Priority: Medium
+Description: Unified bag interface
+
+Requirements:
+- All-in-one bag (combine all bags)
+- Bank integration (show bank when at bank)
+- Search bar with highlighting
+- Item level display on gear
+- Rarity border coloring
+- Auto-sort (by item type, by quality)
+- Auto-vendor grey items
+- Custom categories (consumables, gear, quest items, trade goods)
+- Bag slots display (X/Y free)
+- Currency display (show major currencies)
+- Bag bar (show/hide individual bag buttons)
+- New item glow
+
+Acceptance Criteria:
+- Unified bag displays all items
+- Search works correctly
+- Auto-sort organizes logically
+- Bank integration seamless
+
+### A4: Tooltip Enhancement
+Priority: Low
+Description: Enhanced tooltips with additional information
+
+Requirements:
+- Item level on gear
+- Vendor price (sell value)
+- Already known indicator (transmog, toys, pets, mounts)
+- Guild rank display for players
+- Mythic+ score for players
+- Health values (numerical) for NPCs
+- Target information (who they're targeting)
+- Spell ID for developers (optional)
+- Anchor position (cursor, top, bottom, mouse)
+- Custom styling (colors, borders, backdrop)
+- Fade in/out animations
+
+Acceptance Criteria:
+- All information displays correctly
+- Tooltips don't obscure important UI
+- Performance acceptable
+
+### A5: Chat Enhancement
+Priority: Low
+Description: Improved chat interface
+
+Requirements:
+- Move and resize chat frames
+- Custom channel colors
+- Chat copy functionality (Ctrl+C to copy)
+- URL detection (clickable links)
+- Spam filter with customizable keywords
+- Chat fading options (fade after X seconds)
+- Custom timestamps (format, color)
+- Chat history persistence between sessions
+- Tab management (add, remove, rename tabs)
+- Font size customization
+- Scroll speed adjustment
+
+Acceptance Criteria:
+- Chat movable and resizable
+- Copy functionality works
+- URLs clickable
+- History persists correctly
+
+---
+
+## PHASE 4: CONTENT-SPECIFIC FEATURES (Week 7-8)
+
+### S1: Mythic+ UI Elements (Midnight-Compliant)
+Priority: Medium
+Description: Information display for Mythic+ dungeons (no automation)
+
+Requirements:
+- Percentage progress bar to 100%
+- Timer display with color-coded milestones (+3 green, +2 yellow, +1 orange, depleted red)
+- Death counter with visual warning (5+ deaths highlighted)
+- Current affix display (icons with tooltips)
+- Pull count tracker (mobs in combat vs total mobs)
+- Dungeon map integration (show % per pack on map)
+- Enemy forces tooltips (hover mob = see % value)
+- Custom nameplate styling for priority targets
+- Objective tracker styling and positioning
+- Clear, readable progress displays
+- Moveable and scalable elements
+
+Acceptance Criteria:
+- All displays accurate during M+ run
+- Timer syncs correctly
+- Percentage matches in-game tracker
+- No automation or decision-making
+- Performance acceptable
+
+### S2: Raid UI Tools (Midnight-Compliant)
+Priority: Medium
+Description: Information display for raid encounters (no automation)
+
+Requirements:
+- Cooldown usage display (visual log of who used what)
+- Consumable status indicators (show who has flask/food)
+- Ready check visualization (large checkmarks)
+- Pull timer integration (countdown timer, works with DBM/BigWigs)
+- Loot roll tracking (who won what)
+- Loot history display (recent drops)
+- Item level comparison tooltips
+- Raid assignment notes display
+
+Acceptance Criteria:
+- Cooldown log tracks major CDs
+- Consumable check accurate
+- Pull timer syncs with raid leader
+- No automation
+
+### S3: PvP UI Tools (Midnight-Compliant)
+Priority: Low
+Description: Information display for PvP content (no automation)
+
+Requirements:
+- Arena enemy spec display
+- Trinket status indicators (visual only, no automation)
+- Arena preparation timer
+- Enemy health percentage displays
+- Battleground objective status displays
+- Flag carrier information
+- Score tracking (kills, deaths, HKs)
+- Map integration
+- Enemy player count
+
+Acceptance Criteria:
+- Arena displays work in arena only
+- Trinket status visual only
+- Battleground displays work in BGs only
+- No automation or decision-making
+
+---
+
+## PHASE 5: POLISH & OPTIMIZATION (Week 9-10)
+
+### O1: Performance Optimization
+Priority: Critical
+Description: Ensure DivinicalUI is the fastest full UI addon
+
+Requirements:
+- Lazy loading (raid frames load in raid only, arena frames in arena only)
+- Event throttling (batch UNIT_HEALTH updates, throttle to 0.1s intervals)
+- Frame pooling (reuse frames instead of create/destroy)
+- Texture optimization (compress all textures, use texture atlas)
+- Database optimization (local variables, cached lookups, minimal SavedVariables writes)
+- Code profiling (profile with WoW built-in profiler)
+- Optimize hot paths (update loops, event handlers)
+- Remove debug code in release builds
+- Memory management (GC hints, nil unused references, clear old data)
+- Target: < 3MB memory with all features enabled
+- Target: < 0.5% CPU in combat
+
+Acceptance Criteria:
+- Memory usage < 3MB measured via /fstack
+- CPU usage < 0.5% measured via profiler during raid combat
+- No frame drops during heavy combat
+- Addon loads in < 500ms
+
+### O2: Quality of Life Features
+Priority: Medium
+Description: Small features that improve daily gameplay
+
+Requirements:
+- Auto-repair with guild bank (use guild funds if available)
+- Auto-summon pet on login (hunter, warlock)
+- Auto-screenshot on achievements
+- Auto-vendor grey items (when talking to vendor)
+- Durability warning (alert at 20% durability)
+- Low health/mana warning (alert at 30%)
+- Combat state indicator (visual indicator when in combat)
+- AFK mode (dim screen, show AFK message)
+- Currency tracker (show gold gained/lost per session)
+
+Acceptance Criteria:
+- All features work correctly
+- Options to enable/disable each feature
+- No unwanted behavior
+
+### O3: Installation Wizard
+Priority: High
+Description: First-time setup experience
+
+Requirements:
+- Welcome screen with addon description
+- Feature highlights (show what DivinicalUI can do)
+- Role selection (Tank, Healer, DPS, PvP)
+- Resolution detection and confirmation
+- Preset application based on role
+- Feature tour (highlight each UI element with tooltips)
+- Quick settings overview (show where to customize)
+- Links to documentation, Discord, CurseForge
+- Skip option for experienced users
+- "Show wizard again" option in settings
+
+Acceptance Criteria:
+- Wizard appears on first load only
+- All steps clear and helpful
+- Preset applies correctly
+- Tour highlights correct elements
+- Skip works permanently
+
+### O4: Import/Export System
+Priority: High
+Description: Profile sharing system
+
+Requirements:
+- Export current profile to Base64 encoded string
+- Import profile from string with validation
+- Export individual components (just action bars, just unit frames, etc.)
+- Share profiles via Discord/forums/Wago
+- Profile compression (reduce string length)
+- Version compatibility checking (detect incompatible profiles)
+- Backup current profile before import
+- Restore from backup option
+- Cloud sync integration (optional, via external service)
+- Profile library in settings (community profiles)
+
+Acceptance Criteria:
+- Export generates valid string
+- Import validates and applies correctly
+- Version checking prevents breaking changes
+- Backups restore correctly
+- Community library accessible
+
+### O5: Developer Tools
+Priority: Low
+Description: Debug and development utilities
+
+Requirements:
+- Frame stack tool (/divfstack)
+- Event logger (show all events firing in real-time)
+- Performance profiler (CPU and memory per module)
+- Memory usage tracker (per frame type)
+- Lua error handler (catch and display errors)
+- Reload UI button in settings
+- Reset profile button with confirmation
+- Debug mode toggle (enables extra logging)
+- Export debug log (for bug reports)
+
+Acceptance Criteria:
+- All tools work correctly
+- Frame stack shows frame hierarchy
+- Event logger scrollable
+- Profiler accurate
+
+---
+
+## PHASE 6: COMMUNITY & MARKETING (Week 11-12)
+
+### M1: Documentation
+Priority: High
+Description: Complete user and developer documentation
+
+Requirements:
+- User guide (getting started, installation, first setup)
+- Feature documentation (what each setting does, screenshots)
+- FAQ (common questions: migration, performance, compatibility)
+- Troubleshooting guide (common issues and solutions)
+- Video tutorials (YouTube: setup, action bar customization, profile sharing)
+- API documentation (for addon developers)
+- Changelog (version history, what's new)
+- Migration guide from ElvUI/Bartender
+
+Acceptance Criteria:
+- All documentation complete and accurate
+- Screenshots up-to-date
+- Videos professional quality
+- Search functionality works
+
+### M2: Distribution
+Priority: Critical
+Description: Publish addon on major platforms
+
+Requirements:
+- CurseForge (primary platform)
+- Wago Addons (secondary platform)
+- WoWInterface (legacy platform)
+- GitHub (source code, issue tracker)
+- Own website (landing page, feature showcase)
+- Automated releases (GitHub Actions to publish on tag)
+- Versioning (semantic versioning: MAJOR.MINOR.PATCH)
+
+Acceptance Criteria:
+- Published on all platforms
+- Automated releases working
+- Landing page live
+- GitHub repository public
+
+### M3: Community Building
+Priority: High
+Description: Build user community
+
+Requirements:
+- Discord server (support, announcements, profiles)
+- Subreddit (r/DivinicalUI)
+- Twitter/X account (updates, screenshots)
+- YouTube channel (tutorials, updates)
+- Streamer partnerships (sponsor streamers to use addon)
+- Content creator program (provide early access, profile templates)
+- Community events (profile contests, screenshot contests)
+
+Acceptance Criteria:
+- Discord active with moderation
+- Social media accounts posting regularly
+- At least 3 streamer partnerships
+- Community engaged
+
+### M4: Marketing Strategy
+Priority: High
+Description: Promote addon to WoW community
+
+Requirements:
+- Competitive comparison chart (DivinicalUI vs Bartender vs ElvUI)
+- Feature highlight videos (action bars, performance, themes)
+- Before/after screenshots (default UI vs DivinicalUI)
+- Testimonials from beta testers
+- "Why switch from ElvUI/Bartender" article
+- SEO optimization ("best wow ui addon 2025", "bartender alternative")
+- Paid ads on WoWHead, MMO-Champion, Icy Veins
+- Submit to "best addons" lists (WoWHead, Icy Veins guides)
+- Press release to MMO news sites
+
+Acceptance Criteria:
+- Comparison chart published
+- Videos published on YouTube
+- Articles written and published
+- Ads running
+- Featured on at least one major site
+
+---
+
+END OF PRD

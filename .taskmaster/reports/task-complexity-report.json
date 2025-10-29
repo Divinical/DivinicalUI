@@ -1,0 +1,173 @@
+{
+	"meta": {
+		"generatedAt": "2025-10-29T17:53:48.681Z",
+		"tasksAnalyzed": 20,
+		"totalTasks": 20,
+		"analysisCount": 20,
+		"thresholdScore": 8,
+		"projectName": "Taskmaster",
+		"usedResearch": false
+	},
+	"complexityAnalysis": [
+		{
+			"taskId": 1,
+			"taskTitle": "oUF Framework Integration",
+			"complexityScore": 8,
+			"recommendedSubtasks": 5,
+			"expansionPrompt": "Break down into framework setup, element implementation (health/power), aura system integration, castbar/portrait/threat implementation, and callback verification",
+			"reasoning": "Requires deep understanding of oUF's API architecture, handling load order dependencies, implementing multiple complex elements with dynamic text tags, and testing various unit frame types. The integration of multiple visual components and event callbacks increases complexity."
+		},
+		{
+			"taskId": 2,
+			"taskTitle": "Media Library Implementation",
+			"complexityScore": 7,
+			"recommendedSubtasks": 4,
+			"expansionPrompt": "Separate into font integration, texture implementation, sound system setup, and optimization phases",
+			"reasoning": "Involves asset management across multiple formats, integration with LibSharedMedia, and optimization constraints. Requires handling different media types while maintaining performance limits, but follows established implementation patterns."
+		},
+		{
+			"taskId": 3,
+			"taskTitle": "Settings Panel Development",
+			"complexityScore": 9,
+			"recommendedSubtasks": 6,
+			"expansionPrompt": "Decompose into UI layout, category implementation, real-time preview system, profile management, input controls (color pickers/sliders), and search/export functionality",
+			"reasoning": "High complexity due to multiple nested categories, real-time preview requirements, profile management system, and integration with various UI elements. Demands robust state management and error handling for configuration options."
+		},
+		{
+			"taskId": 4,
+			"taskTitle": "Core Action Bar Implementation",
+			"complexityScore": 8,
+			"recommendedSubtasks": 5,
+			"expansionPrompt": "Divide into main bar implementation, bottom bars, right bars, special purpose bars, and conflict resolution layer",
+			"reasoning": "Requires managing 96+ buttons across multiple bars while avoiding conflicts with default UI. Involves complex layout management and ensuring proper keybind functionality across all action bar types."
+		},
+		{
+			"taskId": 5,
+			"taskTitle": "Action Bar Positioning System",
+			"complexityScore": 8,
+			"recommendedSubtasks": 4,
+			"expansionPrompt": "Break into drag-and-drop system, coordinate controls, alignment tools, and layout persistence components",
+			"reasoning": "Combines complex UI interactions (drag-and-drop) with precise mathematical calculations for scaling, spacing, and grid alignment. Requires handling multiple input methods and maintaining layout consistency."
+		},
+		{
+			"taskId": 6,
+			"taskTitle": "Action Bar Visibility System",
+			"complexityScore": 7,
+			"recommendedSubtasks": 3,
+			"expansionPrompt": "Separate into state detection engine, visibility rules engine, and fading animation system",
+			"reasoning": "Requires managing multiple overlapping visibility conditions and implementing smooth transitions. Complexity comes from handling numerous game state combinations without performance impact."
+		},
+		{
+			"taskId": 7,
+			"taskTitle": "Action Button Customization",
+			"complexityScore": 7,
+			"recommendedSubtasks": 4,
+			"expansionPrompt": "Divide into display options, visual effects, color systems, and layout controls",
+			"reasoning": "Involves implementing multiple visual customization options that must work together seamlessly. Requires handling different visual states and ensuring compatibility across various button skins."
+		},
+		{
+			"taskId": 8,
+			"taskTitle": "Action Bar State Management",
+			"complexityScore": 8,
+			"recommendedSubtasks": 3,
+			"expansionPrompt": "Break into state detection system, page configuration engine, and override handling module",
+			"reasoning": "Demands complex state machine implementation with multiple conditional layers. Must handle class-specific requirements and maintain visual consistency across different game modes."
+		},
+		{
+			"taskId": 9,
+			"taskTitle": "Visual Bar Editor",
+			"complexityScore": 8,
+			"recommendedSubtasks": 4,
+			"expansionPrompt": "Decompose into edit mode system, layout manipulation tools, history management, and visual feedback components",
+			"reasoning": "Combines drag-and-drop complexity with real-time preview and state management. Requires implementing undo/redo functionality while maintaining performance for frequent updates."
+		},
+		{
+			"taskId": 10,
+			"taskTitle": "Action Bar Setup Wizard",
+			"complexityScore": 7,
+			"recommendedSubtasks": 3,
+			"expansionPrompt": "Separate into detection system, configuration engine, and preset application components",
+			"reasoning": "Requires intelligent configuration based on multiple factors (role, resolution, class). Needs to balance automation with user customization while maintaining clear UI flow."
+		},
+		{
+			"taskId": 11,
+			"taskTitle": "Per-Button Customization",
+			"complexityScore": 7,
+			"recommendedSubtasks": 3,
+			"expansionPrompt": "Break into customization engine, grouping system, and priority management components",
+			"reasoning": "Demands granular control implementation while maintaining overall bar functionality. Requires efficient data management for individual button states without performance degradation."
+		},
+		{
+			"taskId": 12,
+			"taskTitle": "Smart Action Bar Features",
+			"complexityScore": 8,
+			"recommendedSubtasks": 4,
+			"expansionPrompt": "Divide into automation engine, sorting system, visual indicators, and performance monitoring",
+			"reasoning": "Involves implementing intelligent behavior that requires monitoring game state changes and player actions. Must balance automation with user control while maintaining performance."
+		},
+		{
+			"taskId": 13,
+			"taskTitle": "Profile Management System",
+			"complexityScore": 7,
+			"recommendedSubtasks": 3,
+			"expansionPrompt": "Separate into profile storage, import/export system, and community integration components",
+			"reasoning": "Requires robust data serialization and management system with multiple access points. Complexity comes from handling different profile scopes and ensuring data integrity."
+		},
+		{
+			"taskId": 14,
+			"taskTitle": "Action Bar Optimization",
+			"complexityScore": 9,
+			"recommendedSubtasks": 4,
+			"expansionPrompt": "Break into loading optimization, update efficiency, memory management, and performance monitoring components",
+			"reasoning": "High complexity due to multiple optimization techniques (lazy loading, frame pooling) and strict performance targets. Requires deep understanding of WoW's performance characteristics."
+		},
+		{
+			"taskId": 15,
+			"taskTitle": "Unit Frame System Implementation",
+			"complexityScore": 9,
+			"recommendedSubtasks": 5,
+			"expansionPrompt": "Decompose into frame types, element system, filtering engine, performance optimization, and class-specific handling",
+			"reasoning": "Extremely complex due to multiple frame types with shared and unique requirements. Demands efficient resource management while implementing advanced features like smart buff filtering."
+		},
+		{
+			"taskId": 16,
+			"taskTitle": "Nameplate System Development",
+			"complexityScore": 8,
+			"recommendedSubtasks": 4,
+			"expansionPrompt": "Separate into nameplate framework, customization system, threat detection, and performance optimization",
+			"reasoning": "Requires handling dynamic in-combat elements with strict performance constraints. Implementation must balance customization with game engine limitations."
+		},
+		{
+			"taskId": 17,
+			"taskTitle": "Visual Information Display",
+			"complexityScore": 7,
+			"recommendedSubtasks": 3,
+			"expansionPrompt": "Break into buff/debuff system, resource tracking, and visual indicator components",
+			"reasoning": "Moderate complexity from implementing multiple visual indicators with different triggers. Requires efficient filtering and display logic without automation features."
+		},
+		{
+			"taskId": 18,
+			"taskTitle": "Theme System Development",
+			"complexityScore": 8,
+			"recommendedSubtasks": 4,
+			"expansionPrompt": "Divide into theme framework, component system, import/export, and live switching implementation",
+			"reasoning": "High complexity from managing multiple visual components that must work together. Requires implementing theme persistence and seamless switching without UI reload."
+		},
+		{
+			"taskId": 19,
+			"taskTitle": "Minimap Enhancement System",
+			"complexityScore": 7,
+			"recommendedSubtasks": 3,
+			"expansionPrompt": "Separate into shape system, tracking features, and position management components",
+			"reasoning": "Moderate complexity from implementing multiple visual and functional enhancements while maintaining compatibility with existing minimap elements."
+		},
+		{
+			"taskId": 20,
+			"taskTitle": "Bag System Implementation",
+			"complexityScore": 8,
+			"recommendedSubtasks": 4,
+			"expansionPrompt": "Break into bag framework, search system, categorization engine, and bank integration components",
+			"reasoning": "High complexity due to integrating multiple bag-related features into a unified interface while maintaining performance and implementing intelligent sorting systems."
+		}
+	]
+}
