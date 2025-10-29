@@ -1,0 +1,27 @@
+# WoW Addon specific ignores
+*.bak
+*.tmp
+*.log
+
+# IDE/Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS specific files
+.DS_Store
+Thumbs.db
+
+# Backup files
+*.backup
+*.old
+
+# Cache directories
+cache/
+Cache/
+
+# Local configuration files (if any)
+local_config.lua
+user_settings.lua

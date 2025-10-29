@@ -1,0 +1,24 @@
+## Interface: 110205
+## Title: DivinicalUI
+## Author: Divinical
+## Version: 1.0.0
+## Notes: Advanced unit frames and targeting system
+## SavedVariables: DivinicalDB
+## SavedVariablesPerCharacter: DivinicalCharDB
+## OptionalDeps: oUF
+
+# Libraries
+Libs\oUF\oUF.xml
+
+# Core
+Core.lua
+
+# Configuration
+Config\Config.lua
+Config\Settings.lua
+Config\Profiles.lua
+
+# Modules
+Modules\Utils.lua
+Modules\UnitFrames.lua
+Modules\Targeting.lua
