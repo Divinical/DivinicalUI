@@ -38,32 +38,32 @@ function Media:RegisterFonts()
         DivinicalUI.modules.Utils.Debug.Print("LibSharedMedia not available, skipping font registration", "WARN")
         return
     end
-    
+
     -- Register default font
     local defaultFont = "Interface\\AddOns\\DivinicalUI\\Media\\Fonts\\Font.ttf"
-    LSM:Register(LSM.MediaType.FONT, "DivinicalUI Default", defaultFont)
-    
+    LSM:Register("font", "DivinicalUI Default", defaultFont)
+
     -- Register Expressway font
     local expresswayFont = "Interface\\AddOns\\DivinicalUI\\Media\\Fonts\\Expressway.ttf"
-    LSM:Register(LSM.MediaType.FONT, "Expressway", expresswayFont)
+    LSM:Register("font", "Expressway", expresswayFont)
     Media.fonts.expressway = expresswayFont
 
     -- Register PT Sans font
     local ptSansFont = "Interface\\AddOns\\DivinicalUI\\Media\\Fonts\\PTSans.ttf"
-    LSM:Register(LSM.MediaType.FONT, "PT Sans", ptSansFont)
+    LSM:Register("font", "PT Sans", ptSansFont)
     Media.fonts.ptsans = ptSansFont
 
     -- Register pixel font for UI elements
     local pixelFont = "Interface\\AddOns\\DivinicalUI\\Media\\Fonts\\Pixel.ttf"
-    LSM:Register(LSM.MediaType.FONT, "DivinicalUI Pixel", pixelFont)
+    LSM:Register("font", "DivinicalUI Pixel", pixelFont)
     Media.fonts.pixel = pixelFont
-    
+
     -- Set default fonts
     Media.fonts.default = defaultFont
-    Media.fonts.normal = LSM:GetDefault(LSM.MediaType.FONT)
-    Media.fonts.bold = LSM:Fetch(LSM.MediaType.FONT, "Arial Bold") or defaultFont
-    Media.fonts.small = LSM:Fetch(LSM.MediaType.FONT, "Arial Narrow") or defaultFont
-    
+    Media.fonts.normal = LSM:GetDefault("font") or defaultFont
+    Media.fonts.bold = LSM:Fetch("font", "Arial Bold", true) or defaultFont
+    Media.fonts.small = LSM:Fetch("font", "Arial Narrow", true) or defaultFont
+
     DivinicalUI.modules.Utils.Debug.Print("Fonts registered with LibSharedMedia", "DEBUG")
 end
 
@@ -73,26 +73,26 @@ function Media:RegisterTextures()
         DivinicalUI.modules.Utils.Debug.Print("LibSharedMedia not available, skipping texture registration", "WARN")
         return
     end
-    
+
     -- Register status bar textures
     local aluminiumTexture = "Interface\\AddOns\\DivinicalUI\\Media\\Textures\\Aluminium"
-    LSM:Register(LSM.MediaType.STATUSBAR, "Aluminium", aluminiumTexture)
+    LSM:Register("statusbar", "Aluminium", aluminiumTexture)
     Media.textures.aluminium = aluminiumTexture
 
     local gradientTexture = "Interface\\AddOns\\DivinicalUI\\Media\\Textures\\Gradient"
-    LSM:Register(LSM.MediaType.STATUSBAR, "DivinicalUI Gradient", gradientTexture)
+    LSM:Register("statusbar", "DivinicalUI Gradient", gradientTexture)
     Media.textures.gradient = gradientTexture
 
     -- Register glow texture
     local glowTexture = "Interface\\AddOns\\DivinicalUI\\Media\\Textures\\Glow"
-    LSM:Register(LSM.MediaType.BACKGROUND, "DivinicalUI Glow", glowTexture)
+    LSM:Register("background", "DivinicalUI Glow", glowTexture)
     Media.textures.glow = glowTexture
-    
+
     -- Set default textures
     Media.textures.default = "Interface\\TargetingFrame\\UI-StatusBar"
-    Media.textures.normal = LSM:GetDefault(LSM.MediaType.STATUSBAR)
+    Media.textures.normal = LSM:GetDefault("statusbar") or Media.textures.default
     Media.textures.background = "Interface\\DialogFrame\\UI-DialogBox-Background"
-    
+
     DivinicalUI.modules.Utils.Debug.Print("Textures registered with LibSharedMedia", "DEBUG")
 end
 
@@ -102,21 +102,21 @@ function Media:RegisterSounds()
         DivinicalUI.modules.Utils.Debug.Print("LibSharedMedia not available, skipping sound registration", "WARN")
         return
     end
-    
+
     -- Register custom sounds
     local alertSound = "Interface\\AddOns\\DivinicalUI\\Media\\Sounds\\Alert.ogg"
-    LSM:Register(LSM.MediaType.SOUND, "DivinicalUI Alert", alertSound)
+    LSM:Register("sound", "DivinicalUI Alert", alertSound)
     Media.sounds.alert = alertSound
 
     local readySound = "Interface\\AddOns\\DivinicalUI\\Media\\Sounds\\Ready.ogg"
-    LSM:Register(LSM.MediaType.SOUND, "DivinicalUI Ready", readySound)
+    LSM:Register("sound", "DivinicalUI Ready", readySound)
     Media.sounds.ready = readySound
-    
+
     -- Set default sounds
-    Media.sounds.default = LSM:GetDefault(LSM.MediaType.SOUND)
+    Media.sounds.default = LSM:GetDefault("sound") or "Sound\\Interface\\RaidWarning.ogg"
     Media.sounds.raidwarning = "Interface\\AddOns\\DivinicalUI\\Media\\Sounds\\RaidWarning.ogg"
     Media.sounds.whisper = "Interface\\AddOns\\DivinicalUI\\Media\\Sounds\\Whisper.ogg"
-    
+
     DivinicalUI.modules.Utils.Debug.Print("Sounds registered with LibSharedMedia", "DEBUG")
 end
 
@@ -126,26 +126,26 @@ function Media:RegisterBorders()
         DivinicalUI.modules.Utils.Debug.Print("LibSharedMedia not available, skipping border registration", "WARN")
         return
     end
-    
+
     -- Register glow border
     local glowBorder = "Interface\\AddOns\\DivinicalUI\\Media\\Borders\\Glow"
-    LSM:Register(LSM.MediaType.BORDER, "DivinicalUI Glow", glowBorder)
+    LSM:Register("border", "DivinicalUI Glow", glowBorder)
     Media.borders.glow = glowBorder
 
     -- Register clean border
     local cleanBorder = "Interface\\AddOns\\DivinicalUI\\Media\\Borders\\Clean"
-    LSM:Register(LSM.MediaType.BORDER, "DivinicalUI Clean", cleanBorder)
+    LSM:Register("border", "DivinicalUI Clean", cleanBorder)
     Media.borders.clean = cleanBorder
 
     -- Register pixel border
     local pixelBorder = "Interface\\AddOns\\DivinicalUI\\Media\\Borders\\Pixel"
-    LSM:Register(LSM.MediaType.BORDER, "DivinicalUI Pixel", pixelBorder)
+    LSM:Register("border", "DivinicalUI Pixel", pixelBorder)
     Media.borders.pixel = pixelBorder
-    
+
     -- Set default borders
     Media.borders.default = "Interface\\Minimap\\MiniMap-TrackingBorder"
-    Media.borders.normal = LSM:GetDefault(LSM.MediaType.BORDER)
-    
+    Media.borders.normal = LSM:GetDefault("border") or Media.borders.default
+
     DivinicalUI.modules.Utils.Debug.Print("Borders registered with LibSharedMedia", "DEBUG")
 end
 
@@ -155,21 +155,21 @@ function Media:RegisterStatusBars()
         DivinicalUI.modules.Utils.Debug.Print("LibSharedMedia not available, skipping statusbar registration", "WARN")
         return
     end
-    
+
     -- Register aluminium status bar
     local aluminiumBar = "Interface\\AddOns\\DivinicalUI\\Media\\Textures\\Aluminium"
-    LSM:Register(LSM.MediaType.STATUSBAR, "DivinicalUI Aluminium", aluminiumBar)
+    LSM:Register("statusbar", "DivinicalUI Aluminium", aluminiumBar)
     Media.statusbars.aluminium = aluminiumBar
 
     -- Register gradient status bar
     local gradientBar = "Interface\\AddOns\\DivinicalUI\\Media\\Textures\\Gradient"
-    LSM:Register(LSM.MediaType.STATUSBAR, "DivinicalUI Gradient", gradientBar)
+    LSM:Register("statusbar", "DivinicalUI Gradient", gradientBar)
     Media.statusbars.gradient = gradientBar
-    
+
     -- Set default status bars
     Media.statusbars.default = "Interface\\TargetingFrame\\UI-StatusBar"
-    Media.statusbars.normal = LSM:GetDefault(LSM.MediaType.STATUSBAR)
-    
+    Media.statusbars.normal = LSM:GetDefault("statusbar") or Media.statusbars.default
+
     DivinicalUI.modules.Utils.Debug.Print("Status bars registered with LibSharedMedia", "DEBUG")
 end
 
@@ -180,8 +180,8 @@ function Media:GetFont(fontName, size, flags)
     if not fontName then
         fontName = Media.fonts.normal
     end
-    
-    local font = LSM and LSM:Fetch(LSM.MediaType.FONT, fontName) or Media.fonts.default
+
+    local font = LSM and LSM:Fetch("font", fontName, true) or Media.fonts.default
     return font, size or 12, flags or "OUTLINE"
 end
 
@@ -190,8 +190,8 @@ function Media:GetTexture(textureName)
     if not textureName then
         textureName = Media.textures.normal
     end
-    
-    return LSM and LSM:Fetch(LSM.MediaType.STATUSBAR, textureName) or Media.textures.default
+
+    return LSM and LSM:Fetch("statusbar", textureName, true) or Media.textures.default
 end
 
 -- Get sound with fallback
@@ -199,8 +199,8 @@ function Media:GetSound(soundName)
     if not soundName then
         soundName = Media.sounds.default
     end
-    
-    return LSM and LSM:Fetch(LSM.MediaType.SOUND, soundName) or Media.sounds.default
+
+    return LSM and LSM:Fetch("sound", soundName, true) or Media.sounds.default
 end
 
 -- Get border with fallback
@@ -208,8 +208,8 @@ function Media:GetBorder(borderName)
     if not borderName then
         borderName = Media.borders.normal
     end
-    
-    return LSM and LSM:Fetch(LSM.MediaType.BORDER, borderName) or Media.borders.default
+
+    return LSM and LSM:Fetch("border", borderName, true) or Media.borders.default
 end
 
 -- Play sound with error handling
