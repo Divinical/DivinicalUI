@@ -222,12 +222,10 @@ function UnitFrames:CreateStyle()
         self.Buffs.initialAnchor = "TOPLEFT"
         self.Buffs["growth-x"] = "RIGHT"
         self.Buffs["growth-y"] = "DOWN"
-        
-        -- Apply same filtering to buffs
-        self.Buffs.CustomFilter = self.Auras.CustomFilter
-        self.Buffs.PostCreateIcon = self.Auras.PostCreateIcon
-        self.Buffs.PostUpdateIcon = self.Auras.PostUpdateIcon
-        
+
+        -- Note: Buffs use default oUF behavior (show all player buffs)
+        -- Custom filtering can be added later if needed
+
         -- Aura system - Debuffs (separate for better visibility)
         self.Debuffs = CreateFrame("Frame", nil, self)
         self.Debuffs:SetPoint("TOPLEFT", self.Buffs, "BOTTOMLEFT", 0, -5)
@@ -325,8 +323,17 @@ function UnitFrames:CreateStyle()
             
             return importantDebuffs[spellId] or false
         end
-        
-        self.Debuffs.PostCreateIcon = self.Auras.PostCreateIcon
+
+        -- Create overlay for debuff highlighting
+        self.Debuffs.PostCreateIcon = function(Debuffs, icon)
+            -- Create overlay for border coloring
+            icon.overlay = icon:CreateTexture(nil, "OVERLAY")
+            icon.overlay:SetTexture("Interface\\Buttons\\WHITE8X8")
+            icon.overlay:SetPoint("TOPLEFT", icon, "TOPLEFT", -1, 1)
+            icon.overlay:SetPoint("BOTTOMRIGHT", icon, "BOTTOMRIGHT", 1, -1)
+            icon.overlay:SetVertexColor(0, 0, 0, 0.8)
+        end
+
         self.Debuffs.PostUpdateIcon = function(Auras, unit, icon, index, offset)
             local name, _, _, _, dtype, duration, expirationTime, caster, _, _, spellId = UnitAura(unit, index, icon.filter)
             
