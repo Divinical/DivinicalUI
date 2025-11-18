@@ -5,9 +5,11 @@
 ## Notes: Advanced unit frames and targeting system
 ## SavedVariables: DivinicalDB
 ## SavedVariablesPerCharacter: DivinicalCharDB
-## OptionalDeps: oUF
+## OptionalDeps: oUF, LibSharedMedia-3.0
+## X-oUF: DivinicalUI
 
 # Libraries
+Libs\LibSharedMedia-3.0\lib.xml
 Libs\oUF\oUF.xml
 
 # Core
@@ -20,5 +22,6 @@ Config\Profiles.lua
 
 # Modules
 Modules\Utils.lua
+Modules\Media.lua
 Modules\UnitFrames.lua
 Modules\Targeting.lua
