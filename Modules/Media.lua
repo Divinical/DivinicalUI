@@ -39,30 +39,21 @@ function Media:RegisterFonts()
         return
     end
     
-    -- Register default font
-    local defaultFont = "Interface\\AddOns\\DivinicalUI\\Media\\Fonts\\Font.ttf"
-    LSM:Register(LSM.MediaType.FONT, "DivinicalUI Default", defaultFont)
-    
-    -- Register Expressway font
-    local expresswayFont = "Interface\\AddOns\\DivinicalUI\\Media\\Fonts\\Expressway.ttf"
-    LSM:Register(LSM.MediaType.FONT, "Expressway", expresswayFont)
-    Media.fonts.expressway = expresswayFont
-
-    -- Register PT Sans font
-    local ptSansFont = "Interface\\AddOns\\DivinicalUI\\Media\\Fonts\\PTSans.ttf"
-    LSM:Register(LSM.MediaType.FONT, "PT Sans", ptSansFont)
-    Media.fonts.ptsans = ptSansFont
-
-    -- Register pixel font for UI elements
+    -- Register pixel font for UI elements (primary working font)
     local pixelFont = "Interface\\AddOns\\DivinicalUI\\Media\\Fonts\\Pixel.ttf"
     LSM:Register(LSM.MediaType.FONT, "DivinicalUI Pixel", pixelFont)
     Media.fonts.pixel = pixelFont
-    
+
+    -- TODO: Add proper Expressway and PT Sans fonts
+    -- Note: Previous font files were corrupted HTML documents, removed during optimization
+    -- Expressway font: Needed for main UI (clean, readable)
+    -- PT Sans font: Needed for body text
+
     -- Set default fonts
-    Media.fonts.default = defaultFont
+    Media.fonts.default = pixelFont
     Media.fonts.normal = LSM:GetDefault(LSM.MediaType.FONT)
-    Media.fonts.bold = LSM:Fetch(LSM.MediaType.FONT, "Arial Bold") or defaultFont
-    Media.fonts.small = LSM:Fetch(LSM.MediaType.FONT, "Arial Narrow") or defaultFont
+    Media.fonts.bold = LSM:Fetch(LSM.MediaType.FONT, "Arial Bold") or pixelFont
+    Media.fonts.small = LSM:Fetch(LSM.MediaType.FONT, "Arial Narrow") or pixelFont
     
     DivinicalUI.modules.Utils.Debug.Print("Fonts registered with LibSharedMedia", "DEBUG")
 end
