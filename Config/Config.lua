@@ -8,6 +8,11 @@ local Config = {}
 Config.categories = {}
 Config.panels = {}
 
+-- Preview system state
+Config.previewMode = true  -- Enable real-time preview by default
+Config.pendingUpdates = {}  -- Queue for debounced updates
+Config.updateTimers = {}  -- Timers for debounced updates
+
 -- Initialize config module
 function Config:Initialize()
     self:RegisterSettingsPanel()
@@ -16,6 +21,45 @@ end
 -- Post-initialization
 function Config:PostInitialize()
     -- Called after all modules are loaded
+end
+
+-- Debounced update function for real-time preview
+function Config:SchedulePreviewUpdate(updateKey, updateFunc, delay)
+    delay = delay or 0.15  -- Default 150ms debounce
+
+    -- Cancel existing timer if present
+    if self.updateTimers[updateKey] then
+        self.updateTimers[updateKey]:Cancel()
+    end
+
+    -- Store the update function
+    self.pendingUpdates[updateKey] = updateFunc
+
+    -- Create new timer
+    self.updateTimers[updateKey] = C_Timer.NewTimer(delay, function()
+        if self.pendingUpdates[updateKey] and self.previewMode then
+            self.pendingUpdates[updateKey]()
+            self.pendingUpdates[updateKey] = nil
+        end
+        self.updateTimers[updateKey] = nil
+    end)
+end
+
+-- Apply update immediately (for checkboxes and buttons)
+function Config:ApplyImmediateUpdate(updateFunc)
+    if self.previewMode and updateFunc then
+        updateFunc()
+    end
+end
+
+-- Toggle preview mode
+function Config:TogglePreviewMode(enabled)
+    self.previewMode = enabled
+    if enabled then
+        print("|cff33ff99DivinicalUI|r: Real-time preview enabled")
+    else
+        print("|cff33ff99DivinicalUI|r: Real-time preview disabled. Changes will apply on UI reload.")
+    end
 end
 
 -- Create a canvas frame for a settings category
@@ -497,11 +541,39 @@ function Config:PopulateProfilesSettings(canvas)
     placeholder:SetTextColor(0.6, 0.6, 0.6)
 end
 
--- Populate Advanced settings (placeholder)
+-- Populate Advanced settings
 function Config:PopulateAdvancedSettings(canvas)
+    -- Preview mode header
+    local previewHeader = self:CreateHeader("Real-time Preview")
+    self:AddControl(canvas, previewHeader, 24)
+
+    -- Enable real-time preview checkbox
+    local enablePreview = self:CreateCheckbox(
+        "Enable Real-time Preview",
+        function() return Config.previewMode end,
+        function(value)
+            Config:TogglePreviewMode(value)
+        end,
+        "When enabled, UI changes apply immediately without reload"
+    )
+    self:AddControl(canvas, enablePreview, 32)
+
+    -- Preview info text
+    local previewInfo = canvas:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+    previewInfo:SetPoint("TOPLEFT", canvas.content, "TOPLEFT", 32, -(canvas.lastY))
+    previewInfo:SetWidth(560)
+    previewInfo:SetJustifyH("LEFT")
+    previewInfo:SetText("Real-time preview updates unit frames instantly as you adjust sliders.\nDisabling this may improve performance on slower systems.")
+    previewInfo:SetTextColor(0.8, 0.8, 0.8)
+    self:AddControl(canvas, CreateFrame("Frame"), 36)
+
+    -- Spacer
+    self:AddControl(canvas, CreateFrame("Frame"), 16)
+
+    -- Placeholder for additional settings
     local placeholder = canvas:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-    placeholder:SetPoint("TOPLEFT", canvas.content, "TOPLEFT", 8, -8)
-    placeholder:SetText("Advanced settings coming soon...")
+    placeholder:SetPoint("TOPLEFT", canvas.content, "TOPLEFT", 8, -(canvas.lastY))
+    placeholder:SetText("Additional advanced settings coming soon...")
     placeholder:SetTextColor(0.6, 0.6, 0.6)
 end
 
@@ -534,7 +606,7 @@ function Config:CreateCheckbox(name, getFunc, setFunc, tooltip)
     return checkbox
 end
 
--- Helper function to create a slider control
+-- Helper function to create a slider control with debounced real-time preview
 function Config:CreateSlider(name, min, max, step, getFunc, setFunc, tooltip)
     local slider = CreateFrame("Slider", nil, nil, "OptionsSliderTemplate")
     slider:SetWidth(560)
@@ -543,16 +615,34 @@ function Config:CreateSlider(name, min, max, step, getFunc, setFunc, tooltip)
     slider:SetValueStep(step)
     slider:SetObeyStepOnDrag(true)
 
+    -- Generate unique update key for debouncing
+    local updateKey = "slider_" .. tostring(slider):gsub("table: ", "")
+
     -- Set up labels
     _G[slider:GetName() .. "Low"]:SetText(min)
     _G[slider:GetName() .. "High"]:SetText(max)
     _G[slider:GetName() .. "Text"]:SetText(name)
 
-    -- Value changed handler
-    slider:SetScript("OnValueChanged", function(self, value)
+    -- Value changed handler with debounced preview
+    slider:SetScript("OnValueChanged", function(self, value, userInput)
         value = math.floor(value / step + 0.5) * step
-        setFunc(value)
         _G[self:GetName() .. "Text"]:SetText(name .. ": " .. value)
+
+        -- Only apply debounced update if user is dragging
+        if userInput then
+            Config:SchedulePreviewUpdate(updateKey, function()
+                setFunc(value)
+            end, 0.15)
+        end
+    end)
+
+    -- Apply immediately on mouse up (when user releases slider)
+    slider:SetScript("OnMouseUp", function(self)
+        local value = self:GetValue()
+        value = math.floor(value / step + 0.5) * step
+        setFunc(value)  -- Apply immediately when released
+        Config.updateTimers[updateKey] = nil  -- Cancel any pending debounced update
+        Config.pendingUpdates[updateKey] = nil
     end)
 
     -- Initialize value
