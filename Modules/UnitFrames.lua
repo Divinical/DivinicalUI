@@ -225,11 +225,32 @@ function UnitFrames:CreateStyle()
         self.Buffs.initialAnchor = "TOPLEFT"
         self.Buffs["growth-x"] = "RIGHT"
         self.Buffs["growth-y"] = "DOWN"
-        
-        -- Apply same filtering to buffs
-        self.Buffs.CustomFilter = self.Auras.CustomFilter
-        self.Buffs.PostCreateIcon = self.Auras.PostCreateIcon
-        self.Buffs.PostUpdateIcon = self.Auras.PostUpdateIcon
+
+        -- Buff filtering - show player buffs and important buffs
+        self.Buffs.CustomFilter = function(icons, unit, icon, name, rank, texture, count, dtype, duration, expirationTime, caster, isStealable, nameplateShowPersonal, spellId, canApplyAura, isBossDebuff, casterIsPlayer, nameplateShowAll)
+            -- Show player cast buffs
+            if caster == "player" or caster == "vehicle" or caster == "pet" then
+                return true
+            end
+            return false
+        end
+
+        -- Create icon styling for buffs
+        self.Buffs.PostCreateIcon = function(Auras, icon)
+            -- Add overlay for highlighting
+            icon.overlay = icon:CreateTexture(nil, "OVERLAY")
+            icon.overlay:SetAllPoints()
+            icon.overlay:SetTexture("Interface\\Buttons\\WHITE8X8")
+            icon.overlay:SetBlendMode("ADD")
+            icon.overlay:Hide()
+        end
+
+        self.Buffs.PostUpdateIcon = function(Auras, unit, icon, index, offset)
+            -- Basic buff icon updates - can be enhanced later
+            if icon.overlay then
+                icon.overlay:Hide()
+            end
+        end
         
         -- Aura system - Debuffs (separate for better visibility)
         self.Debuffs = CreateFrame("Frame", nil, self)
@@ -328,8 +349,17 @@ function UnitFrames:CreateStyle()
             
             return importantDebuffs[spellId] or false
         end
-        
-        self.Debuffs.PostCreateIcon = self.Auras.PostCreateIcon
+
+        -- Create icon styling for debuffs
+        self.Debuffs.PostCreateIcon = function(Auras, icon)
+            -- Add overlay for highlighting
+            icon.overlay = icon:CreateTexture(nil, "OVERLAY")
+            icon.overlay:SetAllPoints()
+            icon.overlay:SetTexture("Interface\\Buttons\\WHITE8X8")
+            icon.overlay:SetBlendMode("ADD")
+            icon.overlay:Hide()
+        end
+
         self.Debuffs.PostUpdateIcon = function(Auras, unit, icon, index, offset)
             local name, _, _, _, dtype, duration, expirationTime, caster, _, _, spellId = UnitAura(unit, index, icon.filter)
             
