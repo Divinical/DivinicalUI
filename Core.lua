@@ -79,7 +79,9 @@ end
 -- Module registration
 function DivinicalUI:RegisterModule(name, module)
     self.modules[name] = module
-    -- Module initialization happens in DivinicalUI:Initialize() after database is ready
+    -- Expose module at top level for easy access (e.g., DivinicalUI.Utils)
+    self[name] = module
+    -- Don't initialize immediately - will be done in Initialize() in the correct order
 end
 
 -- Initialization
