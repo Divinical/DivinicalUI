@@ -931,15 +931,66 @@ function Config:ShowExportDialog()
         self.exportFrame = frame
     end
 
-    -- Generate export string
-    local exportString = "DivinicalUI_Export_v1\n"
-    exportString = exportString .. "Profile: " .. (DivinicalUI.db:GetCurrentProfile() or "Default") .. "\n"
-    exportString = exportString .. "Data: [Profile data will be serialized here]\n"
-    exportString = exportString .. "-- Export functionality coming soon in full implementation"
+    -- Generate export string with profile data
+    local profile = DivinicalUI.db.profile
+    local profileName = DivinicalUI.db:GetCurrentProfile() or "Default"
+
+    -- Serialize profile data to string
+    local serialized = self:SerializeTable(profile, 0)
+
+    -- Create export string with header and data
+    local exportString = string.format([[DivinicalUI Profile Export v1.0
+Profile Name: %s
+Created: %s
+Version: %s
+
+-- Paste this entire block into the Import dialog --
+
+return %s]], profileName, date("%Y-%m-%d %H:%M"), DivinicalUI.version, serialized)
 
     self.exportFrame.editBox:SetText(exportString)
     self.exportFrame.editBox:HighlightText()
     self.exportFrame:Show()
+end
+
+-- Serialize a table to a Lua string
+function Config:SerializeTable(tbl, indent)
+    if type(tbl) ~= "table" then
+        if type(tbl) == "string" then
+            return string.format("%q", tbl)
+        else
+            return tostring(tbl)
+        end
+    end
+
+    local result = "{\n"
+    indent = indent or 0
+    local indentStr = string.rep("  ", indent + 1)
+
+    for k, v in pairs(tbl) do
+        result = result .. indentStr
+
+        -- Handle key
+        if type(k) == "number" then
+            result = result .. "[" .. k .. "] = "
+        elseif type(k) == "string" then
+            result = result .. "[" .. string.format("%q", k) .. "] = "
+        end
+
+        -- Handle value
+        if type(v) == "table" then
+            result = result .. self:SerializeTable(v, indent + 1)
+        elseif type(v) == "string" then
+            result = result .. string.format("%q", v)
+        else
+            result = result .. tostring(v)
+        end
+
+        result = result .. ",\n"
+    end
+
+    result = result .. string.rep("  ", indent) .. "}"
+    return result
 end
 
 -- Show import dialog
@@ -984,11 +1035,35 @@ function Config:ShowImportDialog()
         importBtn:SetScript("OnClick", function()
             local importString = frame.editBox:GetText()
             if importString and importString ~= "" then
-                -- TODO: Implement import parsing and validation
-                print("|cff33ff99DivinicalUI|r: Import functionality coming soon!")
-                frame:Hide()
+                -- Parse and validate import string
+                local success, profileData = Config:DeserializeProfile(importString)
+
+                if success and profileData then
+                    -- Confirm import
+                    StaticPopupDialogs["DIVINICALUI_CONFIRM_IMPORT"] = {
+                        text = "Import profile settings?\n\nThis will overwrite your current profile!",
+                        button1 = "Import",
+                        button2 = "Cancel",
+                        OnAccept = function()
+                            -- Apply imported settings
+                            for k, v in pairs(profileData) do
+                                DivinicalUI.db.profile[k] = v
+                            end
+                            print("|cff33ff99DivinicalUI|r: Profile imported successfully!")
+                            ReloadUI()
+                        end,
+                        timeout = 0,
+                        whileDead = true,
+                        hideOnEscape = true,
+                        preferredIndex = 3,
+                    }
+                    StaticPopup_Show("DIVINICALUI_CONFIRM_IMPORT")
+                    frame:Hide()
+                else
+                    print("|cffff0000DivinicalUI|r: Invalid import string. Please check and try again.")
+                end
             else
-                print("|cff33ff99DivinicalUI|r: Please paste an export string.")
+                print("|cffff0000DivinicalUI|r: Please paste an export string.")
             end
         end)
 
@@ -1005,6 +1080,37 @@ function Config:ShowImportDialog()
     self.importFrame.editBox:SetText("")
     self.importFrame:Show()
     self.importFrame.editBox:SetFocus()
+end
+
+-- Deserialize imported profile string
+function Config:DeserializeProfile(importString)
+    -- Extract the Lua code from the import string
+    local codeStart = importString:find("return %{")
+    if not codeStart then
+        return false, nil
+    end
+
+    local code = importString:sub(codeStart)
+
+    -- Create a safe environment for loading the profile data
+    local env = {}
+    local func, err = loadstring(code)
+
+    if not func then
+        print("|cffff0000DivinicalUI|r: Parse error: " .. tostring(err))
+        return false, nil
+    end
+
+    -- Set environment and execute
+    setfenv(func, env)
+    local success, profileData = pcall(func)
+
+    if not success or type(profileData) ~= "table" then
+        print("|cffff0000DivinicalUI|r: Invalid profile data")
+        return false, nil
+    end
+
+    return true, profileData
 end
 
 -- Open configuration panel
