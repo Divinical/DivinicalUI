@@ -207,7 +207,9 @@ end
 function Media:PlaySound(soundName)
     local sound = self:GetSound(soundName)
     if sound then
-        PlaySound(sound, "Master")
+        -- Use PlaySoundFile for custom sound files (.ogg, .mp3, etc.)
+        -- PlaySound() only accepts soundKitIDs (numeric) in modern WoW
+        PlaySoundFile(sound, "Master")
     else
         DivinicalUI.modules.Utils.Debug.Print("Sound not found: " .. tostring(soundName), "WARN")
     end
