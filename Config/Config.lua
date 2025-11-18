@@ -4,8 +4,9 @@ local AddonName, DivinicalUI = ...
 -- Config module
 local Config = {}
 
--- Settings panel reference
-local settingsPanel
+-- Settings categories storage
+Config.categories = {}
+Config.panels = {}
 
 -- Initialize config module
 function Config:Initialize()
@@ -17,127 +18,411 @@ function Config:PostInitialize()
     -- Called after all modules are loaded
 end
 
+-- Create a canvas frame for a settings category
+function Config:CreateCategoryCanvas(name)
+    local canvas = CreateFrame("Frame")
+    canvas:SetSize(630, 560)
+    canvas.name = name
+
+    -- Add a title
+    local title = canvas:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
+    title:SetPoint("TOPLEFT", 16, -16)
+    title:SetText(name)
+    canvas.title = title
+
+    -- Add a description
+    local desc = canvas:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+    desc:SetPoint("TOPLEFT", title, "BOTTOMLEFT", 0, -8)
+    desc:SetWidth(600)
+    desc:SetJustifyH("LEFT")
+    desc:SetText("Configure " .. name .. " settings below.")
+    canvas.desc = desc
+
+    -- Create a scroll frame for content
+    local scrollFrame = CreateFrame("ScrollFrame", nil, canvas, "UIPanelScrollFrameTemplate")
+    scrollFrame:SetPoint("TOPLEFT", desc, "BOTTOMLEFT", 0, -16)
+    scrollFrame:SetPoint("BOTTOMRIGHT", canvas, "BOTTOMRIGHT", -30, 16)
+    canvas.scrollFrame = scrollFrame
+
+    -- Create content frame inside scroll
+    local content = CreateFrame("Frame")
+    content:SetSize(590, 1)
+    scrollFrame:SetScrollChild(content)
+    canvas.content = content
+
+    -- Track last element position for auto-layout
+    canvas.lastY = 0
+
+    return canvas
+end
+
+-- Add a control to a canvas
+function Config:AddControl(canvas, control, height)
+    height = height or 32
+    control:SetParent(canvas.content)
+    control:SetPoint("TOPLEFT", canvas.content, "TOPLEFT", 4, -canvas.lastY)
+    canvas.lastY = canvas.lastY + height
+
+    -- Update content height
+    canvas.content:SetHeight(math.max(canvas.lastY + 20, 500))
+end
+
 -- Register settings panel with Blizzard's Settings API
 function Config:RegisterSettingsPanel()
-    local category = Settings.RegisterCanvasLayoutCategory(DivinicalUI, "DivinicalUI", "DivinicalUI")
-    category.ID = "DivinicalUI"
-    Settings.RegisterAddOnCategory(category)
+    -- Create General category canvas
+    local generalCanvas = self:CreateCategoryCanvas("General")
+    generalCanvas.desc:SetText("General addon settings and basic configuration.")
+    self:PopulateGeneralSettings(generalCanvas)
+
+    -- Register General category
+    local generalCategory = Settings.RegisterCanvasLayoutCategory(generalCanvas, "DivinicalUI")
+    generalCategory.ID = "DivinicalUI_General"
+    Settings.RegisterAddOnCategory(generalCategory)
+    self.categories.general = generalCategory
+    self.panels.general = generalCanvas
+
+    -- Create Unit Frames category canvas
+    local unitFramesCanvas = self:CreateCategoryCanvas("Unit Frames")
+    unitFramesCanvas.desc:SetText("Configure unit frame appearance, positioning, and elements.")
+    self:PopulateUnitFramesSettings(unitFramesCanvas)
+
+    -- Register Unit Frames as subcategory
+    local unitFramesCategory = Settings.RegisterCanvasLayoutCategory(unitFramesCanvas, "Unit Frames", "DivinicalUI")
+    unitFramesCategory.ID = "DivinicalUI_UnitFrames"
+    Settings.RegisterAddOnCategory(unitFramesCategory)
+    self.categories.unitframes = unitFramesCategory
+    self.panels.unitframes = unitFramesCanvas
+
+    -- Create Raid Frames category canvas
+    local raidCanvas = self:CreateCategoryCanvas("Raid Frames")
+    raidCanvas.desc:SetText("Configure raid frame layout, sorting, and indicators.")
+    self:PopulateRaidSettings(raidCanvas)
+
+    local raidCategory = Settings.RegisterCanvasLayoutCategory(raidCanvas, "Raid Frames", "DivinicalUI")
+    raidCategory.ID = "DivinicalUI_Raid"
+    Settings.RegisterAddOnCategory(raidCategory)
+    self.categories.raid = raidCategory
+    self.panels.raid = raidCanvas
+
+    -- Create Action Bars category canvas
+    local actionBarsCanvas = self:CreateCategoryCanvas("Action Bars")
+    actionBarsCanvas.desc:SetText("Configure action bar positioning, visibility, and appearance.")
+    self:PopulateActionBarsSettings(actionBarsCanvas)
+
+    local actionBarsCategory = Settings.RegisterCanvasLayoutCategory(actionBarsCanvas, "Action Bars", "DivinicalUI")
+    actionBarsCategory.ID = "DivinicalUI_ActionBars"
+    Settings.RegisterAddOnCategory(actionBarsCategory)
+    self.categories.actionbars = actionBarsCategory
+    self.panels.actionbars = actionBarsCanvas
+
+    -- Create Themes category canvas
+    local themesCanvas = self:CreateCategoryCanvas("Themes")
+    themesCanvas.desc:SetText("Select and customize visual themes for the UI.")
+    self:PopulateThemesSettings(themesCanvas)
+
+    local themesCategory = Settings.RegisterCanvasLayoutCategory(themesCanvas, "Themes", "DivinicalUI")
+    themesCategory.ID = "DivinicalUI_Themes"
+    Settings.RegisterAddOnCategory(themesCategory)
+    self.categories.themes = themesCategory
+    self.panels.themes = themesCanvas
+
+    -- Create Profiles category canvas
+    local profilesCanvas = self:CreateCategoryCanvas("Profiles")
+    profilesCanvas.desc:SetText("Manage profiles, import/export settings, and apply presets.")
+    self:PopulateProfilesSettings(profilesCanvas)
+
+    local profilesCategory = Settings.RegisterCanvasLayoutCategory(profilesCanvas, "Profiles", "DivinicalUI")
+    profilesCategory.ID = "DivinicalUI_Profiles"
+    Settings.RegisterAddOnCategory(profilesCategory)
+    self.categories.profiles = profilesCategory
+    self.panels.profiles = profilesCanvas
+
+    -- Create Advanced category canvas
+    local advancedCanvas = self:CreateCategoryCanvas("Advanced")
+    advancedCanvas.desc:SetText("Advanced options, performance settings, and developer tools.")
+    self:PopulateAdvancedSettings(advancedCanvas)
+
+    local advancedCategory = Settings.RegisterCanvasLayoutCategory(advancedCanvas, "Advanced", "DivinicalUI")
+    advancedCategory.ID = "DivinicalUI_Advanced"
+    Settings.RegisterAddOnCategory(advancedCategory)
+    self.categories.advanced = advancedCategory
+    self.panels.advanced = advancedCanvas
 end
 
--- Open configuration panel
-function Config:OpenConfig()
-    Settings.OpenToCategory("DivinicalUI")
+-- Populate General settings
+function Config:PopulateGeneralSettings(canvas)
+    -- Enable addon checkbox
+    local enableAddon = self:CreateCheckbox(
+        "Enable DivinicalUI",
+        function() return DivinicalUI.db.profile.enabled end,
+        function(value)
+            DivinicalUI.db.profile.enabled = value
+            if value then
+                print("|cff33ff99DivinicalUI|r: Addon enabled. Reload UI for changes to take effect.")
+            else
+                print("|cff33ff99DivinicalUI|r: Addon disabled. Reload UI for changes to take effect.")
+            end
+        end,
+        "Enable or disable the entire addon"
+    )
+    self:AddControl(canvas, enableAddon, 32)
+
+    -- Debug mode checkbox
+    local debugMode = self:CreateCheckbox(
+        "Enable Debug Mode",
+        function() return DivinicalUI.db.profile.debug end,
+        function(value)
+            DivinicalUI.db.profile.debug = value
+            print("|cff33ff99DivinicalUI|r: Debug mode " .. (value and "enabled" or "disabled"))
+        end,
+        "Show detailed debug messages in chat"
+    )
+    self:AddControl(canvas, debugMode, 32)
+
+    -- Spacer
+    self:AddControl(canvas, CreateFrame("Frame"), 16)
+
+    -- Header for actions
+    local actionsHeader = self:CreateHeader("Actions")
+    self:AddControl(canvas, actionsHeader, 24)
+
+    -- Reload UI button
+    local reloadButton = self:CreateButton("Reload UI", function()
+        ReloadUI()
+    end, 120, 25)
+    self:AddControl(canvas, reloadButton, 32)
+
+    -- Reset to defaults button
+    local resetButton = self:CreateButton("Reset to Defaults", function()
+        StaticPopupDialogs["DIVINICALUI_RESET"] = {
+            text = "Reset all DivinicalUI settings to defaults?\n\n|cffff0000This cannot be undone!|r",
+            button1 = "Reset",
+            button2 = "Cancel",
+            OnAccept = function()
+                DivinicalUI.db.profile = CopyTable(DivinicalUI.defaults.profile)
+                print("|cff33ff99DivinicalUI|r: Settings reset to defaults.")
+                ReloadUI()
+            end,
+            timeout = 0,
+            whileDead = true,
+            hideOnEscape = true,
+            preferredIndex = 3,
+        }
+        StaticPopup_Show("DIVINICALUI_RESET")
+    end, 150, 25)
+    self:AddControl(canvas, resetButton, 32)
 end
 
--- Create basic settings options
-function Config:CreateOptions()
-    local options = {}
-    
-    -- General section
-    table.insert(options, {
-        type = "Header",
-        name = "General Settings"
-    })
-    
-    table.insert(options, {
-        type = "Checkbox",
-        name = "Enable Unit Frames",
-        tooltip = "Enable or disable all unit frames",
-        get = function() return DivinicalUI.db.profile.unitframes.player.enabled end,
-        set = function(value) 
-            DivinicalUI.db.profile.unitframes.player.enabled = value
-            DivinicalUI.db.profile.unitframes.target.enabled = value
-        end
-    })
-    
-    -- Player frame section
-    table.insert(options, {
-        type = "Header",
-        name = "Player Frame"
-    })
-    
-    table.insert(options, {
-        type = "Slider",
-        name = "Width",
-        min = 100,
-        max = 400,
-        step = 10,
-        get = function() return DivinicalUI.db.profile.unitframes.player.width end,
-        set = function(value) 
+-- Populate Unit Frames settings
+function Config:PopulateUnitFramesSettings(canvas)
+    -- Enable unit frames
+    local enableFrames = self:CreateCheckbox(
+        "Enable Unit Frames",
+        function() return DivinicalUI.db.profile.unitframes.enabled end,
+        function(value)
+            DivinicalUI.db.profile.unitframes.enabled = value
+            if DivinicalUI.modules.UnitFrames then
+                DivinicalUI.modules.UnitFrames:UpdateAllFrames()
+            end
+        end,
+        "Enable or disable all unit frames"
+    )
+    self:AddControl(canvas, enableFrames, 32)
+
+    -- Spacer
+    self:AddControl(canvas, CreateFrame("Frame"), 16)
+
+    -- Player frame header
+    local playerHeader = self:CreateHeader("Player Frame")
+    self:AddControl(canvas, playerHeader, 24)
+
+    -- Player frame width
+    local playerWidth = self:CreateSlider(
+        "Width",
+        100, 400, 10,
+        function() return DivinicalUI.db.profile.unitframes.player.width end,
+        function(value)
             DivinicalUI.db.profile.unitframes.player.width = value
             if DivinicalUI.modules.UnitFrames then
                 DivinicalUI.modules.UnitFrames:UpdatePlayerFrame()
             end
-        end
-    })
-    
-    table.insert(options, {
-        type = "Slider",
-        name = "Height",
-        min = 20,
-        max = 100,
-        step = 5,
-        get = function() return DivinicalUI.db.profile.unitframes.player.height end,
-        set = function(value) 
+        end,
+        "Player frame width"
+    )
+    self:AddControl(canvas, playerWidth, 48)
+
+    -- Player frame height
+    local playerHeight = self:CreateSlider(
+        "Height",
+        20, 100, 5,
+        function() return DivinicalUI.db.profile.unitframes.player.height end,
+        function(value)
             DivinicalUI.db.profile.unitframes.player.height = value
             if DivinicalUI.modules.UnitFrames then
                 DivinicalUI.modules.UnitFrames:UpdatePlayerFrame()
             end
-        end
-    })
-    
-    -- Target frame section
-    table.insert(options, {
-        type = "Header",
-        name = "Target Frame"
-    })
-    
-    table.insert(options, {
-        type = "Slider",
-        name = "Width",
-        min = 100,
-        max = 400,
-        step = 10,
-        get = function() return DivinicalUI.db.profile.unitframes.target.width end,
-        set = function(value) 
+        end,
+        "Player frame height"
+    )
+    self:AddControl(canvas, playerHeight, 48)
+
+    -- Target frame header
+    local targetHeader = self:CreateHeader("Target Frame")
+    self:AddControl(canvas, targetHeader, 24)
+
+    -- Target frame width
+    local targetWidth = self:CreateSlider(
+        "Width",
+        100, 400, 10,
+        function() return DivinicalUI.db.profile.unitframes.target.width end,
+        function(value)
             DivinicalUI.db.profile.unitframes.target.width = value
             if DivinicalUI.modules.UnitFrames then
                 DivinicalUI.modules.UnitFrames:UpdateTargetFrame()
             end
-        end
-    })
-    
-    table.insert(options, {
-        type = "Slider",
-        name = "Height",
-        min = 20,
-        max = 100,
-        step = 5,
-        get = function() return DivinicalUI.db.profile.unitframes.target.height end,
-        set = function(value) 
+        end,
+        "Target frame width"
+    )
+    self:AddControl(canvas, targetWidth, 48)
+
+    -- Target frame height
+    local targetHeight = self:CreateSlider(
+        "Height",
+        20, 100, 5,
+        function() return DivinicalUI.db.profile.unitframes.target.height end,
+        function(value)
             DivinicalUI.db.profile.unitframes.target.height = value
             if DivinicalUI.modules.UnitFrames then
                 DivinicalUI.modules.UnitFrames:UpdateTargetFrame()
             end
-        end
-    })
-    
-    -- Action buttons
-    table.insert(options, {
-        type = "Header",
-        name = "Actions"
-    })
-    
-    table.insert(options, {
-        type = "Button",
-        name = "Reset to Defaults",
-        func = function()
-            DivinicalUI.db.profile = DivinicalUI.defaults.profile
-            ReloadUI()
-        end
-    })
-    
-    return options
+        end,
+        "Target frame height"
+    )
+    self:AddControl(canvas, targetHeight, 48)
+end
+
+-- Populate Raid settings (placeholder)
+function Config:PopulateRaidSettings(canvas)
+    local placeholder = canvas:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+    placeholder:SetPoint("TOPLEFT", canvas.content, "TOPLEFT", 8, -8)
+    placeholder:SetText("Raid frame settings coming soon...")
+    placeholder:SetTextColor(0.6, 0.6, 0.6)
+end
+
+-- Populate Action Bars settings (placeholder)
+function Config:PopulateActionBarsSettings(canvas)
+    local placeholder = canvas:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+    placeholder:SetPoint("TOPLEFT", canvas.content, "TOPLEFT", 8, -8)
+    placeholder:SetText("Action bar settings coming soon...")
+    placeholder:SetTextColor(0.6, 0.6, 0.6)
+end
+
+-- Populate Themes settings (placeholder)
+function Config:PopulateThemesSettings(canvas)
+    local placeholder = canvas:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+    placeholder:SetPoint("TOPLEFT", canvas.content, "TOPLEFT", 8, -8)
+    placeholder:SetText("Theme selection coming soon...")
+    placeholder:SetTextColor(0.6, 0.6, 0.6)
+end
+
+-- Populate Profiles settings (placeholder)
+function Config:PopulateProfilesSettings(canvas)
+    local placeholder = canvas:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+    placeholder:SetPoint("TOPLEFT", canvas.content, "TOPLEFT", 8, -8)
+    placeholder:SetText("Profile management coming soon...")
+    placeholder:SetTextColor(0.6, 0.6, 0.6)
+end
+
+-- Populate Advanced settings (placeholder)
+function Config:PopulateAdvancedSettings(canvas)
+    local placeholder = canvas:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+    placeholder:SetPoint("TOPLEFT", canvas.content, "TOPLEFT", 8, -8)
+    placeholder:SetText("Advanced settings coming soon...")
+    placeholder:SetTextColor(0.6, 0.6, 0.6)
+end
+
+-- Open configuration panel
+function Config:OpenConfig()
+    Settings.OpenToCategory("DivinicalUI_General")
+end
+
+-- Helper function to create a checkbox control
+function Config:CreateCheckbox(name, getFunc, setFunc, tooltip)
+    local checkbox = CreateFrame("CheckButton", nil, nil, "InterfaceOptionsCheckButtonTemplate")
+    checkbox:SetSize(26, 26)
+
+    local text = checkbox:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+    text:SetPoint("LEFT", checkbox, "RIGHT", 4, 0)
+    text:SetText(name)
+    checkbox.text = text
+
+    checkbox:SetScript("OnClick", function(self)
+        local checked = self:GetChecked() and true or false
+        setFunc(checked)
+    end)
+
+    checkbox:SetChecked(getFunc())
+
+    if tooltip then
+        checkbox.tooltipText = tooltip
+    end
+
+    return checkbox
+end
+
+-- Helper function to create a slider control
+function Config:CreateSlider(name, min, max, step, getFunc, setFunc, tooltip)
+    local slider = CreateFrame("Slider", nil, nil, "OptionsSliderTemplate")
+    slider:SetWidth(560)
+    slider:SetHeight(20)
+    slider:SetMinMaxValues(min, max)
+    slider:SetValueStep(step)
+    slider:SetObeyStepOnDrag(true)
+
+    -- Set up labels
+    _G[slider:GetName() .. "Low"]:SetText(min)
+    _G[slider:GetName() .. "High"]:SetText(max)
+    _G[slider:GetName() .. "Text"]:SetText(name)
+
+    -- Value changed handler
+    slider:SetScript("OnValueChanged", function(self, value)
+        value = math.floor(value / step + 0.5) * step
+        setFunc(value)
+        _G[self:GetName() .. "Text"]:SetText(name .. ": " .. value)
+    end)
+
+    -- Initialize value
+    local currentValue = getFunc()
+    slider:SetValue(currentValue)
+    _G[slider:GetName() .. "Text"]:SetText(name .. ": " .. currentValue)
+
+    if tooltip then
+        slider.tooltipText = tooltip
+    end
+
+    return slider
+end
+
+-- Helper function to create a button control
+function Config:CreateButton(name, onClick, width, height)
+    local button = CreateFrame("Button", nil, nil, "UIPanelButtonTemplate")
+    button:SetText(name)
+    button:SetSize(width or 120, height or 25)
+    button:SetScript("OnClick", onClick)
+    return button
+end
+
+-- Helper function to create a header text
+function Config:CreateHeader(text)
+    local frame = CreateFrame("Frame")
+    frame:SetSize(560, 20)
+
+    local header = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
+    header:SetPoint("TOPLEFT", frame, "TOPLEFT", 0, 0)
+    header:SetText(text)
+    frame.text = header
+
+    return frame
 end
 
 -- Register module
