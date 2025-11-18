@@ -6,6 +6,7 @@ local Config = {}
 
 -- Settings panel reference
 local settingsPanel
+local settingsCategory
 
 -- Initialize config module
 function Config:Initialize()
@@ -19,9 +20,27 @@ end
 
 -- Register settings panel with Blizzard's Settings API
 function Config:RegisterSettingsPanel()
-    local category = Settings.RegisterCanvasLayoutCategory(DivinicalUI, "DivinicalUI", "DivinicalUI")
-    category.ID = "DivinicalUI"
-    Settings.RegisterAddOnCategory(category)
+    -- Create a frame for the settings panel (required by Settings API)
+    settingsPanel = CreateFrame("Frame")
+    settingsPanel.name = "DivinicalUI"
+
+    -- Add content to the panel
+    local title = settingsPanel:CreateFontString(nil, "ARTWORK", "GameFontNormalLarge")
+    title:SetPoint("TOPLEFT", 16, -16)
+    title:SetText("DivinicalUI Settings")
+
+    local subtitle = settingsPanel:CreateFontString(nil, "ARTWORK", "GameFontHighlightSmall")
+    subtitle:SetPoint("TOPLEFT", title, "BOTTOMLEFT", 0, -8)
+    subtitle:SetText("Version " .. DivinicalUI.version)
+
+    local description = settingsPanel:CreateFontString(nil, "ARTWORK", "GameFontHighlight")
+    description:SetPoint("TOPLEFT", subtitle, "BOTTOMLEFT", 0, -8)
+    description:SetText("Advanced unit frames and targeting system")
+
+    -- Register with Settings API
+    settingsCategory = Settings.RegisterCanvasLayoutCategory(settingsPanel, "DivinicalUI")
+    settingsCategory.ID = "DivinicalUI"
+    Settings.RegisterAddOnCategory(settingsCategory)
 end
 
 -- Open configuration panel

@@ -9,6 +9,7 @@
 ## X-oUF: DivinicalUI
 
 # Libraries
+Libs\LibSharedMedia-3.0\LibStub\LibStub.lua
 Libs\LibSharedMedia-3.0\lib.xml
 Libs\oUF\oUF.xml
 
