@@ -49,7 +49,8 @@ function UnitFrames:CreateStyle()
         self.Health.gradient:SetTexture("Interface\\TargetingFrame\\UI-StatusBar")
         self.Health.gradient:SetBlendMode("ADD")
         self.Health.gradient:SetAlpha(0.3)
-        self.Health.gradient:SetGradientAlpha("HORIZONTAL", 1, 1, 1, 0.2, 1, 1, 1, 0)
+        -- Use SetGradient instead of SetGradientAlpha (modern WoW API)
+        self.Health.gradient:SetGradient("HORIZONTAL", CreateColor(1, 1, 1, 0.2), CreateColor(1, 1, 1, 0))
         
         -- Health text with enhanced formatting
         self.Health.value = self.Health:CreateFontString(nil, "OVERLAY")
@@ -74,7 +75,8 @@ function UnitFrames:CreateStyle()
         self.Power:SetHeight(10) -- Slightly taller for better visibility
         self.Power:SetStatusBarTexture("Interface\\TargetingFrame\\UI-StatusBar")
         self.Power:GetStatusBarTexture():SetDrawLayer("ARTWORK")
-        self.Power:SetSmoothProgress(true) -- Enable smooth transitions
+        -- Note: SetSmoothProgress is not available in all WoW versions
+        self.Power.smoothGradient = true
         
         -- Power background
         self.Power.bg = self.Power:CreateTexture(nil, "BORDER")
@@ -88,7 +90,8 @@ function UnitFrames:CreateStyle()
         self.Power.gradient:SetTexture("Interface\\TargetingFrame\\UI-StatusBar")
         self.Power.gradient:SetBlendMode("ADD")
         self.Power.gradient:SetAlpha(0.3)
-        self.Power.gradient:SetGradientAlpha("HORIZONTAL", 1, 1, 1, 0.2, 1, 1, 1, 0)
+        -- Use SetGradient instead of SetGradientAlpha (modern WoW API)
+        self.Power.gradient:SetGradient("HORIZONTAL", CreateColor(1, 1, 1, 0.2), CreateColor(1, 1, 1, 0))
         
         -- Power text with enhanced formatting
         self.Power.value = self.Power:CreateFontString(nil, "OVERLAY")
