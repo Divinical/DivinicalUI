@@ -55,15 +55,21 @@ function UnitFrames:CreateStyle()
         -- Health text with enhanced formatting
         self.Health.value = self.Health:CreateFontString(nil, "OVERLAY")
         self.Health.value:SetPoint("RIGHT", self.Health, "RIGHT", -2, 0)
-        self.Health.value:SetFont("Interface\\AddOns\\DivinicalUI\\Media\\Fonts\\Font.ttf", 12, "OUTLINE")
+        -- Use default font as fallback
+        local font, _, flags = self.Health.value:GetFont()
+        if not self.Health.value:SetFont("Interface\\AddOns\\DivinicalUI\\Media\\Fonts\\Font.ttf", 12, "OUTLINE") then
+            self.Health.value:SetFont(font or "Fonts\\FRIZQT__.TTF", 12, "OUTLINE")
+        end
         self.Health.value:SetShadowColor(0, 0, 0, 0.5)
         self.Health.value:SetShadowOffset(1, -1)
         self:Tag(self.Health.value, "[divinical:health]")
-        
+
         -- Health percentage text
         self.Health.percentage = self.Health:CreateFontString(nil, "OVERLAY")
         self.Health.percentage:SetPoint("LEFT", self.Health, "LEFT", 2, 0)
-        self.Health.percentage:SetFont("Interface\\AddOns\\DivinicalUI\\Media\\Fonts\\Font.ttf", 11, "OUTLINE")
+        if not self.Health.percentage:SetFont("Interface\\AddOns\\DivinicalUI\\Media\\Fonts\\Font.ttf", 11, "OUTLINE") then
+            self.Health.percentage:SetFont("Fonts\\FRIZQT__.TTF", 11, "OUTLINE")
+        end
         self.Health.percentage:SetShadowColor(0, 0, 0, 0.5)
         self.Health.percentage:SetShadowOffset(1, -1)
         self:Tag(self.Health.percentage, "[divinical:healthperc]")
@@ -96,30 +102,38 @@ function UnitFrames:CreateStyle()
         -- Power text with enhanced formatting
         self.Power.value = self.Power:CreateFontString(nil, "OVERLAY")
         self.Power.value:SetPoint("RIGHT", self.Power, "RIGHT", -2, 0)
-        self.Power.value:SetFont("Interface\\AddOns\\DivinicalUI\\Media\\Fonts\\Font.ttf", 10, "OUTLINE")
+        if not self.Power.value:SetFont("Interface\\AddOns\\DivinicalUI\\Media\\Fonts\\Font.ttf", 10, "OUTLINE") then
+            self.Power.value:SetFont("Fonts\\FRIZQT__.TTF", 10, "OUTLINE")
+        end
         self.Power.value:SetShadowColor(0, 0, 0, 0.5)
         self.Power.value:SetShadowOffset(1, -1)
         self:Tag(self.Power.value, "[divinical:power]")
-        
+
         -- Power type indicator
         self.Power.type = self.Power:CreateFontString(nil, "OVERLAY")
         self.Power.type:SetPoint("LEFT", self.Power, "LEFT", 2, 0)
-        self.Power.type:SetFont("Interface\\AddOns\\DivinicalUI\\Media\\Fonts\\Font.ttf", 9, "OUTLINE")
+        if not self.Power.type:SetFont("Interface\\AddOns\\DivinicalUI\\Media\\Fonts\\Font.ttf", 9, "OUTLINE") then
+            self.Power.type:SetFont("Fonts\\FRIZQT__.TTF", 9, "OUTLINE")
+        end
         self.Power.type:SetShadowColor(0, 0, 0, 0.5)
         self.Power.type:SetShadowOffset(1, -1)
         self:Tag(self.Power.type, "[divinical:powertype]")
-        
+
         -- Name text using oUF tags
         self.Name = self:CreateFontString(nil, "OVERLAY")
         self.Name:SetPoint("LEFT", self.Health, "LEFT", 2, 0)
-        self.Name:SetFont("Interface\\AddOns\\DivinicalUI\\Media\\Fonts\\Font.ttf", 12, "OUTLINE")
+        if not self.Name:SetFont("Interface\\AddOns\\DivinicalUI\\Media\\Fonts\\Font.ttf", 12, "OUTLINE") then
+            self.Name:SetFont("Fonts\\FRIZQT__.TTF", 12, "OUTLINE")
+        end
         self.Name:SetJustifyH("LEFT")
         self:Tag(self.Name, "[name]")
-        
+
         -- Level text using oUF tags
         self.Level = self:CreateFontString(nil, "OVERLAY")
         self.Level:SetPoint("TOPRIGHT", self, "TOPRIGHT", -2, -2)
-        self.Level:SetFont("Interface\\AddOns\\DivinicalUI\\Media\\Fonts\\Font.ttf", 10, "OUTLINE")
+        if not self.Level:SetFont("Interface\\AddOns\\DivinicalUI\\Media\\Fonts\\Font.ttf", 10, "OUTLINE") then
+            self.Level:SetFont("Fonts\\FRIZQT__.TTF", 10, "OUTLINE")
+        end
         self:Tag(self.Level, "[level][classification]")
         
         -- Enhanced Cast bar with latency and spell queue detection
@@ -160,14 +174,18 @@ function UnitFrames:CreateStyle()
         -- Castbar text with shadow
         self.Castbar.Text = self.Castbar:CreateFontString(nil, "OVERLAY")
         self.Castbar.Text:SetPoint("LEFT", self.Castbar, "LEFT", 2, 0)
-        self.Castbar.Text:SetFont("Interface\\AddOns\\DivinicalUI\\Media\\Fonts\\Font.ttf", 10, "OUTLINE")
+        if not self.Castbar.Text:SetFont("Interface\\AddOns\\DivinicalUI\\Media\\Fonts\\Font.ttf", 10, "OUTLINE") then
+            self.Castbar.Text:SetFont("Fonts\\FRIZQT__.TTF", 10, "OUTLINE")
+        end
         self.Castbar.Text:SetShadowColor(0, 0, 0, 0.8)
         self.Castbar.Text:SetShadowOffset(1, -1)
-        
+
         -- Castbar time with shadow
         self.Castbar.Time = self.Castbar:CreateFontString(nil, "OVERLAY")
         self.Castbar.Time:SetPoint("RIGHT", self.Castbar, "RIGHT", -2, 0)
-        self.Castbar.Time:SetFont("Interface\\AddOns\\DivinicalUI\\Media\\Fonts\\Font.ttf", 10, "OUTLINE")
+        if not self.Castbar.Time:SetFont("Interface\\AddOns\\DivinicalUI\\Media\\Fonts\\Font.ttf", 10, "OUTLINE") then
+            self.Castbar.Time:SetFont("Fonts\\FRIZQT__.TTF", 10, "OUTLINE")
+        end
         self.Castbar.Time:SetShadowColor(0, 0, 0, 0.8)
         self.Castbar.Time:SetShadowOffset(1, -1)
         
@@ -1032,34 +1050,47 @@ end
 -- Validate all spawned frames
 function UnitFrames:ValidateAllFrames()
     DivinicalUI.Utils.Debug.Print("Starting comprehensive frame validation...", "INFO")
-    
+
     local totalFrames = 0
     local validFrames = 0
-    
+
     for unitType, frame in pairs(frames) do
         if type(frame) == "table" then
-            -- Handle frame groups (boss, party, raid, arena)
-            for i, subFrame in pairs(frame) do
+            -- Check if it's a frame group (has numeric indices) vs single frame
+            local isFrameGroup = false
+            for k, v in pairs(frame) do
+                if type(k) == "number" and type(v) == "table" and v.UpdateAllElements then
+                    isFrameGroup = true
+                    break
+                end
+            end
+
+            if isFrameGroup then
+                -- Handle frame groups (boss, party, raid, arena)
+                for i, subFrame in ipairs(frame) do
+                    totalFrames = totalFrames + 1
+                    if subFrame and type(subFrame) == "table" and subFrame.UpdateAllElements then
+                        validFrames = validFrames + 1
+                        DivinicalUI.Utils.Debug.Print("Frame " .. unitType .. i .. " validated", "DEBUG")
+                    else
+                        DivinicalUI.Utils.Debug.Print("Frame " .. unitType .. i .. " validation failed", "ERROR")
+                    end
+                end
+            else
+                -- Handle single frames
                 totalFrames = totalFrames + 1
-                if subFrame and subFrame.UpdateAllElements then
+                if frame and frame.UpdateAllElements then
                     validFrames = validFrames + 1
-                    DivinicalUI.Utils.Debug.Print("Frame " .. unitType .. i .. " validated", "DEBUG")
+                    DivinicalUI.Utils.Debug.Print("Frame " .. unitType .. " validated", "DEBUG")
                 else
-                    DivinicalUI.Utils.Debug.Print("Frame " .. unitType .. i .. " validation failed", "ERROR")
+                    DivinicalUI.Utils.Debug.Print("Frame " .. unitType .. " validation failed", "ERROR")
                 end
             end
         else
-            -- Handle single frames
-            totalFrames = totalFrames + 1
-            if frame and frame.UpdateAllElements then
-                validFrames = validFrames + 1
-                DivinicalUI.Utils.Debug.Print("Frame " .. unitType .. " validated", "DEBUG")
-            else
-                DivinicalUI.Utils.Debug.Print("Frame " .. unitType .. " validation failed", "ERROR")
-            end
+            -- Skip non-table values
         end
     end
-    
+
     DivinicalUI.Utils.Debug.Print("Frame validation complete: " .. validFrames .. "/" .. totalFrames .. " frames valid", "INFO")
 end
 
