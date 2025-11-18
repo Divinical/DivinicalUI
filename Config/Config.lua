@@ -81,17 +81,23 @@ function Config:RegisterSettingsPanel()
     self.categories.general = generalCategory
     self.panels.general = generalCanvas
 
-    -- Create Unit Frames category canvas
+    -- Create Unit Frames category canvas (overview page)
     local unitFramesCanvas = self:CreateCategoryCanvas("Unit Frames")
     unitFramesCanvas.desc:SetText("Configure unit frame appearance, positioning, and elements.")
     self:PopulateUnitFramesSettings(unitFramesCanvas)
 
-    -- Register Unit Frames as subcategory
+    -- Register Unit Frames as main category
     local unitFramesCategory = Settings.RegisterCanvasLayoutCategory(unitFramesCanvas, "Unit Frames", "DivinicalUI")
     unitFramesCategory.ID = "DivinicalUI_UnitFrames"
     Settings.RegisterAddOnCategory(unitFramesCategory)
     self.categories.unitframes = unitFramesCategory
     self.panels.unitframes = unitFramesCanvas
+
+    -- Create subcategories for different frame types
+    self:CreateUnitFrameSubcategory("Player", "DivinicalUI_UnitFrames")
+    self:CreateUnitFrameSubcategory("Target", "DivinicalUI_UnitFrames")
+    self:CreateUnitFrameSubcategory("Party", "DivinicalUI_UnitFrames")
+    self:CreateUnitFrameSubcategory("Raid", "DivinicalUI_UnitFrames")
 
     -- Create Raid Frames category canvas
     local raidCanvas = self:CreateCategoryCanvas("Raid Frames")
@@ -147,6 +153,164 @@ function Config:RegisterSettingsPanel()
     Settings.RegisterAddOnCategory(advancedCategory)
     self.categories.advanced = advancedCategory
     self.panels.advanced = advancedCanvas
+end
+
+-- Create a unit frame subcategory dynamically
+function Config:CreateUnitFrameSubcategory(frameName, parentID)
+    local canvas = self:CreateCategoryCanvas(frameName .. " Frame")
+    canvas.desc:SetText("Configure " .. frameName:lower() .. " frame settings and appearance.")
+
+    -- Populate with frame-specific settings
+    self:PopulateFrameTypeSettings(canvas, frameName:lower())
+
+    -- Register as subcategory under Unit Frames
+    local category = Settings.RegisterCanvasLayoutCategory(canvas, frameName, parentID)
+    category.ID = "DivinicalUI_UnitFrames_" .. frameName
+    Settings.RegisterAddOnCategory(category)
+
+    -- Store references
+    self.categories["unitframes_" .. frameName:lower()] = category
+    self.panels["unitframes_" .. frameName:lower()] = canvas
+
+    return category
+end
+
+-- Populate frame type specific settings
+function Config:PopulateFrameTypeSettings(canvas, frameType)
+    -- Enable frame checkbox
+    local enableFrame = self:CreateCheckbox(
+        "Enable " .. frameType:gsub("^%l", string.upper) .. " Frame",
+        function()
+            if not DivinicalUI.db.profile.unitframes[frameType] then
+                return false
+            end
+            return DivinicalUI.db.profile.unitframes[frameType].enabled or false
+        end,
+        function(value)
+            if not DivinicalUI.db.profile.unitframes[frameType] then
+                DivinicalUI.db.profile.unitframes[frameType] = {}
+            end
+            DivinicalUI.db.profile.unitframes[frameType].enabled = value
+            if DivinicalUI.modules.UnitFrames then
+                if DivinicalUI.modules.UnitFrames["Update" .. frameType:gsub("^%l", string.upper) .. "Frame"] then
+                    DivinicalUI.modules.UnitFrames["Update" .. frameType:gsub("^%l", string.upper) .. "Frame"](DivinicalUI.modules.UnitFrames)
+                end
+            end
+        end,
+        "Enable or disable this frame"
+    )
+    self:AddControl(canvas, enableFrame, 32)
+
+    -- Spacer
+    self:AddControl(canvas, CreateFrame("Frame"), 16)
+
+    -- Size header
+    local sizeHeader = self:CreateHeader("Size")
+    self:AddControl(canvas, sizeHeader, 24)
+
+    -- Width slider
+    local widthSlider = self:CreateSlider(
+        "Width",
+        100, 400, 10,
+        function()
+            if not DivinicalUI.db.profile.unitframes[frameType] then
+                return 200
+            end
+            return DivinicalUI.db.profile.unitframes[frameType].width or 200
+        end,
+        function(value)
+            if not DivinicalUI.db.profile.unitframes[frameType] then
+                DivinicalUI.db.profile.unitframes[frameType] = {}
+            end
+            DivinicalUI.db.profile.unitframes[frameType].width = value
+            if DivinicalUI.modules.UnitFrames then
+                if DivinicalUI.modules.UnitFrames["Update" .. frameType:gsub("^%l", string.upper) .. "Frame"] then
+                    DivinicalUI.modules.UnitFrames["Update" .. frameType:gsub("^%l", string.upper) .. "Frame"](DivinicalUI.modules.UnitFrames)
+                end
+            end
+        end,
+        "Frame width in pixels"
+    )
+    self:AddControl(canvas, widthSlider, 48)
+
+    -- Height slider
+    local heightSlider = self:CreateSlider(
+        "Height",
+        20, 100, 5,
+        function()
+            if not DivinicalUI.db.profile.unitframes[frameType] then
+                return 40
+            end
+            return DivinicalUI.db.profile.unitframes[frameType].height or 40
+        end,
+        function(value)
+            if not DivinicalUI.db.profile.unitframes[frameType] then
+                DivinicalUI.db.profile.unitframes[frameType] = {}
+            end
+            DivinicalUI.db.profile.unitframes[frameType].height = value
+            if DivinicalUI.modules.UnitFrames then
+                if DivinicalUI.modules.UnitFrames["Update" .. frameType:gsub("^%l", string.upper) .. "Frame"] then
+                    DivinicalUI.modules.UnitFrames["Update" .. frameType:gsub("^%l", string.upper) .. "Frame"](DivinicalUI.modules.UnitFrames)
+                end
+            end
+        end,
+        "Frame height in pixels"
+    )
+    self:AddControl(canvas, heightSlider, 48)
+
+    -- Position header
+    local posHeader = self:CreateHeader("Position")
+    self:AddControl(canvas, posHeader, 24)
+
+    -- X position slider
+    local xPosSlider = self:CreateSlider(
+        "X Position",
+        -1000, 1000, 10,
+        function()
+            if not DivinicalUI.db.profile.unitframes[frameType] then
+                return 0
+            end
+            return DivinicalUI.db.profile.unitframes[frameType].x or 0
+        end,
+        function(value)
+            if not DivinicalUI.db.profile.unitframes[frameType] then
+                DivinicalUI.db.profile.unitframes[frameType] = {}
+            end
+            DivinicalUI.db.profile.unitframes[frameType].x = value
+            if DivinicalUI.modules.UnitFrames then
+                if DivinicalUI.modules.UnitFrames["Update" .. frameType:gsub("^%l", string.upper) .. "Frame"] then
+                    DivinicalUI.modules.UnitFrames["Update" .. frameType:gsub("^%l", string.upper) .. "Frame"](DivinicalUI.modules.UnitFrames)
+                end
+            end
+        end,
+        "Horizontal position offset"
+    )
+    self:AddControl(canvas, xPosSlider, 48)
+
+    -- Y position slider
+    local yPosSlider = self:CreateSlider(
+        "Y Position",
+        -1000, 1000, 10,
+        function()
+            if not DivinicalUI.db.profile.unitframes[frameType] then
+                return 0
+            end
+            return DivinicalUI.db.profile.unitframes[frameType].y or 0
+        end,
+        function(value)
+            if not DivinicalUI.db.profile.unitframes[frameType] then
+                DivinicalUI.db.profile.unitframes[frameType] = {}
+            end
+            DivinicalUI.db.profile.unitframes[frameType].y = value
+            if DivinicalUI.modules.UnitFrames then
+                if DivinicalUI.modules.UnitFrames["Update" .. frameType:gsub("^%l", string.upper) .. "Frame"] then
+                    DivinicalUI.modules.UnitFrames["Update" .. frameType:gsub("^%l", string.upper) .. "Frame"](DivinicalUI.modules.UnitFrames)
+                end
+            end
+        end,
+        "Vertical position offset"
+    )
+    self:AddControl(canvas, yPosSlider, 48)
 end
 
 -- Populate General settings

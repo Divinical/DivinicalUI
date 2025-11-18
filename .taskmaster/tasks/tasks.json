@@ -147,8 +147,8 @@
             "dependencies": [
               1
             ],
-            "details": "Implement nested unit frame categories (Player/Target/Party/Raid), create template for adding/removing categories dynamically",
-            "status": "pending",
+            "details": "Implement nested unit frame categories (Player/Target/Party/Raid), create template for adding/removing categories dynamically\n<info added on 2025-11-18T15:30:00.000Z>\nImplemented nested subcategory system for unit frames. Created CreateUnitFrameSubcategory() function for dynamic subcategory creation under parent categories. Created PopulateFrameTypeSettings() template function that generates frame-specific settings (enable toggle, width/height sliders, X/Y position controls). Added 4 subcategories under Unit Frames: Player, Target, Party, Raid. System is fully extensible - new frame types can be added with single function call. Each subcategory registers with Blizzard Settings API as nested category.\n</info added on 2025-11-18T15:30:00.000Z>",
+            "status": "done",
             "testStrategy": "Test nested category expansion/collapsing and persistence across sessions"
           },
           {
@@ -1670,7 +1670,7 @@
     ],
     "metadata": {
       "created": "2025-10-29T17:49:44.992Z",
-      "updated": "2025-11-18T15:00:00.000Z",
+      "updated": "2025-11-18T15:30:00.000Z",
       "description": "Tasks for master context - Updated to incorporate full MASTER_UPGRADE_PLAN.md vision"
     }
   }
