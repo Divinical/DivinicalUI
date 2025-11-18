@@ -921,7 +921,14 @@ end
 
 -- Helper function to create a slider control with debounced real-time preview
 function Config:CreateSlider(name, min, max, step, getFunc, setFunc, tooltip)
-    local slider = CreateFrame("Slider", nil, nil, "OptionsSliderTemplate")
+    -- Generate unique slider name
+    if not Config.sliderCount then
+        Config.sliderCount = 0
+    end
+    Config.sliderCount = Config.sliderCount + 1
+    local sliderName = "DivinicalUISlider" .. Config.sliderCount
+
+    local slider = CreateFrame("Slider", sliderName, nil, "OptionsSliderTemplate")
     slider:SetWidth(560)
     slider:SetHeight(20)
     slider:SetMinMaxValues(min, max)
@@ -932,14 +939,14 @@ function Config:CreateSlider(name, min, max, step, getFunc, setFunc, tooltip)
     local updateKey = "slider_" .. tostring(slider):gsub("table: ", "")
 
     -- Set up labels
-    _G[slider:GetName() .. "Low"]:SetText(min)
-    _G[slider:GetName() .. "High"]:SetText(max)
-    _G[slider:GetName() .. "Text"]:SetText(name)
+    _G[sliderName .. "Low"]:SetText(min)
+    _G[sliderName .. "High"]:SetText(max)
+    _G[sliderName .. "Text"]:SetText(name)
 
     -- Value changed handler with debounced preview
     slider:SetScript("OnValueChanged", function(self, value, userInput)
         value = math.floor(value / step + 0.5) * step
-        _G[self:GetName() .. "Text"]:SetText(name .. ": " .. value)
+        _G[sliderName .. "Text"]:SetText(name .. ": " .. value)
 
         -- Only apply debounced update if user is dragging
         if userInput then
@@ -961,7 +968,7 @@ function Config:CreateSlider(name, min, max, step, getFunc, setFunc, tooltip)
     -- Initialize value
     local currentValue = getFunc()
     slider:SetValue(currentValue)
-    _G[slider:GetName() .. "Text"]:SetText(name .. ": " .. currentValue)
+    _G[sliderName .. "Text"]:SetText(name .. ": " .. currentValue)
 
     if tooltip then
         slider.tooltipText = tooltip

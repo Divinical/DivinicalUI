@@ -9,8 +9,12 @@
 ## X-oUF: DivinicalUI
 
 # Libraries
+Libs\LibSharedMedia-3.0\LibStub\LibStub.lua
 Libs\LibSharedMedia-3.0\lib.xml
 Libs\oUF\oUF.xml
+
+# Utilities (must load before Core)
+Modules\Utils.lua
 
 # Core
 Core.lua
@@ -21,7 +25,6 @@ Config\Settings.lua
 Config\Profiles.lua
 
 # Modules
-Modules\Utils.lua
 Modules\Media.lua
 Modules\UnitFrames.lua
 Modules\Targeting.lua
