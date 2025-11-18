@@ -113,38 +113,39 @@ end
 
 -- Register settings panel with Blizzard's Settings API
 function Config:RegisterSettingsPanel()
-    -- === CATEGORY 1: DivinicalUI (Main) ===
+    -- === ROOT: DivinicalUI (Main entry point - this is the only top-level category) ===
     local mainCanvas = self:CreateCategoryCanvas("DivinicalUI")
-    mainCanvas.desc:SetText("Main settings and quick access to common options.")
+    mainCanvas.desc:SetText("General addon settings, advanced mode toggle, and quick actions.")
     self:PopulateGeneralSettings(mainCanvas)
 
     local mainCategory = Settings.RegisterCanvasLayoutCategory(mainCanvas, "DivinicalUI")
-    mainCategory.ID = "DivinicalUI_Main"
-    Settings.RegisterAddOnCategory(mainCategory)
+    mainCategory.ID = "DivinicalUI"
+    Settings.RegisterAddOnCategory(mainCategory) -- Only call this ONCE for the root
     self.categories.main = mainCategory
     self.panels.main = mainCanvas
 
-    -- === CATEGORY 2: Unit Frames (Comprehensive) ===
+    -- === SUBCATEGORY: Unit Frames (under DivinicalUI) ===
     local unitFramesCanvas = self:CreateCategoryCanvas("Unit Frames")
-    unitFramesCanvas.desc:SetText("Customize health bars, power bars, colors, fonts, and positioning for all unit frames.")
+    unitFramesCanvas.desc:SetText("Customize colors, fonts, sizes, and positioning for all unit frames.")
     self:PopulateUnitFramesSettings(unitFramesCanvas)
 
-    local unitFramesCategory = Settings.RegisterCanvasLayoutCategory(unitFramesCanvas, "DivinicalUI - Unit Frames")
+    local unitFramesCategory = Settings.RegisterCanvasLayoutCategory(unitFramesCanvas, "Unit Frames", "DivinicalUI")
     unitFramesCategory.ID = "DivinicalUI_UnitFrames"
-    Settings.RegisterAddOnCategory(unitFramesCategory)
     self.categories.unitframes = unitFramesCategory
     self.panels.unitframes = unitFramesCanvas
 
-    -- === CATEGORY 3: Profiles ===
+    -- === SUBCATEGORY: Profiles (under DivinicalUI) ===
     local profilesCanvas = self:CreateCategoryCanvas("Profiles")
-    profilesCanvas.desc:SetText("Create, switch, copy, and export profiles. Apply role-specific presets.")
+    profilesCanvas.desc:SetText("Manage, switch, and share your UI configurations.")
     self:PopulateProfilesSettings(profilesCanvas)
 
-    local profilesCategory = Settings.RegisterCanvasLayoutCategory(profilesCanvas, "DivinicalUI - Profiles")
+    local profilesCategory = Settings.RegisterCanvasLayoutCategory(profilesCanvas, "Profiles", "DivinicalUI")
     profilesCategory.ID = "DivinicalUI_Profiles"
-    Settings.RegisterAddOnCategory(profilesCategory)
     self.categories.profiles = profilesCategory
     self.panels.profiles = profilesCanvas
+
+    -- === FUTURE SUBCATEGORIES (Placeholders) ===
+    -- Action Bars, Nameplates, Minimap, Bags, etc. will go here as subcategories under DivinicalUI
 end
 
 -- Create a unit frame subcategory dynamically
@@ -420,6 +421,36 @@ end
 
 -- Populate General settings
 function Config:PopulateGeneralSettings(canvas)
+    -- Interface Mode header
+    local modeHeader = self:CreateHeader("Interface Mode")
+    self:AddControl(canvas, modeHeader, 24)
+
+    -- Info text
+    local modeInfo = canvas:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+    modeInfo:SetPoint("TOPLEFT", canvas.content, "TOPLEFT", 8, -(canvas.lastY))
+    modeInfo:SetWidth(560)
+    modeInfo:SetJustifyH("LEFT")
+    modeInfo:SetText("Simple mode shows global settings that apply to all frames. Advanced mode adds per-frame customization options.")
+    modeInfo:SetTextColor(0.8, 0.8, 0.8)
+    self:AddControl(canvas, CreateFrame("Frame"), 32)
+
+    -- Advanced mode checkbox
+    local advancedMode = self:CreateCheckbox(
+        "Advanced Mode",
+        function() return DivinicalUI.db.profile.advancedMode end,
+        function(value)
+            DivinicalUI.db.profile.advancedMode = value
+            print("|cff33ff99DivinicalUI|r: " .. (value and "Advanced mode enabled. Per-frame customization options now available." or "Simple mode enabled. Using global settings for all frames."))
+            -- Suggest reloading settings panel
+            print("|cff33ff99DivinicalUI|r: Close and reopen settings to see changes.")
+        end,
+        "Enable per-frame customization options for power users"
+    )
+    self:AddControl(canvas, advancedMode, 32)
+
+    -- Spacer
+    self:AddControl(canvas, CreateFrame("Frame"), 16)
+
     -- Debug mode checkbox
     local debugMode = self:CreateCheckbox(
         "Enable Debug Mode",
@@ -627,6 +658,124 @@ function Config:PopulateUnitFramesSettings(canvas)
         "Target frame height in pixels"
     )
     self:AddControl(canvas, targetHeight, 48)
+
+    -- === ADVANCED MODE: PER-FRAME CUSTOMIZATION ===
+    if DivinicalUI.db.profile.advancedMode then
+        -- Spacer
+        self:AddControl(canvas, CreateFrame("Frame"), 24)
+
+        -- Advanced header
+        local advancedHeader = self:CreateHeader("Advanced: Per-Frame Color Overrides")
+        self:AddControl(canvas, advancedHeader, 24)
+
+        -- Info text
+        local advancedInfo = canvas:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+        advancedInfo:SetPoint("TOPLEFT", canvas.content, "TOPLEFT", 8, -(canvas.lastY))
+        advancedInfo:SetWidth(560)
+        advancedInfo:SetJustifyH("LEFT")
+        advancedInfo:SetText("Override global colors for specific frames. Leave unset to use global colors.")
+        advancedInfo:SetTextColor(1, 0.8, 0.2) -- Yellow/gold to indicate advanced
+        self:AddControl(canvas, CreateFrame("Frame"), 32)
+
+        -- Player frame override colors
+        local playerAdvHeader = self:CreateHeader("Player Frame Colors")
+        self:AddControl(canvas, playerAdvHeader, 20)
+
+        local playerHealthColor = self:CreateColorPicker(
+            "Health Bar Color Override",
+            function()
+                local c = DivinicalUI.db.profile.unitframes.player.healthColor
+                if c then
+                    return c[1], c[2], c[3], c[4] or 1
+                end
+                -- Return global default if no override
+                local gc = DivinicalUI.db.profile.colors.health
+                return gc[1], gc[2], gc[3], gc[4] or 1
+            end,
+            function(r, g, b, a)
+                DivinicalUI.db.profile.unitframes.player.healthColor = {r, g, b, a}
+                if DivinicalUI.modules.UnitFrames then
+                    DivinicalUI.modules.UnitFrames:UpdatePlayerFrame()
+                end
+            end,
+            true,
+            "Custom health color for player frame only"
+        )
+        self:AddControl(canvas, playerHealthColor, 32)
+
+        local playerPowerColor = self:CreateColorPicker(
+            "Power Bar Color Override",
+            function()
+                local c = DivinicalUI.db.profile.unitframes.player.powerColor
+                if c then
+                    return c[1], c[2], c[3], c[4] or 1
+                end
+                -- Return global default if no override
+                local gc = DivinicalUI.db.profile.colors.power
+                return gc[1], gc[2], gc[3], gc[4] or 1
+            end,
+            function(r, g, b, a)
+                DivinicalUI.db.profile.unitframes.player.powerColor = {r, g, b, a}
+                if DivinicalUI.modules.UnitFrames then
+                    DivinicalUI.modules.UnitFrames:UpdatePlayerFrame()
+                end
+            end,
+            true,
+            "Custom power color for player frame only"
+        )
+        self:AddControl(canvas, playerPowerColor, 32)
+
+        -- Spacer
+        self:AddControl(canvas, CreateFrame("Frame"), 16)
+
+        -- Target frame override colors
+        local targetAdvHeader = self:CreateHeader("Target Frame Colors")
+        self:AddControl(canvas, targetAdvHeader, 20)
+
+        local targetHealthColor = self:CreateColorPicker(
+            "Health Bar Color Override",
+            function()
+                local c = DivinicalUI.db.profile.unitframes.target.healthColor
+                if c then
+                    return c[1], c[2], c[3], c[4] or 1
+                end
+                -- Return global default if no override
+                local gc = DivinicalUI.db.profile.colors.health
+                return gc[1], gc[2], gc[3], gc[4] or 1
+            end,
+            function(r, g, b, a)
+                DivinicalUI.db.profile.unitframes.target.healthColor = {r, g, b, a}
+                if DivinicalUI.modules.UnitFrames then
+                    DivinicalUI.modules.UnitFrames:UpdateTargetFrame()
+                end
+            end,
+            true,
+            "Custom health color for target frame only"
+        )
+        self:AddControl(canvas, targetHealthColor, 32)
+
+        local targetPowerColor = self:CreateColorPicker(
+            "Power Bar Color Override",
+            function()
+                local c = DivinicalUI.db.profile.unitframes.target.powerColor
+                if c then
+                    return c[1], c[2], c[3], c[4] or 1
+                end
+                -- Return global default if no override
+                local gc = DivinicalUI.db.profile.colors.power
+                return gc[1], gc[2], gc[3], gc[4] or 1
+            end,
+            function(r, g, b, a)
+                DivinicalUI.db.profile.unitframes.target.powerColor = {r, g, b, a}
+                if DivinicalUI.modules.UnitFrames then
+                    DivinicalUI.modules.UnitFrames:UpdateTargetFrame()
+                end
+            end,
+            true,
+            "Custom power color for target frame only"
+        )
+        self:AddControl(canvas, targetPowerColor, 32)
+    end
 end
 
 -- Populate Raid settings (placeholder)

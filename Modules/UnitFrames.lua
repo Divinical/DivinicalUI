@@ -585,20 +585,32 @@ function UnitFrames:CreateStyle()
     end
     
     local function PostUpdatePower(self, unit, min, max)
-        local powerType = UnitPowerType(unit)
-        local r, g, b = DivinicalUI.modules.Utils.Colors.GetPowerColor(powerType)
-        
-        -- Enhanced power colors with better visibility
-        if powerType == "MANA" then
-            r, g, b = 0.25, 0.5, 1.0 -- Brighter blue
-        elseif powerType == "RAGE" then
-            r, g, b = 1.0, 0.1, 0.1 -- Brighter red
-        elseif powerType == "ENERGY" then
-            r, g, b = 1.0, 0.9, 0.1 -- Brighter yellow
+        local r, g, b
+
+        -- Check if user has set custom power colors
+        local customColor = DivinicalUI.db.profile.colors.power
+
+        if customColor then
+            -- Use user-defined power color
+            r, g, b = customColor[1], customColor[2], customColor[3]
+            self.Power:SetStatusBarColor(r, g, b, customColor[4] or 1)
+        else
+            -- Fall back to power type colors
+            local powerType = UnitPowerType(unit)
+            r, g, b = DivinicalUI.modules.Utils.Colors.GetPowerColor(powerType)
+
+            -- Enhanced power colors with better visibility
+            if powerType == "MANA" then
+                r, g, b = 0.25, 0.5, 1.0 -- Brighter blue
+            elseif powerType == "RAGE" then
+                r, g, b = 1.0, 0.1, 0.1 -- Brighter red
+            elseif powerType == "ENERGY" then
+                r, g, b = 1.0, 0.9, 0.1 -- Brighter yellow
+            end
+
+            self.Power:SetStatusBarColor(r, g, b)
         end
-        
-        self.Power:SetStatusBarColor(r, g, b)
-        
+
         -- Update power gradient
         self.Power.gradient:SetVertexColor(r, g, b, 0.3)
         
