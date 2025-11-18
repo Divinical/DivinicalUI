@@ -1294,7 +1294,7 @@ end
 
 -- Open configuration panel
 function Config:OpenConfig()
-    Settings.OpenToCategory("DivinicalUI_General")
+    Settings.OpenToCategory("DivinicalUI")
 end
 
 -- Helper function to create a checkbox control
