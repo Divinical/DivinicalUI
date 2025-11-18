@@ -355,6 +355,120 @@ function Config:PopulateFrameTypeSettings(canvas, frameType)
         "Vertical position offset"
     )
     self:AddControl(canvas, yPosSlider, 48)
+
+    -- Colors header
+    local colorHeader = self:CreateHeader("Colors")
+    self:AddControl(canvas, colorHeader, 24)
+
+    -- Health bar color picker
+    local healthColor = self:CreateColorPicker(
+        "Health Bar Color",
+        function()
+            if not DivinicalUI.db.profile.unitframes[frameType] then
+                return 0, 1, 0, 1  -- Default green
+            end
+            local colors = DivinicalUI.db.profile.unitframes[frameType].healthColor or {0, 1, 0, 1}
+            return colors[1], colors[2], colors[3], colors[4]
+        end,
+        function(r, g, b, a)
+            if not DivinicalUI.db.profile.unitframes[frameType] then
+                DivinicalUI.db.profile.unitframes[frameType] = {}
+            end
+            DivinicalUI.db.profile.unitframes[frameType].healthColor = {r, g, b, a}
+            -- Update frame colors in real-time
+            if DivinicalUI.modules.UnitFrames then
+                if DivinicalUI.modules.UnitFrames["Update" .. frameType:gsub("^%l", string.upper) .. "Frame"] then
+                    DivinicalUI.modules.UnitFrames["Update" .. frameType:gsub("^%l", string.upper) .. "Frame"](DivinicalUI.modules.UnitFrames)
+                end
+            end
+        end,
+        true,  -- Has alpha
+        "Choose the color for the health bar"
+    )
+    self:AddControl(canvas, healthColor, 36)
+
+    -- Power bar color picker
+    local powerColor = self:CreateColorPicker(
+        "Power Bar Color",
+        function()
+            if not DivinicalUI.db.profile.unitframes[frameType] then
+                return 0, 0.5, 1, 1  -- Default blue
+            end
+            local colors = DivinicalUI.db.profile.unitframes[frameType].powerColor or {0, 0.5, 1, 1}
+            return colors[1], colors[2], colors[3], colors[4]
+        end,
+        function(r, g, b, a)
+            if not DivinicalUI.db.profile.unitframes[frameType] then
+                DivinicalUI.db.profile.unitframes[frameType] = {}
+            end
+            DivinicalUI.db.profile.unitframes[frameType].powerColor = {r, g, b, a}
+            -- Update frame colors in real-time
+            if DivinicalUI.modules.UnitFrames then
+                if DivinicalUI.modules.UnitFrames["Update" .. frameType:gsub("^%l", string.upper) .. "Frame"] then
+                    DivinicalUI.modules.UnitFrames["Update" .. frameType:gsub("^%l", string.upper) .. "Frame"](DivinicalUI.modules.UnitFrames)
+                end
+            end
+        end,
+        true,  -- Has alpha
+        "Choose the color for the power bar"
+    )
+    self:AddControl(canvas, powerColor, 36)
+
+    -- Media header
+    local mediaHeader = self:CreateHeader("Appearance")
+    self:AddControl(canvas, mediaHeader, 24)
+
+    -- Font dropdown
+    local fontDropdown = self:CreateDropdown(
+        "Font",
+        {"Pixel", "Arial", "Friz Quadrata", "Morpheus"},  -- Add more fonts as available
+        function()
+            if not DivinicalUI.db.profile.unitframes[frameType] then
+                return "Pixel"
+            end
+            return DivinicalUI.db.profile.unitframes[frameType].font or "Pixel"
+        end,
+        function(value)
+            if not DivinicalUI.db.profile.unitframes[frameType] then
+                DivinicalUI.db.profile.unitframes[frameType] = {}
+            end
+            DivinicalUI.db.profile.unitframes[frameType].font = value
+            -- Update frame font in real-time
+            if DivinicalUI.modules.UnitFrames then
+                if DivinicalUI.modules.UnitFrames["Update" .. frameType:gsub("^%l", string.upper) .. "Frame"] then
+                    DivinicalUI.modules.UnitFrames["Update" .. frameType:gsub("^%l", string.upper) .. "Frame"](DivinicalUI.modules.UnitFrames)
+                end
+            end
+        end,
+        "Select the font for frame text"
+    )
+    self:AddControl(canvas, fontDropdown, 50)
+
+    -- Texture dropdown
+    local textureDropdown = self:CreateDropdown(
+        "Status Bar Texture",
+        {"Default", "Smooth", "Minimalist", "Gradient"},
+        function()
+            if not DivinicalUI.db.profile.unitframes[frameType] then
+                return "Default"
+            end
+            return DivinicalUI.db.profile.unitframes[frameType].texture or "Default"
+        end,
+        function(value)
+            if not DivinicalUI.db.profile.unitframes[frameType] then
+                DivinicalUI.db.profile.unitframes[frameType] = {}
+            end
+            DivinicalUI.db.profile.unitframes[frameType].texture = value
+            -- Update frame texture in real-time
+            if DivinicalUI.modules.UnitFrames then
+                if DivinicalUI.modules.UnitFrames["Update" .. frameType:gsub("^%l", string.upper) .. "Frame"] then
+                    DivinicalUI.modules.UnitFrames["Update" .. frameType:gsub("^%l", string.upper) .. "Frame"](DivinicalUI.modules.UnitFrames)
+                end
+            end
+        end,
+        "Select the texture for health/power bars"
+    )
+    self:AddControl(canvas, textureDropdown, 50)
 end
 
 -- Populate General settings
@@ -998,6 +1112,156 @@ function Config:CreateHeader(text)
     header:SetPoint("TOPLEFT", frame, "TOPLEFT", 0, 0)
     header:SetText(text)
     frame.text = header
+
+    return frame
+end
+
+-- Helper function to create a color picker control with alpha support
+function Config:CreateColorPicker(name, getFunc, setFunc, hasAlpha, tooltip)
+    local frame = CreateFrame("Frame")
+    frame:SetSize(560, 30)
+
+    -- Label
+    local label = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+    label:SetPoint("LEFT", frame, "LEFT", 0, 0)
+    label:SetText(name)
+
+    -- Color swatch button
+    local swatch = CreateFrame("Button", nil, frame)
+    swatch:SetSize(20, 20)
+    swatch:SetPoint("RIGHT", frame, "RIGHT", -80, 0)
+
+    -- Swatch background
+    local bg = swatch:CreateTexture(nil, "BACKGROUND")
+    bg:SetAllPoints()
+    bg:SetColorTexture(0, 0, 0, 1)
+    bg:SetPoint("CENTER")
+
+    -- Swatch color texture
+    local color = swatch:CreateTexture(nil, "BORDER")
+    color:SetSize(18, 18)
+    color:SetPoint("CENTER")
+
+    -- Get current color
+    local r, g, b, a = getFunc()
+    color:SetColorTexture(r or 1, g or 1, b or 1, a or 1)
+    swatch.color = color
+
+    -- Current value display
+    local valueText = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+    valueText:SetPoint("RIGHT", swatch, "LEFT", -8, 0)
+    if hasAlpha then
+        valueText:SetText(string.format("%.2f, %.2f, %.2f, %.2f", r or 1, g or 1, b or 1, a or 1))
+    else
+        valueText:SetText(string.format("%.2f, %.2f, %.2f", r or 1, g or 1, b or 1))
+    end
+
+    -- Color picker button click handler
+    swatch:SetScript("OnClick", function(self)
+        local r, g, b, a = getFunc()
+
+        local function OnColorChanged()
+            local newR, newG, newB = ColorPickerFrame:GetColorRGB()
+            local newA = hasAlpha and ColorPickerFrame:GetColorAlpha() or 1
+
+            -- Update swatch
+            color:SetColorTexture(newR, newG, newB, newA)
+
+            -- Update value text
+            if hasAlpha then
+                valueText:SetText(string.format("%.2f, %.2f, %.2f, %.2f", newR, newG, newB, newA))
+            else
+                valueText:SetText(string.format("%.2f, %.2f, %.2f", newR, newG, newB))
+            end
+
+            -- Apply color
+            Config:SchedulePreviewUpdate("colorpicker_" .. name, function()
+                setFunc(newR, newG, newB, newA)
+            end, 0.1)
+        end
+
+        local function OnColorFinished()
+            local newR, newG, newB = ColorPickerFrame:GetColorRGB()
+            local newA = hasAlpha and ColorPickerFrame:GetColorAlpha() or 1
+            setFunc(newR, newG, newB, newA)
+        end
+
+        ColorPickerFrame:SetupColorPickerAndShow({
+            r = r,
+            g = g,
+            b = b,
+            opacity = hasAlpha and a or nil,
+            hasOpacity = hasAlpha,
+            swatchFunc = OnColorChanged,
+            opacityFunc = hasAlpha and OnColorChanged or nil,
+            cancelFunc = function()
+                local oldR, oldG, oldB, oldA = getFunc()
+                color:SetColorTexture(oldR, oldG, oldB, oldA or 1)
+                if hasAlpha then
+                    valueText:SetText(string.format("%.2f, %.2f, %.2f, %.2f", oldR, oldG, oldB, oldA))
+                else
+                    valueText:SetText(string.format("%.2f, %.2f, %.2f", oldR, oldG, oldB))
+                end
+            end,
+            finishedFunc = OnColorFinished,
+        })
+    end)
+
+    if tooltip then
+        swatch:SetScript("OnEnter", function(self)
+            GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+            GameTooltip:SetText(tooltip)
+            GameTooltip:Show()
+        end)
+        swatch:SetScript("OnLeave", function(self)
+            GameTooltip:Hide()
+        end)
+    end
+
+    return frame
+end
+
+-- Helper function to create a dropdown menu control
+function Config:CreateDropdown(name, items, getFunc, setFunc, tooltip)
+    local frame = CreateFrame("Frame")
+    frame:SetSize(560, 40)
+
+    -- Label
+    local label = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+    label:SetPoint("TOPLEFT", frame, "TOPLEFT", 0, -8)
+    label:SetText(name)
+
+    -- Dropdown button
+    local dropdown = CreateFrame("Frame", "DivinicalUIDropdown" .. name, frame, "UIDropDownMenuTemplate")
+    dropdown:SetPoint("TOPLEFT", label, "BOTTOMLEFT", -15, -4)
+
+    -- Initialize dropdown
+    UIDropDownMenu_SetWidth(dropdown, 200)
+    UIDropDownMenu_SetText(dropdown, getFunc())
+
+    -- Dropdown menu initialization function
+    local function InitializeDropdown(self, level)
+        local info = UIDropDownMenu_CreateInfo()
+
+        for i, item in ipairs(items) do
+            info.text = item
+            info.func = function(self)
+                UIDropDownMenu_SetText(dropdown, item)
+                setFunc(item)
+                Config:ApplyImmediateUpdate(function()
+                    -- Apply the selected value immediately
+                end)
+            end
+            info.checked = (getFunc() == item)
+            UIDropDownMenu_AddButton(info, level)
+        end
+    end
+
+    UIDropDownMenu_Initialize(dropdown, InitializeDropdown)
+
+    if tooltip then
+        dropdown.tooltipText = tooltip
+    end
 
     return frame
 end
