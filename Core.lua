@@ -290,7 +290,7 @@ function DivinicalUI:InitializeSoundSystem()
     -- Register sound events if enabled
     if self.db.profile.sounds.enabled then
         eventFrame:RegisterEvent("UNIT_HEALTH")
-        eventFrame:RegisterEvent("PLAYER_TARGET_CHANGED")
+        -- PLAYER_TARGET_CHANGED removed - beeping sound was annoying
         eventFrame:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
         if self.modules.Utils then
             self.modules.Utils.Debug.Print("Sound system initialized", "INFO")

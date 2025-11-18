@@ -27,7 +27,18 @@ function UnitFrames:CreateStyle()
     local function Style(self, unit)
         -- Set size and position (will be overridden per frame type)
         self:SetSize(150, 40)
-        
+
+        -- Determine font sizes based on unit type (smaller fonts for secondary frames)
+        local isSmallFrame = (unit == "targettarget" or unit == "focustarget" or unit == "pettarget")
+        local isMediumFrame = (unit == "pet" or unit == "focus")
+
+        local healthFontSize = isSmallFrame and 8 or (isMediumFrame and 10 or 12)
+        local healthPercFontSize = isSmallFrame and 7 or (isMediumFrame and 9 or 11)
+        local powerFontSize = isSmallFrame and 7 or (isMediumFrame and 8 or 10)
+        local powerTypeFontSize = isSmallFrame and 6 or (isMediumFrame and 7 or 9)
+        local nameFontSize = isSmallFrame and 8 or (isMediumFrame and 10 or 12)
+        local levelFontSize = isSmallFrame and 7 or (isMediumFrame and 9 or 10)
+
         -- Health bar with gradient texture
         self.Health = CreateFrame("StatusBar", nil, self)
         self.Health:SetAllPoints()
@@ -53,15 +64,15 @@ function UnitFrames:CreateStyle()
         -- Health text with enhanced formatting
         self.Health.value = self.Health:CreateFontString(nil, "OVERLAY")
         self.Health.value:SetPoint("RIGHT", self.Health, "RIGHT", -2, 0)
-        self.Health.value:SetFont("Interface\\AddOns\\DivinicalUI\\Media\\Fonts\\Pixel.ttf", 12, "OUTLINE")
+        self.Health.value:SetFont("Interface\\AddOns\\DivinicalUI\\Media\\Fonts\\Pixel.ttf", healthFontSize, "OUTLINE")
         self.Health.value:SetShadowColor(0, 0, 0, 0.5)
         self.Health.value:SetShadowOffset(1, -1)
         self:Tag(self.Health.value, "[divinical:health]")
-        
+
         -- Health percentage text
         self.Health.percentage = self.Health:CreateFontString(nil, "OVERLAY")
         self.Health.percentage:SetPoint("LEFT", self.Health, "LEFT", 2, 0)
-        self.Health.percentage:SetFont("Interface\\AddOns\\DivinicalUI\\Media\\Fonts\\Pixel.ttf", 11, "OUTLINE")
+        self.Health.percentage:SetFont("Interface\\AddOns\\DivinicalUI\\Media\\Fonts\\Pixel.ttf", healthPercFontSize, "OUTLINE")
         self.Health.percentage:SetShadowColor(0, 0, 0, 0.5)
         self.Health.percentage:SetShadowOffset(1, -1)
         self:Tag(self.Health.percentage, "[divinical:healthperc]")
@@ -94,15 +105,15 @@ function UnitFrames:CreateStyle()
         -- Power text with enhanced formatting
         self.Power.value = self.Power:CreateFontString(nil, "OVERLAY")
         self.Power.value:SetPoint("RIGHT", self.Power, "RIGHT", -2, 0)
-        self.Power.value:SetFont("Interface\\AddOns\\DivinicalUI\\Media\\Fonts\\Pixel.ttf", 10, "OUTLINE")
+        self.Power.value:SetFont("Interface\\AddOns\\DivinicalUI\\Media\\Fonts\\Pixel.ttf", powerFontSize, "OUTLINE")
         self.Power.value:SetShadowColor(0, 0, 0, 0.5)
         self.Power.value:SetShadowOffset(1, -1)
         self:Tag(self.Power.value, "[divinical:power]")
-        
+
         -- Power type indicator
         self.Power.type = self.Power:CreateFontString(nil, "OVERLAY")
         self.Power.type:SetPoint("LEFT", self.Power, "LEFT", 2, 0)
-        self.Power.type:SetFont("Interface\\AddOns\\DivinicalUI\\Media\\Fonts\\Pixel.ttf", 9, "OUTLINE")
+        self.Power.type:SetFont("Interface\\AddOns\\DivinicalUI\\Media\\Fonts\\Pixel.ttf", powerTypeFontSize, "OUTLINE")
         self.Power.type:SetShadowColor(0, 0, 0, 0.5)
         self.Power.type:SetShadowOffset(1, -1)
         self:Tag(self.Power.type, "[divinical:powertype]")
@@ -110,14 +121,14 @@ function UnitFrames:CreateStyle()
         -- Name text using oUF tags
         self.Name = self:CreateFontString(nil, "OVERLAY")
         self.Name:SetPoint("LEFT", self.Health, "LEFT", 2, 0)
-        self.Name:SetFont("Interface\\AddOns\\DivinicalUI\\Media\\Fonts\\Pixel.ttf", 12, "OUTLINE")
+        self.Name:SetFont("Interface\\AddOns\\DivinicalUI\\Media\\Fonts\\Pixel.ttf", nameFontSize, "OUTLINE")
         self.Name:SetJustifyH("LEFT")
         self:Tag(self.Name, "[name]")
-        
+
         -- Level text using oUF tags
         self.Level = self:CreateFontString(nil, "OVERLAY")
         self.Level:SetPoint("TOPRIGHT", self, "TOPRIGHT", -2, -2)
-        self.Level:SetFont("Interface\\AddOns\\DivinicalUI\\Media\\Fonts\\Pixel.ttf", 10, "OUTLINE")
+        self.Level:SetFont("Interface\\AddOns\\DivinicalUI\\Media\\Fonts\\Pixel.ttf", levelFontSize, "OUTLINE")
         self:Tag(self.Level, "[level][classification]")
         
         -- Enhanced Cast bar with latency and spell queue detection
@@ -949,21 +960,31 @@ function UnitFrames:ApplyFrameSettings(frame, frameType)
             fontPath = "Fonts\\MORPHEUS.ttf"
         end
 
-        -- Update all text elements
+        -- Scale font sizes based on frame type
+        local isSmallFrame = (frameType == "targettarget" or frameType == "focustarget" or frameType == "pettarget")
+        local isMediumFrame = (frameType == "pet" or frameType == "focus")
+
+        local healthFontSize = isSmallFrame and 8 or (isMediumFrame and 10 or 12)
+        local healthPercFontSize = isSmallFrame and 7 or (isMediumFrame and 9 or 11)
+        local powerFontSize = isSmallFrame and 7 or (isMediumFrame and 8 or 10)
+        local nameFontSize = isSmallFrame and 8 or (isMediumFrame and 10 or 13)
+        local levelFontSize = isSmallFrame and 7 or (isMediumFrame and 9 or 12)
+
+        -- Update all text elements with scaled fonts
         if frame.Health and frame.Health.value then
-            frame.Health.value:SetFont(fontPath, 12, "OUTLINE")
+            frame.Health.value:SetFont(fontPath, healthFontSize, "OUTLINE")
         end
         if frame.Health and frame.Health.percentage then
-            frame.Health.percentage:SetFont(fontPath, 11, "OUTLINE")
+            frame.Health.percentage:SetFont(fontPath, healthPercFontSize, "OUTLINE")
         end
         if frame.Power and frame.Power.value then
-            frame.Power.value:SetFont(fontPath, 10, "OUTLINE")
+            frame.Power.value:SetFont(fontPath, powerFontSize, "OUTLINE")
         end
         if frame.Name then
-            frame.Name:SetFont(fontPath, 13, "OUTLINE")
+            frame.Name:SetFont(fontPath, nameFontSize, "OUTLINE")
         end
         if frame.Level then
-            frame.Level:SetFont(fontPath, 12, "OUTLINE")
+            frame.Level:SetFont(fontPath, levelFontSize, "OUTLINE")
         end
     end
 
