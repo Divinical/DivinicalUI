@@ -885,44 +885,44 @@ function UnitFrames:PLAYER_ENTERING_WORLD()
     -- Update all frames when entering world
     for _, frame in pairs(frames) do
         if frame.UpdateAllElements then
-            frame:UpdateAllElements()
+            frame:UpdateAllElements("RefreshUnit")
         end
     end
 end
 
 function UnitFrames:UNIT_HEALTH(unit)
     if frames[unit] and frames[unit].UpdateAllElements then
-        frames[unit]:UpdateAllElements()
+        frames[unit]:UpdateAllElements("UNIT_HEALTH")
     end
 end
 
 function UnitFrames:UNIT_POWER_UPDATE(unit)
     if frames[unit] and frames[unit].UpdateAllElements then
-        frames[unit]:UpdateAllElements()
+        frames[unit]:UpdateAllElements("UNIT_POWER_UPDATE")
     end
 end
 
 function UnitFrames:PLAYER_TARGET_CHANGED()
     if frames.target and frames.target.UpdateAllElements then
-        frames.target:UpdateAllElements()
+        frames.target:UpdateAllElements("PLAYER_TARGET_CHANGED")
     end
 end
 
 -- Update player frame
 function UnitFrames:UpdatePlayerFrame()
     if frames.player then
-        frames.player:SetSize(DivinicalUI.db.profile.unitframes.player.width, 
+        frames.player:SetSize(DivinicalUI.db.profile.unitframes.player.width,
                              DivinicalUI.db.profile.unitframes.player.height)
-        frames.player:UpdateAllElements()
+        frames.player:UpdateAllElements("RefreshUnit")
     end
 end
 
 -- Update target frame
 function UnitFrames:UpdateTargetFrame()
     if frames.target then
-        frames.target:SetSize(DivinicalUI.db.profile.unitframes.target.width, 
+        frames.target:SetSize(DivinicalUI.db.profile.unitframes.target.width,
                              DivinicalUI.db.profile.unitframes.target.height)
-        frames.target:UpdateAllElements()
+        frames.target:UpdateAllElements("RefreshUnit")
     end
 end
 
@@ -931,7 +931,7 @@ function UnitFrames:OnProfileChanged(profileName)
     -- Update all frames when profile changes
     for _, frame in pairs(frames) do
         if frame.UpdateAllElements then
-            frame:UpdateAllElements()
+            frame:UpdateAllElements("RefreshUnit")
         end
     end
 end
