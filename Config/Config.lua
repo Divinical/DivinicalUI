@@ -124,28 +124,25 @@ function Config:RegisterSettingsPanel()
     self.categories.main = mainCategory
     self.panels.main = mainCanvas
 
-    -- === SUBCATEGORY: Unit Frames (under DivinicalUI) ===
+    -- === SUBCATEGORY: Unit Frames ===
     local unitFramesCanvas = self:CreateCategoryCanvas("Unit Frames")
     unitFramesCanvas.desc:SetText("Customize colors, fonts, sizes, and positioning for all unit frames.")
     self:PopulateUnitFramesSettings(unitFramesCanvas)
 
-    local unitFramesCategory = Settings.RegisterCanvasLayoutCategory(unitFramesCanvas, "Unit Frames", "DivinicalUI")
+    local unitFramesCategory = Settings.RegisterCanvasLayoutSubcategory(mainCategory, unitFramesCanvas, "Unit Frames")
     unitFramesCategory.ID = "DivinicalUI_UnitFrames"
     self.categories.unitframes = unitFramesCategory
     self.panels.unitframes = unitFramesCanvas
 
-    -- === SUBCATEGORY: Profiles (under DivinicalUI) ===
+    -- === SUBCATEGORY: Profiles ===
     local profilesCanvas = self:CreateCategoryCanvas("Profiles")
     profilesCanvas.desc:SetText("Manage, switch, and share your UI configurations.")
     self:PopulateProfilesSettings(profilesCanvas)
 
-    local profilesCategory = Settings.RegisterCanvasLayoutCategory(profilesCanvas, "Profiles", "DivinicalUI")
+    local profilesCategory = Settings.RegisterCanvasLayoutSubcategory(mainCategory, profilesCanvas, "Profiles")
     profilesCategory.ID = "DivinicalUI_Profiles"
     self.categories.profiles = profilesCategory
     self.panels.profiles = profilesCanvas
-
-    -- === FUTURE SUBCATEGORIES (Placeholders) ===
-    -- Action Bars, Nameplates, Minimap, Bags, etc. will go here as subcategories under DivinicalUI
 end
 
 -- Create a unit frame subcategory dynamically
