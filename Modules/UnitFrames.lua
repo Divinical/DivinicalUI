@@ -73,6 +73,7 @@ function UnitFrames:CreateStyle()
         self.Power:SetHeight(10) -- Slightly taller for better visibility
         self.Power:SetStatusBarTexture("Interface\\TargetingFrame\\UI-StatusBar")
         self.Power:GetStatusBarTexture():SetDrawLayer("ARTWORK")
+        self.Power.frequentUpdates = true -- Enable frequent power updates
         -- Note: SetSmoothProgress removed - not available in WoW 11.0.2+
         
         -- Power background
@@ -599,16 +600,13 @@ function UnitFrames:CreateStyle()
     oUF.Tags.Methods["divinical:health"] = function(unit)
         local health = UnitHealth(unit)
         local maxHealth = UnitHealthMax(unit)
-        
+
         if not UnitIsConnected(unit) or maxHealth == 0 then
             return "??"
         end
-        
-        if health == maxHealth then
-            return ""
-        else
-            return DivinicalUI.modules.Utils.Strings.FormatNumber(health) .. " / " .. DivinicalUI.modules.Utils.Strings.FormatNumber(maxHealth)
-        end
+
+        -- Always show health values
+        return DivinicalUI.modules.Utils.Strings.FormatNumber(health) .. " / " .. DivinicalUI.modules.Utils.Strings.FormatNumber(maxHealth)
     end
     
     oUF.Tags.Events["divinical:healthperc"] = "UNIT_HEALTH UNIT_MAXHEALTH UNIT_CONNECTION"
@@ -624,20 +622,17 @@ function UnitFrames:CreateStyle()
         return healthPercent .. "%"
     end
     
-    oUF.Tags.Events["divinical:power"] = "UNIT_POWER_UPDATE UNIT_MAXPOWER UNIT_CONNECTION"
+    oUF.Tags.Events["divinical:power"] = "UNIT_POWER_FREQUENT UNIT_MAXPOWER UNIT_CONNECTION UNIT_DISPLAYPOWER"
     oUF.Tags.Methods["divinical:power"] = function(unit)
         local power = UnitPower(unit)
         local maxPower = UnitPowerMax(unit)
-        
+
         if not UnitIsConnected(unit) or maxPower == 0 then
             return ""
         end
-        
-        if power == 0 then
-            return ""
-        else
-            return DivinicalUI.modules.Utils.Strings.FormatNumber(power) .. " / " .. DivinicalUI.modules.Utils.Strings.FormatNumber(maxPower)
-        end
+
+        -- Always show power values (don't hide when 0)
+        return DivinicalUI.modules.Utils.Strings.FormatNumber(power) .. " / " .. DivinicalUI.modules.Utils.Strings.FormatNumber(maxPower)
     end
     
     oUF.Tags.Events["divinical:powertype"] = "UNIT_POWER_UPDATE UNIT_DISPLAYPOWER"
