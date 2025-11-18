@@ -113,84 +113,38 @@ end
 
 -- Register settings panel with Blizzard's Settings API
 function Config:RegisterSettingsPanel()
-    -- Create General category canvas
-    local generalCanvas = self:CreateCategoryCanvas("General")
-    generalCanvas.desc:SetText("General addon settings and basic configuration.")
-    self:PopulateGeneralSettings(generalCanvas)
+    -- === CATEGORY 1: DivinicalUI (Main) ===
+    local mainCanvas = self:CreateCategoryCanvas("DivinicalUI")
+    mainCanvas.desc:SetText("Main settings and quick access to common options.")
+    self:PopulateGeneralSettings(mainCanvas)
 
-    -- Register General as root category (only call RegisterAddOnCategory once)
-    local generalCategory = Settings.RegisterCanvasLayoutCategory(generalCanvas, "DivinicalUI")
-    generalCategory.ID = "DivinicalUI_General"
-    Settings.RegisterAddOnCategory(generalCategory) -- Only the root category uses this
-    self.categories.general = generalCategory
-    self.panels.general = generalCanvas
+    local mainCategory = Settings.RegisterCanvasLayoutCategory(mainCanvas, "DivinicalUI")
+    mainCategory.ID = "DivinicalUI_Main"
+    Settings.RegisterAddOnCategory(mainCategory)
+    self.categories.main = mainCategory
+    self.panels.main = mainCanvas
 
-    -- Create Unit Frames category canvas (overview page)
+    -- === CATEGORY 2: Unit Frames (Comprehensive) ===
     local unitFramesCanvas = self:CreateCategoryCanvas("Unit Frames")
-    unitFramesCanvas.desc:SetText("Configure unit frame appearance, positioning, and elements.")
+    unitFramesCanvas.desc:SetText("Customize health bars, power bars, colors, fonts, and positioning for all unit frames.")
     self:PopulateUnitFramesSettings(unitFramesCanvas)
 
-    -- Register Unit Frames as subcategory (no RegisterAddOnCategory call)
-    local unitFramesCategory = Settings.RegisterCanvasLayoutCategory(unitFramesCanvas, "Unit Frames", "DivinicalUI")
+    local unitFramesCategory = Settings.RegisterCanvasLayoutCategory(unitFramesCanvas, "DivinicalUI - Unit Frames")
     unitFramesCategory.ID = "DivinicalUI_UnitFrames"
+    Settings.RegisterAddOnCategory(unitFramesCategory)
     self.categories.unitframes = unitFramesCategory
     self.panels.unitframes = unitFramesCanvas
 
-    -- Create subcategories for different frame types
-    self:CreateUnitFrameSubcategory("Player", "DivinicalUI_UnitFrames")
-    self:CreateUnitFrameSubcategory("Target", "DivinicalUI_UnitFrames")
-    self:CreateUnitFrameSubcategory("Party", "DivinicalUI_UnitFrames")
-    self:CreateUnitFrameSubcategory("Raid", "DivinicalUI_UnitFrames")
-
-    -- Create Raid Frames category canvas
-    local raidCanvas = self:CreateCategoryCanvas("Raid Frames")
-    raidCanvas.desc:SetText("Configure raid frame layout, sorting, and indicators.")
-    self:PopulateRaidSettings(raidCanvas)
-
-    local raidCategory = Settings.RegisterCanvasLayoutCategory(raidCanvas, "Raid Frames", "DivinicalUI")
-    raidCategory.ID = "DivinicalUI_Raid"
-    self.categories.raid = raidCategory
-    self.panels.raid = raidCanvas
-
-    -- Create Action Bars category canvas
-    local actionBarsCanvas = self:CreateCategoryCanvas("Action Bars")
-    actionBarsCanvas.desc:SetText("Configure action bar positioning, visibility, and appearance.")
-    self:PopulateActionBarsSettings(actionBarsCanvas)
-
-    local actionBarsCategory = Settings.RegisterCanvasLayoutCategory(actionBarsCanvas, "Action Bars", "DivinicalUI")
-    actionBarsCategory.ID = "DivinicalUI_ActionBars"
-    self.categories.actionbars = actionBarsCategory
-    self.panels.actionbars = actionBarsCanvas
-
-    -- Create Themes category canvas
-    local themesCanvas = self:CreateCategoryCanvas("Themes")
-    themesCanvas.desc:SetText("Select and customize visual themes for the UI.")
-    self:PopulateThemesSettings(themesCanvas)
-
-    local themesCategory = Settings.RegisterCanvasLayoutCategory(themesCanvas, "Themes", "DivinicalUI")
-    themesCategory.ID = "DivinicalUI_Themes"
-    self.categories.themes = themesCategory
-    self.panels.themes = themesCanvas
-
-    -- Create Profiles category canvas
+    -- === CATEGORY 3: Profiles ===
     local profilesCanvas = self:CreateCategoryCanvas("Profiles")
-    profilesCanvas.desc:SetText("Manage profiles, import/export settings, and apply presets.")
+    profilesCanvas.desc:SetText("Create, switch, copy, and export profiles. Apply role-specific presets.")
     self:PopulateProfilesSettings(profilesCanvas)
 
-    local profilesCategory = Settings.RegisterCanvasLayoutCategory(profilesCanvas, "Profiles", "DivinicalUI")
+    local profilesCategory = Settings.RegisterCanvasLayoutCategory(profilesCanvas, "DivinicalUI - Profiles")
     profilesCategory.ID = "DivinicalUI_Profiles"
+    Settings.RegisterAddOnCategory(profilesCategory)
     self.categories.profiles = profilesCategory
     self.panels.profiles = profilesCanvas
-
-    -- Create Advanced category canvas
-    local advancedCanvas = self:CreateCategoryCanvas("Advanced")
-    advancedCanvas.desc:SetText("Advanced options, performance settings, and developer tools.")
-    self:PopulateAdvancedSettings(advancedCanvas)
-
-    local advancedCategory = Settings.RegisterCanvasLayoutCategory(advancedCanvas, "Advanced", "DivinicalUI")
-    advancedCategory.ID = "DivinicalUI_Advanced"
-    self.categories.advanced = advancedCategory
-    self.panels.advanced = advancedCanvas
 end
 
 -- Create a unit frame subcategory dynamically
@@ -514,25 +468,97 @@ end
 
 -- Populate Unit Frames settings
 function Config:PopulateUnitFramesSettings(canvas)
-    -- Enable unit frames
-    local enableFrames = self:CreateCheckbox(
-        "Enable Unit Frames",
-        function() return DivinicalUI.db.profile.unitframes.enabled end,
-        function(value)
-            DivinicalUI.db.profile.unitframes.enabled = value
+    -- === GLOBAL COLORS ===
+    local colorsHeader = self:CreateHeader("Colors (All Frames)")
+    self:AddControl(canvas, colorsHeader, 24)
+
+    -- Info text
+    local colorsInfo = canvas:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+    colorsInfo:SetPoint("TOPLEFT", canvas.content, "TOPLEFT", 8, -(canvas.lastY))
+    colorsInfo:SetWidth(560)
+    colorsInfo:SetJustifyH("LEFT")
+    colorsInfo:SetText("Set default colors for health and power bars across all unit frames:")
+    colorsInfo:SetTextColor(0.8, 0.8, 0.8)
+    self:AddControl(canvas, CreateFrame("Frame"), 24)
+
+    -- Health Bar Color picker
+    local healthColorPicker = self:CreateColorPicker(
+        "Health Bar Color",
+        function()
+            local c = DivinicalUI.db.profile.colors.health or {0.2, 0.8, 0.2}
+            return c[1], c[2], c[3], c[4] or 1
+        end,
+        function(r, g, b, a)
+            DivinicalUI.db.profile.colors.health = {r, g, b, a}
             if DivinicalUI.modules.UnitFrames then
-                DivinicalUI.modules.UnitFrames:UpdateAllFrames()
+                DivinicalUI.modules.UnitFrames:UpdatePlayerFrame()
+                DivinicalUI.modules.UnitFrames:UpdateTargetFrame()
             end
         end,
-        "Enable or disable all unit frames"
+        true,
+        "Default color for all health bars"
     )
-    self:AddControl(canvas, enableFrames, 32)
+    self:AddControl(canvas, healthColorPicker, 32)
+
+    -- Power Bar Color picker
+    local powerColorPicker = self:CreateColorPicker(
+        "Power Bar Color",
+        function()
+            local c = DivinicalUI.db.profile.colors.power or {0.2, 0.4, 0.8}
+            return c[1], c[2], c[3], c[4] or 1
+        end,
+        function(r, g, b, a)
+            DivinicalUI.db.profile.colors.power = {r, g, b, a}
+            if DivinicalUI.modules.UnitFrames then
+                DivinicalUI.modules.UnitFrames:UpdatePlayerFrame()
+                DivinicalUI.modules.UnitFrames:UpdateTargetFrame()
+            end
+        end,
+        true,
+        "Default color for all power bars"
+    )
+    self:AddControl(canvas, powerColorPicker, 32)
 
     -- Spacer
     self:AddControl(canvas, CreateFrame("Frame"), 16)
 
-    -- Player frame header
-    local playerHeader = self:CreateHeader("Player Frame")
+    -- === GLOBAL FONT ===
+    local fontHeader = self:CreateHeader("Font (All Frames)")
+    self:AddControl(canvas, fontHeader, 24)
+
+    -- Font dropdown
+    local fontDropdown = self:CreateDropdown(
+        "Font Family",
+        {"Pixel", "Arial", "Friz Quadrata", "Morpheus"},
+        function()
+            -- Check player frame first, fallback to "Pixel"
+            if DivinicalUI.db.profile.unitframes.player and DivinicalUI.db.profile.unitframes.player.font then
+                return DivinicalUI.db.profile.unitframes.player.font
+            end
+            return "Pixel"
+        end,
+        function(value)
+            -- Apply to all frames
+            if DivinicalUI.db.profile.unitframes.player then
+                DivinicalUI.db.profile.unitframes.player.font = value
+            end
+            if DivinicalUI.db.profile.unitframes.target then
+                DivinicalUI.db.profile.unitframes.target.font = value
+            end
+            if DivinicalUI.modules.UnitFrames then
+                DivinicalUI.modules.UnitFrames:UpdatePlayerFrame()
+                DivinicalUI.modules.UnitFrames:UpdateTargetFrame()
+            end
+        end,
+        "Font used for all text on unit frames"
+    )
+    self:AddControl(canvas, fontDropdown, 50)
+
+    -- Spacer
+    self:AddControl(canvas, CreateFrame("Frame"), 16)
+
+    -- === PLAYER FRAME ===
+    local playerHeader = self:CreateHeader("Player Frame Size")
     self:AddControl(canvas, playerHeader, 24)
 
     -- Player frame width
@@ -546,7 +572,7 @@ function Config:PopulateUnitFramesSettings(canvas)
                 DivinicalUI.modules.UnitFrames:UpdatePlayerFrame()
             end
         end,
-        "Player frame width"
+        "Player frame width in pixels"
     )
     self:AddControl(canvas, playerWidth, 48)
 
@@ -561,12 +587,15 @@ function Config:PopulateUnitFramesSettings(canvas)
                 DivinicalUI.modules.UnitFrames:UpdatePlayerFrame()
             end
         end,
-        "Player frame height"
+        "Player frame height in pixels"
     )
     self:AddControl(canvas, playerHeight, 48)
 
-    -- Target frame header
-    local targetHeader = self:CreateHeader("Target Frame")
+    -- Spacer
+    self:AddControl(canvas, CreateFrame("Frame"), 16)
+
+    -- === TARGET FRAME ===
+    local targetHeader = self:CreateHeader("Target Frame Size")
     self:AddControl(canvas, targetHeader, 24)
 
     -- Target frame width
@@ -580,7 +609,7 @@ function Config:PopulateUnitFramesSettings(canvas)
                 DivinicalUI.modules.UnitFrames:UpdateTargetFrame()
             end
         end,
-        "Target frame width"
+        "Target frame width in pixels"
     )
     self:AddControl(canvas, targetWidth, 48)
 
@@ -595,7 +624,7 @@ function Config:PopulateUnitFramesSettings(canvas)
                 DivinicalUI.modules.UnitFrames:UpdateTargetFrame()
             end
         end,
-        "Target frame height"
+        "Target frame height in pixels"
     )
     self:AddControl(canvas, targetHeight, 48)
 end
