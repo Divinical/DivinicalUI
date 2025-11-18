@@ -1,0 +1,1118 @@
+{
+  "master": {
+    "tasks": [
+      {
+        "id": 1,
+        "title": "oUF Framework Integration",
+        "description": "Integrate oUF v11.x for unit frame functionality",
+        "details": "Download oUF v11.x, extract to Libs/oUF/, create oUF.xml load order, implement health/power/auras/castbar/portrait/threat elements, add element tags for dynamic text, verify callbacks, test unit frame spawning for all frame types",
+        "testStrategy": "Verify player/target frames display with oUF, check for Lua errors, confirm real-time health/power updates, validate cast bars functionality",
+        "priority": "high",
+        "dependencies": [],
+        "status": "done",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Framework Setup",
+            "description": "Download and configure oUF v11.x framework",
+            "dependencies": [],
+            "details": "Download oUF v11.x from official source, extract to Libs/oUF/, create oUF.xml load order file with proper dependencies, ensure framework initialization works without errors\n<info added on 2025-10-29T18:35:25.570Z>\nSuccessfully replaced simplified oUF with official v9.3.1 framework. Updated UnitFrames.lua to work with official oUF API including proper element post-update functions and tag system. Framework initialization should now work correctly with full element system (26+ elements vs previous basic implementation).\n</info added on 2025-10-29T18:35:25.570Z>",
+            "status": "done",
+            "testStrategy": null
+          },
+          {
+            "id": 2,
+            "title": "Health/Power Element Implementation",
+            "description": "Implement health and power elements with dynamic text tags",
+            "dependencies": [
+              1
+            ],
+            "details": "Create health/power statusbars with gradient textures, implement dynamic text tags for current/max values, add class-colored power types, ensure smooth value transitions and event updates",
+            "status": "done",
+            "testStrategy": null
+          },
+          {
+            "id": 3,
+            "title": "Aura System Integration",
+            "description": "Implement aura display and filtering system",
+            "dependencies": [
+              2
+            ],
+            "details": "Create aura indicators with icon+duration+stacks, implement smart filtering rules (player cast only, class-specific, boss buffs), add debuff highlighting for important raid/pvp effects\n<info added on 2025-10-29T18:40:07.700Z>\nSuccessfully implemented comprehensive aura system with separate buff and debuff frames. Added smart filtering system showing player-cast auras, priority raid/PvP debuffs (CC, silences, disarms, healing debuffs), and boss debuffs. Enhanced visuals with debuff type coloring (Magic/Curse/Disease/Poison), priority-based glow effects for critical debuffs, stack counters with shadow effects, and stealable buff indicators. Implemented class-specific buff filtering for Warriors and Priests, with plans to expand to all classes.\n</info added on 2025-10-29T18:40:07.700Z>",
+            "status": "done",
+            "testStrategy": null
+          },
+          {
+            "id": 4,
+            "title": "Castbar/Portrait/Threat Implementation",
+            "description": "Add advanced visual elements",
+            "dependencies": [
+              3
+            ],
+            "details": "Implement castbar with latency bar and spell queue detection, add 3D portrait support, integrate threat glow indicators with class-specific color schemes, ensure proper element layering",
+            "status": "done",
+            "testStrategy": null
+          },
+          {
+            "id": 5,
+            "title": "Callback Verification & Frame Testing",
+            "description": "Verify event callbacks and test all frame types",
+            "dependencies": [
+              4
+            ],
+            "details": "Test oUF's UNIT_HEALTH/FORCE_UPDATE callbacks, spawn and validate all 11 unit frame types (player/target/raid/etc), confirm dynamic tag updates during combat, check for memory leaks\n<info added on 2025-10-29T18:42:55.507Z>\nSuccessfully implemented comprehensive callback verification and frame testing system supporting all 11 unit frame types: player, target, targettarget, focus, focustarget, pet, pettarget, boss(1-5), party(1-5), raid(1-40), arena(1-5). Created validation functions for Health, Power, Castbar, Portrait, Auras, and ThreatIndicator elements. Implemented callback testing for UNIT_HEALTH and FORCE_UPDATE events with garbage collection monitoring for memory leak detection. Added dynamic tag update testing during combat, combat log event validation, comprehensive aura update testing, and automatic frame validation on spawn.\n</info added on 2025-10-29T18:42:55.507Z>",
+            "status": "done",
+            "testStrategy": null
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "title": "Media Library Implementation",
+        "description": "Create and integrate media assets for UI elements",
+        "details": "Create directory structure for fonts/textures/sounds, implement Expressway/PT Sans fonts, Aluminium/Gradient statusbars, Glow/Clean borders, integrate LibSharedMedia, implement class/role/power icons, optimize file sizes to <5MB total",
+        "testStrategy": "Verify all fonts render without errors, confirm texture display, validate SharedMedia integration, test asset accessibility via DivinicalUI.Media API",
+        "priority": "high",
+        "dependencies": [],
+        "status": "in-progress",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Font Integration",
+            "description": "Implement Expressway and PT Sans fonts with directory structure",
+            "dependencies": [],
+            "details": "Create Fonts directory, place font files, register with LibSharedMedia, configure fallback handling\n<info added on 2025-10-29T18:44:37.762Z>\nCreated Media.lua module with LibSharedMedia-3.0 integration for dynamic font registration. Implemented font registration system for Expressway, PT Sans, and custom pixel fonts with fallback handling. Added font utility functions to generate font strings with automatic shadow effects. Established validated font directory structure and integrated media fonts with UnitFrames system to replace hardcoded paths.\n</info added on 2025-10-29T18:44:37.762Z>",
+            "status": "done",
+            "testStrategy": "Verify font rendering in UI elements across resolutions"
+          },
+          {
+            "id": 2,
+            "title": "Texture Implementation",
+            "description": "Create and integrate Aluminium/Gradient statusbars and Glow/Clean borders",
+            "dependencies": [],
+            "details": "Build Textures directory, implement 9-patch borders, create statusbar gradients, register textures with LibSharedMedia",
+            "status": "done",
+            "testStrategy": "Test texture display under different UI scale settings"
+          },
+          {
+            "id": 3,
+            "title": "Sound System Setup",
+            "description": "Establish sound asset infrastructure and integration",
+            "dependencies": [],
+            "details": "Create Sounds directory structure, implement basic sound event triggers, register with LibSharedMedia\n<info added on 2025-10-29T18:47:37.030Z>\nImplemented complete sound system with event triggers in Core.lua. Added sound configuration options to database defaults (enabled, lowHealth, targetChanged, combatLog, volume). Created sound event functions for UNIT_HEALTH (low health warning), PLAYER_TARGET_CHANGED (target acquisition sounds), and COMBAT_LOG_EVENT_UNFILTERED (interrupts and kills). Integrated with Media.lua sound functions for playback with volume control. Sound system initializes on PLAYER_LOGIN and registers events based on user preferences.\n</info added on 2025-10-29T18:47:37.030Z>",
+            "status": "done",
+            "testStrategy": "Validate sound playback across different volume settings"
+          },
+          {
+            "id": 4,
+            "title": "Optimization Phase",
+            "description": "Compress assets and verify total size constraints",
+            "dependencies": [
+              1,
+              2,
+              3
+            ],
+            "details": "Implement PNG optimization pipeline, convert textures to DXT5 where appropriate, minify font subsets, validate total package size <5MB",
+            "status": "in-progress",
+            "testStrategy": "Measure final build size using CurseForge packaging tools"
+          }
+        ]
+      },
+      {
+        "id": 3,
+        "title": "Settings Panel Development",
+        "description": "Build configuration interface using Blizzard Settings API",
+        "details": "Implement settings canvas with General/UnitFrames/Raid/ActionBars/Themes/Profiles/Advanced categories, subcategories for unit frames, instant preview system, profile management with preset profiles (Tank/Healer/DPS/PvP/Simple/Advanced), implement search, color pickers, sliders, dropdowns, import/export functionality",
+        "testStrategy": "Verify settings panel opens via /divinical, test real-time preview, confirm profile save/load, validate preset application, check search functionality",
+        "priority": "high",
+        "dependencies": [
+          1,
+          2
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "UI Layout Foundation",
+            "description": "Create settings canvas structure with category navigation",
+            "dependencies": [],
+            "details": "Implement base window with General/UnitFrames/Raid/ActionBars/Themes/Profiles/Advanced tabs, responsive layout, and navigation framework",
+            "status": "pending",
+            "testStrategy": "Verify tab navigation works and layout adapts to different resolutions"
+          },
+          {
+            "id": 2,
+            "title": "Category Implementation",
+            "description": "Build subcategory structure for unit frames",
+            "dependencies": [
+              1
+            ],
+            "details": "Implement nested unit frame categories (Player/Target/Party/Raid), create template for adding/removing categories dynamically",
+            "status": "pending",
+            "testStrategy": "Test nested category expansion/collapsing and persistence across sessions"
+          },
+          {
+            "id": 3,
+            "title": "Real-time Preview System",
+            "description": "Implement instant UI feedback for settings changes",
+            "dependencies": [
+              1,
+              2
+            ],
+            "details": "Create preview sandbox environment, link UI controls to live preview updates without reloading interface",
+            "status": "pending",
+            "testStrategy": "Verify color/position changes reflect immediately in preview without game client crashes"
+          },
+          {
+            "id": 4,
+            "title": "Profile Management System",
+            "description": "Develop profile creation and switching interface",
+            "dependencies": [
+              1,
+              2
+            ],
+            "details": "Implement profile dropdown, create preset profiles (Tank/Healer/DPS/PvP/Simple/Advanced), add import/export buttons",
+            "status": "pending",
+            "testStrategy": "Test profile switching performance and verify preset configurations apply correctly"
+          },
+          {
+            "id": 5,
+            "title": "Input Controls Implementation",
+            "description": "Add interactive configuration elements",
+            "dependencies": [
+              1,
+              2
+            ],
+            "details": "Integrate color pickers with alpha support, sliders with numerical input, dropdowns with search, and toggle switches",
+            "status": "pending",
+            "testStrategy": "Validate control range limits, test keyboard accessibility for all input types"
+          },
+          {
+            "id": 6,
+            "title": "Search & Export Functionality",
+            "description": "Implement settings search and configuration export",
+            "dependencies": [
+              4,
+              5
+            ],
+            "details": "Create search bar with live filtering, develop JSON export/import system with versioning, add shareable link generation",
+            "status": "pending",
+            "testStrategy": "Test search accuracy across all categories, verify exported settings can be imported successfully"
+          }
+        ]
+      },
+      {
+        "id": 4,
+        "title": "Core Action Bar Implementation",
+        "description": "Create base action bar framework",
+        "details": "Implement main action bar (12 buttons), bottom bars 2-6 (60 buttons), right bars 1-2 (24 buttons), pet/stance/vehicle/micro menu/bag/extras/zone bars, ensure no conflicts with default bars",
+        "testStrategy": "Verify all bars display/function, test keybinds, ensure no default bar conflicts",
+        "priority": "high",
+        "dependencies": [
+          3
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Main Action Bar Implementation",
+            "description": "Implement primary 12-button action bar with core functionality",
+            "dependencies": [],
+            "details": "Create main action bar with 12 buttons, implement basic button layout, keybind integration, and ensure compatibility with default UI positioning",
+            "status": "pending",
+            "testStrategy": "Verify button placement, test keybind functionality, validate no overlap with default bars"
+          },
+          {
+            "id": 2,
+            "title": "Bottom Bars Implementation",
+            "description": "Create bottom action bars 2-6 with 60 buttons total",
+            "dependencies": [],
+            "details": "Implement horizontal bottom bars 2-6 with 12 buttons each, ensure proper vertical spacing, maintain consistent alignment with main bar, and integrate keybind zones",
+            "status": "pending",
+            "testStrategy": "Check button distribution, validate vertical positioning, test keybind zones"
+          },
+          {
+            "id": 3,
+            "title": "Right Bars Implementation",
+            "description": "Implement right-side action bars 1-2 with 24 buttons",
+            "dependencies": [],
+            "details": "Create vertical right-side bars with 12 buttons each, implement docking mechanism to main bar, ensure proper z-index layering, and maintain aspect ratio across resolutions",
+            "status": "pending",
+            "testStrategy": "Verify vertical alignment, test docking functionality, validate resolution scaling"
+          },
+          {
+            "id": 4,
+            "title": "Special Purpose Bars Implementation",
+            "description": "Create context-specific action bars for special systems",
+            "dependencies": [],
+            "details": "Implement pet/stance/vehicle/micro menu/bag/extras/zone bars with dynamic activation conditions, ensure proper anchoring points, and maintain consistent visual style with main framework",
+            "status": "pending",
+            "testStrategy": "Test context activation, verify anchoring, validate visual consistency"
+          },
+          {
+            "id": 5,
+            "title": "Conflict Resolution Layer",
+            "description": "Implement system to prevent UI element conflicts",
+            "dependencies": [],
+            "details": "Create detection system for default bar conflicts, implement automatic repositioning logic, develop priority hierarchy for overlapping elements, and add user override options",
+            "status": "pending",
+            "testStrategy": "Simulate conflict scenarios, test override functionality, validate priority system"
+          }
+        ]
+      },
+      {
+        "id": 5,
+        "title": "Action Bar Positioning System",
+        "description": "Implement layout customization",
+        "details": "Add drag-and-drop positioning, coordinate input fields, scale slider (50-200%), button size (16-64px), spacing controls, anchor points, snap-to-grid, alignment guides, lock/unlock toggle",
+        "testStrategy": "Test screen positioning, verify grid snapping, confirm alignment helpers, validate lock functionality",
+        "priority": "high",
+        "dependencies": [
+          4
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Implement Drag-and-Drop System",
+            "description": "Create interactive drag-and-drop functionality for action bar positioning",
+            "dependencies": [],
+            "details": "Handle drag events with coordinate tracking, implement position updates during drag, integrate snap-to-grid calculations, and ensure smooth movement transitions",
+            "status": "pending",
+            "testStrategy": "Test drag responsiveness, verify grid snapping accuracy, and validate position updates during movement"
+          },
+          {
+            "id": 1,
+            "title": "Coordinate Controls Implementation",
+            "description": "Add manual coordinate input and adjustment system",
+            "dependencies": [],
+            "details": "Develop X/Y coordinate input fields with validation, implement position update triggers on input change, and synchronize inputs with visual position updates",
+            "status": "pending",
+            "testStrategy": "Validate input range constraints, test coordinate-to-position synchronization, and verify numeric input parsing"
+          },
+          {
+            "id": 1,
+            "title": "Alignment Tools Development",
+            "description": "Build alignment assistance features",
+            "dependencies": [],
+            "details": "Implement anchor point system with multiple reference points, develop dynamic alignment guides, and create snap-to-grid calculations with customizable grid size",
+            "status": "pending",
+            "testStrategy": "Test alignment accuracy with different anchor points, verify guide visibility, and confirm grid snapping consistency"
+          },
+          {
+            "id": 1,
+            "title": "Layout Persistence System",
+            "description": "Create layout saving and loading functionality",
+            "dependencies": [
+              1,
+              2,
+              3
+            ],
+            "details": "Implement layout serialization to JSON, develop save/load mechanism with versioning, and create UI for layout management",
+            "status": "pending",
+            "testStrategy": "Verify layout saving/loading integrity, test version migration, and validate persistence across application restarts"
+          }
+        ]
+      },
+      {
+        "id": 6,
+        "title": "Action Bar Visibility System",
+        "description": "Implement context-sensitive visibility rules",
+        "details": "Create combat/target/focus/vehicle/stealth/pet battle visibility toggles, instance type (party/raid/arena) rules, spec-based visibility, mouse-over fading with alpha/delay controls",
+        "testStrategy": "Test all visibility conditions, verify smooth fading, ensure no flickering during rapid state changes",
+        "priority": "high",
+        "dependencies": [
+          5
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "State Detection Engine",
+            "description": "Implement game state monitoring system",
+            "dependencies": [
+              5
+            ],
+            "details": "Develop event listeners for combat, target, focus, vehicle, stealth, and pet battle states. Create state tracking system to detect instance types (party/raid/arena) and specialization changes. Must handle overlapping states without performance impact.",
+            "status": "pending",
+            "testStrategy": null
+          },
+          {
+            "id": 2,
+            "title": "Visibility Rules Engine",
+            "description": "Create context-sensitive visibility logic",
+            "dependencies": [
+              5
+            ],
+            "details": "Implement priority-based visibility rules combining multiple conditions. Develop spec-based visibility mapping and instance type rule sets. Ensure seamless transitions between conflicting states while maintaining 60FPS performance.",
+            "status": "pending",
+            "testStrategy": null
+          },
+          {
+            "id": 3,
+            "title": "Fading Animation System",
+            "description": "Implement smooth visibility transitions",
+            "dependencies": [
+              5
+            ],
+            "details": "Develop alpha fading system with customizable delay controls. Create mouse-over fade logic with configurable thresholds. Optimize for rapid state changes to prevent flickering during combat transitions.",
+            "status": "pending",
+            "testStrategy": null
+          }
+        ]
+      },
+      {
+        "id": 7,
+        "title": "Action Button Customization",
+        "description": "Implement button appearance controls",
+        "details": "Add keybind/macro name display options, cooldown text formatting, proc glow styles, range/resource coloring, 8+ button skins, border customization, icon zoom/padding, stack count display",
+        "testStrategy": "Verify all display options function, test proc glow triggers, confirm range/resource coloring accuracy",
+        "priority": "high",
+        "dependencies": [
+          6
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Display Options Implementation",
+            "description": "Implement keybind/macro name display, cooldown text formatting, and stack count display controls",
+            "dependencies": [],
+            "details": "Create UI toggles for text visibility, formatting options for cooldown timers, and stack count positioning/visibility settings",
+            "status": "pending",
+            "testStrategy": "Verify text display toggles function, test different formatting presets, confirm stack counts update correctly"
+          },
+          {
+            "id": 2,
+            "title": "Visual Effects System",
+            "description": "Implement proc glow styles and button skin management",
+            "dependencies": [],
+            "details": "Develop multiple glow animation types (pulsing, spinning, etc.), integrate skin selection UI with 8+ default skins",
+            "status": "pending",
+            "testStrategy": "Test glow triggers during ability procs, validate skin application across different button states"
+          },
+          {
+            "id": 3,
+            "title": "Color System Integration",
+            "description": "Implement range/resource state coloring system",
+            "dependencies": [],
+            "details": "Create color pickers for range/mana/energy states, implement dynamic color overlay system for button backgrounds",
+            "status": "pending",
+            "testStrategy": "Verify color changes based on unit state, test contrast visibility across different skins"
+          },
+          {
+            "id": 4,
+            "title": "Layout Controls Development",
+            "description": "Implement icon zoom, padding, and border customization",
+            "dependencies": [],
+            "details": "Add sliders for icon scale (50-150%), padding controls (0-10px), and border style/width customization options",
+            "status": "pending",
+            "testStrategy": "Test layout changes across different skin templates, verify spacing consistency during animations"
+          }
+        ]
+      },
+      {
+        "id": 8,
+        "title": "Action Bar State Management",
+        "description": "Implement dynamic bar paging",
+        "details": "Create combat/stealth/mount/target/modifier key state pages, override bar handling for vehicles/possess/pet battles, custom page conditions, active page indicators",
+        "testStrategy": "Test class-specific page switching, verify override bars, validate state indicators",
+        "priority": "high",
+        "dependencies": [
+          7
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "State Detection System",
+            "description": "Create state machine for game mode detection",
+            "dependencies": [],
+            "details": "Implement combat/stealth/mount state tracking with class-specific conditions, including modifier key detection and target relationship checks",
+            "status": "pending",
+            "testStrategy": "Test state transitions across different game modes and class specializations"
+          },
+          {
+            "id": 2,
+            "title": "Page Configuration Engine",
+            "description": "Build dynamic page mapping system",
+            "dependencies": [
+              1
+            ],
+            "details": "Develop page assignment logic for combat/stealth/mount states, implement custom condition scripting interface, and create active page indicator system",
+            "status": "pending",
+            "testStrategy": "Validate page configuration parsing and condition evaluation accuracy"
+          },
+          {
+            "id": 3,
+            "title": "Override Handling Module",
+            "description": "Implement bar override system",
+            "dependencies": [
+              1,
+              2
+            ],
+            "details": "Create vehicle/possess/pet battle override hierarchy, develop page priority system, and integrate active page visual indicators",
+            "status": "pending",
+            "testStrategy": "Verify override priority resolution and test active page indicator visibility"
+          }
+        ]
+      },
+      {
+        "id": 9,
+        "title": "Visual Bar Editor",
+        "description": "Create drag-and-drop layout editor",
+        "details": "Implement edit mode toggle, drag handles, real-time preview, grid snapping, undo/redo (10 steps), lock/unlock all button, visual selection highlight, screenshot mode",
+        "testStrategy": "Verify drag precision, test undo/redo, confirm automatic saving, validate edit mode accessibility",
+        "priority": "high",
+        "dependencies": [
+          8
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Edit Mode System Implementation",
+            "description": "Develop toggle functionality between edit and preview modes with locking controls",
+            "dependencies": [],
+            "details": "Implement edit mode toggle button, lock/unlock all elements functionality, and mode-specific UI state management",
+            "status": "pending",
+            "testStrategy": "Verify mode switching preserves layout state, test lock/unlock functionality across multiple elements"
+          },
+          {
+            "id": 11,
+            "title": "Layout Manipulation Tools",
+            "description": "Create drag handles and grid snapping system for element positioning",
+            "dependencies": [
+              1
+            ],
+            "details": "Implement drag handles for all elements, grid snapping with 8px increments, real-time position indicators during drag operations",
+            "status": "pending",
+            "testStrategy": "Test drag precision at different resolutions, validate grid alignment accuracy, verify cross-element positioning consistency"
+          },
+          {
+            "id": 12,
+            "title": "History Management System",
+            "description": "Implement undo/redo functionality with 10-step history",
+            "dependencies": [
+              11
+            ],
+            "details": "Create action history stack, implement undo/redo buttons with keyboard shortcuts, track layout changes including position, size, and properties",
+            "status": "pending",
+            "testStrategy": "Test multi-step undo sequences, verify history persistence across mode switches, validate memory usage for 10-step buffer"
+          },
+          {
+            "id": 13,
+            "title": "Visual Feedback Components",
+            "description": "Develop selection highlights and screenshot capture system",
+            "dependencies": [
+              1,
+              11
+            ],
+            "details": "Implement pulsing selection borders, screenshot mode with transparent background capture, and visual indicators for locked elements",
+            "status": "pending",
+            "testStrategy": "Validate highlight visibility across themes, test screenshot resolution accuracy, verify feedback responsiveness during rapid edits"
+          }
+        ]
+      },
+      {
+        "id": 10,
+        "title": "Action Bar Setup Wizard",
+        "description": "Implement guided configuration",
+        "details": "Create role-based setup (Tank/Healer/DPS/PvP), resolution detection (1080p/1440p/4K), auto-positioning, class-specific presets, simple/advanced modes, preset preview",
+        "testStrategy": "Test first-load wizard, verify role/resolution detection, validate preset application, confirm skip functionality",
+        "priority": "high",
+        "dependencies": [
+          9
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Detection System Implementation",
+            "description": "Create role/resolution/class detection framework",
+            "dependencies": [],
+            "details": "Implement role detection via game APIs, resolution detection through display settings, and class-specific identification. Must handle edge cases like hybrid roles and non-standard resolutions.",
+            "status": "pending",
+            "testStrategy": "Verify accurate detection across all role types, resolution tiers, and class combinations using automated UI tests"
+          },
+          {
+            "id": 2,
+            "title": "Configuration Engine Development",
+            "description": "Build logic for automated layout configuration",
+            "dependencies": [
+              1
+            ],
+            "details": "Develop algorithms for auto-positioning based on detection data, implement resolution scaling logic, create mode-switching mechanics (simple/advanced), and integrate positioning constraints. Must maintain UI flow consistency.",
+            "status": "pending",
+            "testStrategy": "Test layout adjustments across all detected configurations, validate mode transitions preserve settings, and verify positioning constraints"
+          },
+          {
+            "id": 3,
+            "title": "Preset Application System",
+            "description": "Implement preset management and preview",
+            "dependencies": [
+              2
+            ],
+            "details": "Create preset storage system for class-specific configurations, implement real-time preview rendering, develop override handling for user modifications, and integrate with detection/configuration components.",
+            "status": "pending",
+            "testStrategy": "Validate preset application accuracy, test preview rendering performance, and verify override persistence across sessions"
+          }
+        ]
+      },
+      {
+        "id": 11,
+        "title": "Per-Button Customization",
+        "description": "Implement granular button controls",
+        "details": "Add individual size/position overrides, visibility toggles, custom groups, priority ordering, glow rules, label/color customization per button",
+        "testStrategy": "Test individual button customization, verify group separators, validate priority highlighting",
+        "priority": "medium",
+        "dependencies": [
+          10
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Customization Engine Implementation",
+            "description": "Develop core system for individual button customization",
+            "dependencies": [
+              10
+            ],
+            "details": "Implement per-button size/position overrides, visibility toggles, label/color customization, and glow rules with efficient state management. Must support concurrent modifications without performance degradation.",
+            "status": "pending",
+            "testStrategy": "Test individual property overrides, validate state persistence across sessions"
+          },
+          {
+            "id": 2,
+            "title": "Grouping System Development",
+            "description": "Create custom group management framework",
+            "dependencies": [
+              7
+            ],
+            "details": "Build system for creating and managing custom button groups with dynamic separators. Include group-level visibility controls and cross-group interaction handling. Integrate with existing bar layout system.",
+            "status": "pending",
+            "testStrategy": "Verify group creation/deletion, test separator display logic, validate layout stability"
+          },
+          {
+            "id": 3,
+            "title": "Priority Management System",
+            "description": "Implement button priority ordering engine",
+            "dependencies": [
+              14
+            ],
+            "details": "Develop dynamic priority system with drag-and-drop ordering, automatic layout adjustment, and priority-based glow rules. Must maintain compatibility with existing action bar logic.",
+            "status": "pending",
+            "testStrategy": "Test sorting functionality, validate priority inheritance, verify visual indicator accuracy"
+          }
+        ]
+      },
+      {
+        "id": 12,
+        "title": "Smart Action Bar Features",
+        "description": "Implement intelligent bar enhancements",
+        "details": "Add empty button auto-hide, auto-sort by cooldown/usage, charge counters, proc pulses, ready-state highlighting, cooldown progress bars, GCD pulse effects",
+        "testStrategy": "Test auto-hide functionality, verify sort accuracy, validate charge counters, confirm proc detection",
+        "priority": "medium",
+        "dependencies": [
+          11
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Automation Engine Implementation",
+            "description": "Develop core logic for dynamic button behavior",
+            "dependencies": [],
+            "details": "Implement empty button detection using action slot validation checks, create event listeners for cooldown/usage tracking, develop charge counter logic with charge restoration detection, build GCD pulse timing system using combat log parsing",
+            "status": "pending",
+            "testStrategy": "Test empty button detection in various combat scenarios, verify charge counter accuracy during multi-charge abilities"
+          },
+          {
+            "id": 2,
+            "title": "Sorting System Development",
+            "description": "Create intelligent button arrangement system",
+            "dependencies": [
+              1
+            ],
+            "details": "Implement cooldown-based sorting algorithm with remaining duration calculation, develop usage frequency tracking with decay factor, create hybrid sorting mode that combines cooldown/usage metrics, integrate with action bar layout system",
+            "status": "pending",
+            "testStrategy": "Validate sort order accuracy during combat rotations, test sorting stability with rapidly changing cooldown states"
+          },
+          {
+            "id": 3,
+            "title": "Visual Indicator System",
+            "description": "Implement dynamic visual feedback elements",
+            "dependencies": [
+              1
+            ],
+            "details": "Create proc pulse effects with customizable glow styles, develop cooldown progress bars with segmented animation, implement ready-state highlighting with color transitions, design GCD pulse effects synchronized with global cooldown timing",
+            "status": "pending",
+            "testStrategy": "Verify visual feedback during ability usage cycles, test indicator visibility under different lighting conditions"
+          },
+          {
+            "id": 4,
+            "title": "Performance Monitoring Integration",
+            "description": "Optimize system efficiency",
+            "dependencies": [
+              1,
+              2,
+              3
+            ],
+            "details": "Implement frame update throttling based on action bar activity, create performance metrics overlay for CPU/memory usage, develop event filtering system to reduce unnecessary updates, integrate with existing optimization task 14's lazy loading framework",
+            "status": "pending",
+            "testStrategy": "Profile system during intense combat scenarios, validate memory usage under extended play sessions"
+          }
+        ]
+      },
+      {
+        "id": 13,
+        "title": "Profile Management System",
+        "description": "Implement profile creation and sharing",
+        "details": "Create unlimited profiles (per-character/class/account), import/export via strings, community library integration, streamer profile support, auto-backup system",
+        "testStrategy": "Test profile save/load, validate export strings, confirm import functionality, verify community integration",
+        "priority": "medium",
+        "dependencies": [
+          12
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Profile Storage System Implementation",
+            "description": "Create unlimited profile storage with auto-backup and scope management",
+            "dependencies": [],
+            "details": "Implement data serialization for per-character/class/account profiles with automatic versioning and backup system. Must handle concurrent access and ensure data integrity across different profile scopes.",
+            "status": "pending",
+            "testStrategy": "Test profile save/load cycles, verify auto-backup functionality, validate scope-specific data persistence"
+          },
+          {
+            "id": 2,
+            "title": "Profile Import/Export System Development",
+            "description": "Implement string-based profile sharing and streamer profile support",
+            "dependencies": [
+              1
+            ],
+            "details": "Develop base64-encoded profile string generation with metadata embedding. Include streamer profile validation system and import sanitization checks to prevent data corruption.",
+            "status": "pending",
+            "testStrategy": "Validate export string integrity, test import error handling, verify streamer profile compatibility"
+          },
+          {
+            "id": 3,
+            "title": "Community Integration Module Development",
+            "description": "Build community library integration and profile sharing features",
+            "dependencies": [
+              1,
+              2
+            ],
+            "details": "Implement API integration with community library for profile discovery. Develop rating system, version tracking, and secure sharing mechanism with privacy controls.",
+            "status": "pending",
+            "testStrategy": "Confirm library API connectivity, test profile sharing workflows, verify rating system functionality"
+          }
+        ]
+      },
+      {
+        "id": 14,
+        "title": "Action Bar Optimization",
+        "description": "Implement performance enhancements",
+        "details": "Add lazy loading, efficient update loops, event throttling, frame pooling, texture atlas, target <2MB memory and <0.3% combat CPU usage",
+        "testStrategy": "Profile memory/CPU usage, verify lazy loading, test frame pooling efficiency",
+        "priority": "high",
+        "dependencies": [
+          13
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Implement Lazy Loading",
+            "description": "Load action bar assets only when required by user interaction or state changes",
+            "dependencies": [],
+            "details": "Develop conditional loading system that defers initialization until first use, using event triggers for spell icons, cooldowns, and state indicators. Verify initial memory footprint reduction.",
+            "status": "pending",
+            "testStrategy": "Profile memory usage during login and combat, verify assets load on demand"
+          },
+          {
+            "id": 2,
+            "title": "Optimize Update Loops",
+            "description": "Create efficient update cycles with event throttling",
+            "dependencies": [
+              1
+            ],
+            "details": "Implement delta-time based updates with 0.1s throttling intervals for non-critical elements, separate combat-critical updates from background processes. Target <0.3% CPU usage during combat rotations.",
+            "status": "pending",
+            "testStrategy": "Use combat simulator to measure CPU impact during rapid ability usage"
+          },
+          {
+            "id": 3,
+            "title": "Memory Management System",
+            "description": "Implement frame pooling and texture atlas",
+            "dependencies": [
+              2
+            ],
+            "details": "Create object pool for action button frames (20-50 preallocated), combine textures into 1024x1024 atlas. Monitor garbage collection events and memory allocations during extended sessions.",
+            "status": "pending",
+            "testStrategy": "Stress test with 20+ simultaneous action bars, verify memory stays under 2MB"
+          },
+          {
+            "id": 4,
+            "title": "Performance Monitoring Framework",
+            "description": "Build real-time performance tracking system",
+            "dependencies": [
+              3
+            ],
+            "details": "Develop overlay displaying current memory usage and CPU percentage, implement automatic logging when thresholds exceed 1.8MB or 0.25% CPU. Integrate with existing profiling tools.",
+            "status": "pending",
+            "testStrategy": "Simulate raid encounters with maximum action bar configuration to validate monitoring accuracy"
+          }
+        ]
+      },
+      {
+        "id": 15,
+        "title": "Unit Frame System Implementation",
+        "description": "Create all 11 unit frame types",
+        "details": "Implement player/target/focus/pet/party/raid/arena/boss/ToT/pet target/focus target frames with all required elements (cast bars, auras, indicators), smart buff/debuff filtering with class/role/content-type rules",
+        "testStrategy": "Test all frame types, verify real-time updates, validate performance metrics (<0.1% CPU), confirm class/spec compatibility",
+        "priority": "high",
+        "dependencies": [
+          1,
+          3
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Implement Unit Frame Types",
+            "description": "Create all 11 unit frame types with base layout and positioning",
+            "dependencies": [],
+            "details": "Implement player/target/focus/pet/party/raid/arena/boss/ToT/pet target/focus target frames with position anchors, sizing, and visibility logic",
+            "status": "pending",
+            "testStrategy": "Test frame visibility in different contexts (solo/raid/PvP), verify layout alignment"
+          },
+          {
+            "id": 2,
+            "title": "Develop Shared Element System",
+            "description": "Create reusable components for all frames",
+            "dependencies": [
+              1
+            ],
+            "details": "Implement modular cast bars, aura containers, health/mana indicators, and status indicators that can be dynamically attached to any frame type",
+            "status": "pending",
+            "testStrategy": "Test element functionality across multiple frame types, verify cross-frame compatibility"
+          },
+          {
+            "id": 3,
+            "title": "Build Filtering Engine",
+            "description": "Implement smart buff/debuff filtering system",
+            "dependencies": [
+              2
+            ],
+            "details": "Create rule-based filtering with class/role/content-type conditions, including priority sorting and duration-based hiding",
+            "status": "pending",
+            "testStrategy": "Test filtering with different class specs, validate dungeon/raid-specific rules, verify duration thresholds"
+          },
+          {
+            "id": 4,
+            "title": "Optimize Performance",
+            "description": "Ensure system meets performance requirements",
+            "dependencies": [
+              1,
+              2,
+              3
+            ],
+            "details": "Implement object pooling, optimize event handling, reduce texture memory usage, and minimize CPU usage through efficient update mechanisms",
+            "status": "pending",
+            "testStrategy": "Stress test with 40+ raid frames, monitor CPU usage, verify frame rate stability"
+          },
+          {
+            "id": 5,
+            "title": "Implement Class Handling",
+            "description": "Add class-specific visual indicators",
+            "dependencies": [
+              3
+            ],
+            "details": "Create special indicators for class-specific mechanics (paladin auras, warlock shards, monk stagger, etc.) and role-based status icons",
+            "status": "pending",
+            "testStrategy": "Test class-specific indicators with all frame types, verify role-based visuals in group settings"
+          }
+        ]
+      },
+      {
+        "id": 16,
+        "title": "Nameplate System Development",
+        "description": "Implement customizable nameplates",
+        "details": "Create friendly/enemy nameplates with health bars, cast bars, threat coloring, execute range indicators, personal resource display, customization options for size, visibility, class colors, filtering",
+        "testStrategy": "Test nameplate visibility in raids, verify threat coloring, validate execute range indicators, confirm performance metrics",
+        "priority": "medium",
+        "dependencies": [
+          2,
+          15
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Nameplate Framework Implementation",
+            "description": "Create base nameplate structure with core visual elements",
+            "dependencies": [
+              15
+            ],
+            "details": "Implement health bars, cast bars, and positioning system using unit frame data from Task 15. Establish rendering pipeline for dynamic nameplate elements",
+            "status": "pending",
+            "testStrategy": "Verify nameplate visibility in combat, test cast bar synchronization, validate health bar updates"
+          },
+          {
+            "id": 2,
+            "title": "Customization System Development",
+            "description": "Build configuration interface for nameplate appearance",
+            "dependencies": [
+              3,
+              18
+            ],
+            "details": "Integrate settings from Task 3 to control size/visibility options. Implement class color system using Task 18's theme engine for visual customization",
+            "status": "pending",
+            "testStrategy": "Test all customization sliders/dropdowns, validate theme inheritance, confirm settings persistence"
+          },
+          {
+            "id": 3,
+            "title": "Threat Detection Integration",
+            "description": "Implement threat-based visual indicators",
+            "dependencies": [
+              15
+            ],
+            "details": "Connect to Task 15's threat detection system for real-time coloring. Add execute range thresholds and aggro state indicators",
+            "status": "pending",
+            "testStrategy": "Simulate threat transitions, test execute range warnings, validate color transitions in raids"
+          },
+          {
+            "id": 4,
+            "title": "Performance Optimization",
+            "description": "Optimize nameplate rendering and updates",
+            "dependencies": [
+              1,
+              3
+            ],
+            "details": "Implement culling system for off-screen nameplates, optimize texture memory usage, reduce update frequency for non-critical elements",
+            "status": "pending",
+            "testStrategy": "Profile CPU/GPU usage during raids, test 100+ nameplate scenarios, validate frame rate stability"
+          }
+        ]
+      },
+      {
+        "id": 17,
+        "title": "Visual Information Display",
+        "description": "Implement buff/debuff/proc indicators",
+        "details": "Create customizable personal buffs with filtering, cooldown tracking with categories, class resource displays, proc indicators with screen edge glows, no automation",
+        "testStrategy": "Verify buff filtering, test cooldown tracking, validate resource thresholds, confirm proc detection accuracy",
+        "priority": "medium",
+        "dependencies": [
+          3,
+          15
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Buff/Debuff System Implementation",
+            "description": "Develop customizable personal buff/debuff filtering system with cooldown tracking",
+            "dependencies": [
+              3,
+              2
+            ],
+            "details": "Implement filtering logic for personal buffs/debuffs using Settings API, create cooldown categorization system with duration tracking, integrate media library icons for visual representation, develop configuration options for threshold alerts and duration sorting",
+            "status": "pending",
+            "testStrategy": "Verify filter persistence across sessions, test cooldown duration accuracy, validate category-based sorting functionality"
+          },
+          {
+            "id": 2,
+            "title": "Resource Tracking Framework",
+            "description": "Build class-specific resource display system with threshold indicators",
+            "dependencies": [
+              3,
+              2
+            ],
+            "details": "Create dynamic resource bar system supporting class-specific mechanics (mana, combo points, etc.), implement threshold detection for low/resource-full states, develop visual feedback system using media library textures, integrate with unit frame settings for positioning and scaling",
+            "status": "pending",
+            "testStrategy": "Validate resource tracking across multiple classes, test threshold alerts at boundary values, confirm visual feedback synchronization with game events"
+          },
+          {
+            "id": 3,
+            "title": "Visual Indicator System",
+            "description": "Implement proc indicators with screen edge glow effects",
+            "dependencies": [
+              9,
+              2
+            ],
+            "details": "Develop proc detection engine with customizable triggers, create screen edge glow animation system using media assets, implement visual hierarchy for priority indicators, integrate with layout editor for positioning customization, add visual feedback for overlapping procs",
+            "status": "pending",
+            "testStrategy": "Test proc detection latency, validate glow intensity scaling, verify visual priority handling, confirm layout persistence across UI reloads"
+          }
+        ]
+      },
+      {
+        "id": 18,
+        "title": "Theme System Development",
+        "description": "Implement visual theme engine",
+        "details": "Create default themes (dark/teal, classic blue, minimal, GW2, FFXIV), theme components (colors, textures, fonts, layouts), import/export functionality",
+        "testStrategy": "Test theme application, verify component customization, confirm theme switching works without reload",
+        "priority": "medium",
+        "dependencies": [
+          2,
+          3
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Theme Framework Setup",
+            "description": "Create core theme engine architecture",
+            "dependencies": [],
+            "details": "Define theme structure, variables, and API for theme management",
+            "status": "pending",
+            "testStrategy": "Test theme initialization and basic application"
+          },
+          {
+            "id": 2,
+            "title": "Theme Component System",
+            "description": "Implement modular visual components",
+            "dependencies": [
+              1
+            ],
+            "details": "Develop color palettes, texture sets, font configurations, and layout templates",
+            "status": "pending",
+            "testStrategy": "Verify component customization applies correctly across UI elements"
+          },
+          {
+            "id": 3,
+            "title": "Theme Import/Export",
+            "description": "Implement theme file handling",
+            "dependencies": [
+              1
+            ],
+            "details": "Create JSON serialization/deserialization and file I/O operations",
+            "status": "pending",
+            "testStrategy": "Test theme file import/export with all component types"
+          },
+          {
+            "id": 4,
+            "title": "Live Theme Switching",
+            "description": "Implement runtime theme switching",
+            "dependencies": [
+              1,
+              2
+            ],
+            "details": "Develop dynamic theme application without UI reload or state loss",
+            "status": "pending",
+            "testStrategy": "Test seamless switching between all default themes with active UI elements"
+          }
+        ]
+      },
+      {
+        "id": 19,
+        "title": "Minimap Enhancement System",
+        "description": "Implement enhanced minimap features",
+        "details": "Add shape options (square/circle), combat fade, zoom controls, tracking buttons, coordinate display, gathering tracker, position controls",
+        "testStrategy": "Test shape options, verify combat fade, validate coordinate accuracy, confirm performance metrics",
+        "priority": "medium",
+        "dependencies": [
+          3,
+          18
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Shape System Implementation",
+            "description": "Implement shape options and combat fade functionality for minimap",
+            "dependencies": [
+              3,
+              18
+            ],
+            "details": "Implement dynamic shape switching between square and circle forms with smooth transitions. Develop combat fade system that adjusts minimap opacity during combat states while maintaining visibility of critical elements.",
+            "status": "pending",
+            "testStrategy": "Test shape options rendering, verify combat fade transitions, ensure compatibility with theme system"
+          },
+          {
+            "id": 2,
+            "title": "Tracking Features Integration",
+            "description": "Integrate tracking buttons and coordinate display systems",
+            "dependencies": [
+              3,
+              18
+            ],
+            "details": "Integrate tracking buttons for NPCs/points of interest with toggle functionality. Implement real-time coordinate display with format customization. Develop gathering resource tracker overlay with profession-specific indicators.",
+            "status": "pending",
+            "testStrategy": "Validate coordinate display accuracy, test tracking button toggles, verify gathering tracker updates in real-time"
+          },
+          {
+            "id": 3,
+            "title": "Position Management System",
+            "description": "Implement zoom controls and position adjustment features",
+            "dependencies": [
+              3,
+              18
+            ],
+            "details": "Create zoom controls with mousewheel and button inputs. Implement position management system allowing drag-and-drop placement with alignment guides. Develop coordinate-based positioning for precise layout configuration.",
+            "status": "pending",
+            "testStrategy": "Test zoom level persistence, verify position adjustments, confirm alignment guides functionality"
+          }
+        ]
+      },
+      {
+        "id": 20,
+        "title": "Bag System Implementation",
+        "description": "Create unified bag interface",
+        "details": "Implement all-in-one bag with bank integration, search, item level display, auto-vendor, custom categories, currency tracking",
+        "testStrategy": "Test bag functionality at bank, verify auto-vendor, validate item sorting, confirm currency display",
+        "priority": "medium",
+        "dependencies": [
+          3,
+          18
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Bag Framework Implementation",
+            "description": "Create core bag structure with item display and layout management",
+            "dependencies": [],
+            "details": "Develop base framework with item slots, drag-and-drop functionality, and layout management for unified interface",
+            "status": "pending",
+            "testStrategy": "Test item display accuracy, verify drag-and-drop functionality, validate layout persistence"
+          },
+          {
+            "id": 2,
+            "title": "Search System Implementation",
+            "description": "Implement real-time item search and filtering capabilities",
+            "dependencies": [],
+            "details": "Develop search functionality with filters for name, type, item level, and quality with instant results display",
+            "status": "pending",
+            "testStrategy": "Validate search accuracy across multiple criteria, test performance with full inventory, verify filter combinations"
+          },
+          {
+            "id": 3,
+            "title": "Categorization Engine Development",
+            "description": "Create custom categorization and auto-vendor logic",
+            "dependencies": [],
+            "details": "Implement category rules engine with user-defined filters, auto-vendor thresholds, and item sorting algorithms",
+            "status": "pending",
+            "testStrategy": "Confirm category sorting accuracy, verify auto-vendor thresholds, test custom filter creation"
+          },
+          {
+            "id": 4,
+            "title": "Bank Integration Setup",
+            "description": "Integrate bag system with bank storage and currency tracking",
+            "dependencies": [],
+            "details": "Develop shared inventory management between bags and bank, implement currency tracking overlay and cross-container search",
+            "status": "pending",
+            "testStrategy": "Test bank access integration, verify currency tracking accuracy, validate cross-container operations"
+          }
+        ]
+      }
+    ],
+    "metadata": {
+      "created": "2025-10-29T17:49:44.992Z",
+      "updated": "2025-10-29T18:47:42.926Z",
+      "description": "Tasks for master context"
+    }
+  }
+}
