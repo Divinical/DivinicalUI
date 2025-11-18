@@ -7,6 +7,7 @@ local _G = _G
 -- Addon object
 DivinicalUI.version = "1.0.0"
 DivinicalUI.modules = {}
+DivinicalUI.defaults = nil  -- Will be set after defaults table is defined
 
 -- Event frame
 local eventFrame = CreateFrame("Frame")
@@ -51,6 +52,9 @@ local defaults = {
         }
     }
 }
+
+-- Expose defaults to modules
+DivinicalUI.defaults = defaults
 
 -- Initialize database
 local function InitializeDatabase()
