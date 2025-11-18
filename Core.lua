@@ -156,8 +156,12 @@ function CopyTable(src, seen)
         return src
     end
 
+    -- Ensure seen is a valid table (handle nil or invalid values)
+    if type(seen) ~= "table" then
+        seen = {}
+    end
+
     -- Avoid infinite recursion by tracking seen tables
-    seen = seen or {}
     if seen[src] then
         return seen[src]
     end
