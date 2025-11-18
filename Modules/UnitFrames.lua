@@ -47,7 +47,8 @@ function UnitFrames:CreateStyle()
         self.Health.gradient:SetTexture("Interface\\TargetingFrame\\UI-StatusBar")
         self.Health.gradient:SetBlendMode("ADD")
         self.Health.gradient:SetAlpha(0.3)
-        self.Health.gradient:SetGradientAlpha("HORIZONTAL", 1, 1, 1, 0.2, 1, 1, 1, 0)
+        -- Note: SetGradientAlpha replaced with SetGradient for WoW 11.0.2+
+        self.Health.gradient:SetGradient("HORIZONTAL", CreateColor(1, 1, 1, 0.2), CreateColor(1, 1, 1, 0))
         
         -- Health text with enhanced formatting
         self.Health.value = self.Health:CreateFontString(nil, "OVERLAY")
@@ -86,7 +87,8 @@ function UnitFrames:CreateStyle()
         self.Power.gradient:SetTexture("Interface\\TargetingFrame\\UI-StatusBar")
         self.Power.gradient:SetBlendMode("ADD")
         self.Power.gradient:SetAlpha(0.3)
-        self.Power.gradient:SetGradientAlpha("HORIZONTAL", 1, 1, 1, 0.2, 1, 1, 1, 0)
+        -- Note: SetGradientAlpha replaced with SetGradient for WoW 11.0.2+
+        self.Power.gradient:SetGradient("HORIZONTAL", CreateColor(1, 1, 1, 0.2), CreateColor(1, 1, 1, 0))
         
         -- Power text with enhanced formatting
         self.Power.value = self.Power:CreateFontString(nil, "OVERLAY")
