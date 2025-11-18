@@ -672,24 +672,30 @@ function UnitFrames:SpawnFrames()
     if DivinicalUI.db.profile.unitframes.player.enabled then
         local playerFrame = oUF:Spawn("player", "DivinicalUIPlayerFrame")
         playerFrame:SetPoint(unpack(DivinicalUI.db.profile.unitframes.player.position))
-        playerFrame:SetSize(DivinicalUI.db.profile.unitframes.player.width, 
+        playerFrame:SetSize(DivinicalUI.db.profile.unitframes.player.width,
                            DivinicalUI.db.profile.unitframes.player.height)
         frames.player = playerFrame
         DivinicalUI.modules.Utils.Debug.Print("Player frame spawned", "DEBUG")
-        
+
+        -- Apply saved settings (colors, fonts, etc.)
+        self:ApplyFrameSettings(playerFrame, "player")
+
         -- Test player frame elements
         self:TestFrameElements(playerFrame, "player")
     end
-    
+
     -- Target frame
     if DivinicalUI.db.profile.unitframes.target.enabled then
         local targetFrame = oUF:Spawn("target", "DivinicalUITargetFrame")
         targetFrame:SetPoint(unpack(DivinicalUI.db.profile.unitframes.target.position))
-        targetFrame:SetSize(DivinicalUI.db.profile.unitframes.target.width, 
+        targetFrame:SetSize(DivinicalUI.db.profile.unitframes.target.width,
                            DivinicalUI.db.profile.unitframes.target.height)
         frames.target = targetFrame
         DivinicalUI.modules.Utils.Debug.Print("Target frame spawned", "DEBUG")
-        
+
+        -- Apply saved settings (colors, fonts, etc.)
+        self:ApplyFrameSettings(targetFrame, "target")
+
         -- Test target frame elements
         self:TestFrameElements(targetFrame, "target")
     end
@@ -916,16 +922,20 @@ function UnitFrames:ApplyFrameSettings(frame, frameType)
         frame:SetSize(settings.width, settings.height)
     end
 
-    -- Apply health bar color
-    if frame.Health and settings.healthColor then
-        local c = settings.healthColor
-        frame.Health:SetStatusBarColor(c[1], c[2], c[3], c[4] or 1)
+    -- Apply health bar color (use per-frame color or fall back to global color)
+    if frame.Health then
+        local c = settings.healthColor or DivinicalUI.db.profile.colors.health
+        if c then
+            frame.Health:SetStatusBarColor(c[1], c[2], c[3], c[4] or 1)
+        end
     end
 
-    -- Apply power bar color
-    if frame.Power and settings.powerColor then
-        local c = settings.powerColor
-        frame.Power:SetStatusBarColor(c[1], c[2], c[3], c[4] or 1)
+    -- Apply power bar color (use per-frame color or fall back to global color)
+    if frame.Power then
+        local c = settings.powerColor or DivinicalUI.db.profile.colors.power
+        if c then
+            frame.Power:SetStatusBarColor(c[1], c[2], c[3], c[4] or 1)
+        end
     end
 
     -- Apply font (would need font path mapping)
