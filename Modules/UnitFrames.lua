@@ -33,7 +33,9 @@ function UnitFrames:CreateStyle()
         self.Health:SetAllPoints()
         self.Health:SetStatusBarTexture("Interface\\TargetingFrame\\UI-StatusBar") -- Using default texture for now
         self.Health:GetStatusBarTexture():SetDrawLayer("ARTWORK")
-        self.Health:SetSmoothProgress(true) -- Enable smooth transitions
+        -- Note: SetSmoothProgress is not available in all WoW versions
+        -- Smooth transitions can be achieved through oUF's smoothing feature instead
+        self.Health.smoothGradient = true
         
         -- Health background with multi-layer effect
         self.Health.bg = self.Health:CreateTexture(nil, "BORDER")
