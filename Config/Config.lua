@@ -544,7 +544,10 @@ function Config:PopulateProfilesSettings(canvas)
     profileInfo:SetPoint("TOPLEFT", canvas.content, "TOPLEFT", 8, -(canvas.lastY))
     profileInfo:SetJustifyH("LEFT")
     profileInfo:SetWidth(560)
-    local currentProfile = DivinicalUI.db:GetCurrentProfile() or "Default"
+    local currentProfile = "Default"
+    if DivinicalUI.db and DivinicalUI.db.GetCurrentProfile then
+        currentProfile = DivinicalUI.db:GetCurrentProfile()
+    end
     profileInfo:SetText("Current Profile: |cff33ff99" .. currentProfile .. "|r")
     self:AddControl(canvas, CreateFrame("Frame"), 24)
 

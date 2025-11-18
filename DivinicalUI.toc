@@ -10,14 +10,15 @@
 
 # Libraries
 Libs\LibSharedMedia-3.0\LibStub\LibStub.lua
+Libs\LibSharedMedia-3.0\CallbackHandler-1.0\CallbackHandler-1.0.lua
 Libs\LibSharedMedia-3.0\lib.xml
 Libs\oUF\oUF.xml
 
-# Utilities (must load before Core)
-Modules\Utils.lua
-
-# Core
+# Core (must load first to define RegisterModule)
 Core.lua
+
+# Utilities (load after Core)
+Modules\Utils.lua
 
 # Configuration
 Config\Config.lua
