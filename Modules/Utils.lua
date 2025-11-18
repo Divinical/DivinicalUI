@@ -181,7 +181,7 @@ end
 -- Create font string
 function Utils.Frames.CreateFontString(parent, name, font, size, flags)
     local fontString = parent:CreateFontString(name or nil, "OVERLAY")
-    fontString:SetFont(font or "Interface\\AddOns\\DivinicalUI\\Media\\Fonts\\Font.ttf", 
+    fontString:SetFont(font or "Interface\\AddOns\\DivinicalUI\\Media\\Fonts\\Pixel.ttf", 
                       size or 12, 
                       flags or "OUTLINE")
     return fontString

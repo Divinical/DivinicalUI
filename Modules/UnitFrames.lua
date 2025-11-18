@@ -53,7 +53,7 @@ function UnitFrames:CreateStyle()
         -- Health text with enhanced formatting
         self.Health.value = self.Health:CreateFontString(nil, "OVERLAY")
         self.Health.value:SetPoint("RIGHT", self.Health, "RIGHT", -2, 0)
-        self.Health.value:SetFont("Interface\\AddOns\\DivinicalUI\\Media\\Fonts\\Font.ttf", 12, "OUTLINE")
+        self.Health.value:SetFont("Interface\\AddOns\\DivinicalUI\\Media\\Fonts\\Pixel.ttf", 12, "OUTLINE")
         self.Health.value:SetShadowColor(0, 0, 0, 0.5)
         self.Health.value:SetShadowOffset(1, -1)
         self:Tag(self.Health.value, "[divinical:health]")
@@ -61,7 +61,7 @@ function UnitFrames:CreateStyle()
         -- Health percentage text
         self.Health.percentage = self.Health:CreateFontString(nil, "OVERLAY")
         self.Health.percentage:SetPoint("LEFT", self.Health, "LEFT", 2, 0)
-        self.Health.percentage:SetFont("Interface\\AddOns\\DivinicalUI\\Media\\Fonts\\Font.ttf", 11, "OUTLINE")
+        self.Health.percentage:SetFont("Interface\\AddOns\\DivinicalUI\\Media\\Fonts\\Pixel.ttf", 11, "OUTLINE")
         self.Health.percentage:SetShadowColor(0, 0, 0, 0.5)
         self.Health.percentage:SetShadowOffset(1, -1)
         self:Tag(self.Health.percentage, "[divinical:healthperc]")
@@ -93,7 +93,7 @@ function UnitFrames:CreateStyle()
         -- Power text with enhanced formatting
         self.Power.value = self.Power:CreateFontString(nil, "OVERLAY")
         self.Power.value:SetPoint("RIGHT", self.Power, "RIGHT", -2, 0)
-        self.Power.value:SetFont("Interface\\AddOns\\DivinicalUI\\Media\\Fonts\\Font.ttf", 10, "OUTLINE")
+        self.Power.value:SetFont("Interface\\AddOns\\DivinicalUI\\Media\\Fonts\\Pixel.ttf", 10, "OUTLINE")
         self.Power.value:SetShadowColor(0, 0, 0, 0.5)
         self.Power.value:SetShadowOffset(1, -1)
         self:Tag(self.Power.value, "[divinical:power]")
@@ -101,7 +101,7 @@ function UnitFrames:CreateStyle()
         -- Power type indicator
         self.Power.type = self.Power:CreateFontString(nil, "OVERLAY")
         self.Power.type:SetPoint("LEFT", self.Power, "LEFT", 2, 0)
-        self.Power.type:SetFont("Interface\\AddOns\\DivinicalUI\\Media\\Fonts\\Font.ttf", 9, "OUTLINE")
+        self.Power.type:SetFont("Interface\\AddOns\\DivinicalUI\\Media\\Fonts\\Pixel.ttf", 9, "OUTLINE")
         self.Power.type:SetShadowColor(0, 0, 0, 0.5)
         self.Power.type:SetShadowOffset(1, -1)
         self:Tag(self.Power.type, "[divinical:powertype]")
@@ -109,14 +109,14 @@ function UnitFrames:CreateStyle()
         -- Name text using oUF tags
         self.Name = self:CreateFontString(nil, "OVERLAY")
         self.Name:SetPoint("LEFT", self.Health, "LEFT", 2, 0)
-        self.Name:SetFont("Interface\\AddOns\\DivinicalUI\\Media\\Fonts\\Font.ttf", 12, "OUTLINE")
+        self.Name:SetFont("Interface\\AddOns\\DivinicalUI\\Media\\Fonts\\Pixel.ttf", 12, "OUTLINE")
         self.Name:SetJustifyH("LEFT")
         self:Tag(self.Name, "[name]")
         
         -- Level text using oUF tags
         self.Level = self:CreateFontString(nil, "OVERLAY")
         self.Level:SetPoint("TOPRIGHT", self, "TOPRIGHT", -2, -2)
-        self.Level:SetFont("Interface\\AddOns\\DivinicalUI\\Media\\Fonts\\Font.ttf", 10, "OUTLINE")
+        self.Level:SetFont("Interface\\AddOns\\DivinicalUI\\Media\\Fonts\\Pixel.ttf", 10, "OUTLINE")
         self:Tag(self.Level, "[level][classification]")
         
         -- Enhanced Cast bar with latency and spell queue detection
@@ -157,14 +157,14 @@ function UnitFrames:CreateStyle()
         -- Castbar text with shadow
         self.Castbar.Text = self.Castbar:CreateFontString(nil, "OVERLAY")
         self.Castbar.Text:SetPoint("LEFT", self.Castbar, "LEFT", 2, 0)
-        self.Castbar.Text:SetFont("Interface\\AddOns\\DivinicalUI\\Media\\Fonts\\Font.ttf", 10, "OUTLINE")
+        self.Castbar.Text:SetFont("Interface\\AddOns\\DivinicalUI\\Media\\Fonts\\Pixel.ttf", 10, "OUTLINE")
         self.Castbar.Text:SetShadowColor(0, 0, 0, 0.8)
         self.Castbar.Text:SetShadowOffset(1, -1)
         
         -- Castbar time with shadow
         self.Castbar.Time = self.Castbar:CreateFontString(nil, "OVERLAY")
         self.Castbar.Time:SetPoint("RIGHT", self.Castbar, "RIGHT", -2, 0)
-        self.Castbar.Time:SetFont("Interface\\AddOns\\DivinicalUI\\Media\\Fonts\\Font.ttf", 10, "OUTLINE")
+        self.Castbar.Time:SetFont("Interface\\AddOns\\DivinicalUI\\Media\\Fonts\\Pixel.ttf", 10, "OUTLINE")
         self.Castbar.Time:SetShadowColor(0, 0, 0, 0.8)
         self.Castbar.Time:SetShadowOffset(1, -1)
         
@@ -1006,14 +1006,15 @@ end
 -- Validate all spawned frames
 function UnitFrames:ValidateAllFrames()
     DivinicalUI.modules.Utils.Debug.Print("Starting comprehensive frame validation...", "INFO")
-    
+
     local totalFrames = 0
     local validFrames = 0
-    
+
     for unitType, frame in pairs(frames) do
-        if type(frame) == "table" then
-            -- Handle frame groups (boss, party, raid, arena)
-            for i, subFrame in pairs(frame) do
+        -- Check if this is a frame group (has numeric index [1]) or single frame
+        if type(frame) == "table" and frame[1] then
+            -- Handle frame groups (boss, party, raid, arena) - use ipairs for numeric indices only
+            for i, subFrame in ipairs(frame) do
                 totalFrames = totalFrames + 1
                 if subFrame and subFrame.UpdateAllElements then
                     validFrames = validFrames + 1
@@ -1022,8 +1023,8 @@ function UnitFrames:ValidateAllFrames()
                     DivinicalUI.modules.Utils.Debug.Print("Frame " .. unitType .. i .. " validation failed", "ERROR")
                 end
             end
-        else
-            -- Handle single frames
+        elseif type(frame) == "table" and frame.UpdateAllElements then
+            -- Handle single frames (Frame objects are tables with methods)
             totalFrames = totalFrames + 1
             if frame and frame.UpdateAllElements then
                 validFrames = validFrames + 1
@@ -1033,7 +1034,7 @@ function UnitFrames:ValidateAllFrames()
             end
         end
     end
-    
+
     DivinicalUI.modules.Utils.Debug.Print("Frame validation complete: " .. validFrames .. "/" .. totalFrames .. " frames valid", "INFO")
 end
 
