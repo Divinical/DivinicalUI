@@ -926,6 +926,25 @@ function UnitFrames:UpdateTargetFrame()
     end
 end
 
+-- Update all frames (used when toggling unit frames on/off)
+function UnitFrames:UpdateAllFrames()
+    for _, frame in pairs(frames) do
+        if type(frame) == "table" then
+            if frame.UpdateAllElements then
+                -- Single frame
+                frame:UpdateAllElements("RefreshUnit")
+            elseif frame[1] then
+                -- Frame group (party, raid, arena, boss)
+                for i, subFrame in ipairs(frame) do
+                    if subFrame and subFrame.UpdateAllElements then
+                        subFrame:UpdateAllElements("RefreshUnit")
+                    end
+                end
+            end
+        end
+    end
+end
+
 -- Profile change handler
 function UnitFrames:OnProfileChanged(profileName)
     -- Update all frames when profile changes
