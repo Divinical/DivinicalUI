@@ -68,26 +68,31 @@ end
 -- Module registration
 function DivinicalUI:RegisterModule(name, module)
     self.modules[name] = module
-    if module.Initialize then
-        module:Initialize()
-    end
+    -- Expose module at top level for easy access (e.g., DivinicalUI.Utils)
+    self[name] = module
+    -- Don't initialize immediately - will be done in Initialize() in the correct order
 end
 
 -- Initialization
 function DivinicalUI:Initialize()
     -- Initialize database
     InitializeDatabase()
-    
-    -- Load modules
+
+    -- Initialize Utils module first (required by other modules)
+    if self.modules.Utils and self.modules.Utils.Initialize then
+        self.modules.Utils:Initialize()
+    end
+
+    -- Load other modules
     for name, module in pairs(self.modules) do
-        if module.Initialize then
+        if name ~= "Utils" and module.Initialize then
             module:Initialize()
         end
     end
-    
+
     -- Setup slash commands
     self:SetupSlashCommands()
-    
+
     print("|cff33ff99DivinicalUI|r v" .. self.version .. " loaded!")
 end
 
