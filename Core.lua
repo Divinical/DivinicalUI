@@ -149,20 +149,32 @@ local function InitializeDatabase()
     DivinicalUI.db = db
 end
 
--- Deep copy a table
-function CopyTable(src, dest)
+-- Deep copy a table with circular reference protection
+function CopyTable(src, dest, seen)
     if type(src) ~= "table" then
         return src
     end
 
+    -- Avoid infinite recursion by tracking seen tables
+    seen = seen or {}
+    if seen[src] then
+        return seen[src]
+    end
+
     dest = dest or {}
+    seen[src] = dest
+
     for k, v in pairs(src) do
-        if type(v) == "table" then
-            dest[k] = CopyTable(v)
-        else
-            dest[k] = v
+        -- Skip metatables to avoid circular references
+        if k ~= "__index" and k ~= "__newindex" then
+            if type(v) == "table" then
+                dest[k] = CopyTable(v, nil, seen)
+            else
+                dest[k] = v
+            end
         end
     end
+
     return dest
 end
 
