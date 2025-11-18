@@ -944,9 +944,30 @@ function UnitFrames:ApplyFrameSettings(frame, frameType)
 
     local settings = DivinicalUI.db.profile.unitframes[frameType]
 
+    -- Apply enabled/disabled state
+    if settings.enabled == false then
+        frame:Hide()
+        return
+    else
+        frame:Show()
+    end
+
     -- Apply size
     if settings.width and settings.height then
         frame:SetSize(settings.width, settings.height)
+    end
+
+    -- Apply position
+    if settings.x or settings.y then
+        frame:ClearAllPoints()
+        local x = settings.x or 0
+        local y = settings.y or 0
+        frame:SetPoint("CENTER", UIParent, "CENTER", x, y)
+    end
+
+    -- Apply scale
+    if settings.scale then
+        frame:SetScale(settings.scale)
     end
 
     -- Apply health bar color (use per-frame color or fall back to global color)
@@ -965,8 +986,8 @@ function UnitFrames:ApplyFrameSettings(frame, frameType)
         end
     end
 
-    -- Apply font (would need font path mapping)
-    if settings.font then
+    -- Apply font
+    if settings.font or settings.fontSize then
         local fontPath = "Interface\\AddOns\\DivinicalUI\\Media\\Fonts\\Pixel.ttf"
         if settings.font == "Arial" then
             fontPath = "Fonts\\ARIALN.ttf"
@@ -976,15 +997,16 @@ function UnitFrames:ApplyFrameSettings(frame, frameType)
             fontPath = "Fonts\\MORPHEUS.ttf"
         end
 
-        -- Scale font sizes based on frame type
+        -- Use custom font size if set, otherwise fall back to defaults
         local isSmallFrame = (frameType == "targettarget" or frameType == "focustarget" or frameType == "pettarget")
         local isMediumFrame = (frameType == "pet" or frameType == "focus")
 
-        local healthFontSize = isSmallFrame and 8 or (isMediumFrame and 10 or 12)
-        local healthPercFontSize = isSmallFrame and 7 or (isMediumFrame and 9 or 11)
-        local powerFontSize = isSmallFrame and 7 or (isMediumFrame and 8 or 10)
-        local nameFontSize = isSmallFrame and 8 or (isMediumFrame and 10 or 13)
-        local levelFontSize = isSmallFrame and 7 or (isMediumFrame and 9 or 12)
+        local baseFontSize = settings.fontSize or (isSmallFrame and 8 or (isMediumFrame and 10 or 12))
+        local healthFontSize = baseFontSize
+        local healthPercFontSize = math.max(baseFontSize - 1, 6)
+        local powerFontSize = math.max(baseFontSize - 2, 6)
+        local nameFontSize = baseFontSize + 1
+        local levelFontSize = baseFontSize
 
         -- Update all text elements with scaled fonts
         if frame.Health and frame.Health.value then

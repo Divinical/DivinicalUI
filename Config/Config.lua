@@ -496,18 +496,115 @@ end
 
 -- Populate Unit Frames settings
 function Config:PopulateUnitFramesSettings(canvas)
+    -- === TAB SYSTEM ===
+    local tabContainer = CreateFrame("Frame", nil, canvas.content)
+    tabContainer:SetPoint("TOPLEFT", canvas.content, "TOPLEFT", 0, 0)
+    tabContainer:SetSize(590, 40)
+    canvas.tabContainer = tabContainer
+
+    -- Track active tab
+    canvas.activeTab = "basic"
+
+    -- Create Basic and Advanced content containers
+    local basicContent = CreateFrame("Frame", nil, canvas.content)
+    basicContent:SetPoint("TOPLEFT", tabContainer, "BOTTOMLEFT", 0, -8)
+    basicContent:SetSize(590, 1)
+    basicContent.lastY = 0
+    canvas.basicContent = basicContent
+
+    local advancedContent = CreateFrame("Frame", nil, canvas.content)
+    advancedContent:SetPoint("TOPLEFT", tabContainer, "BOTTOMLEFT", 0, -8)
+    advancedContent:SetSize(590, 1)
+    advancedContent.lastY = 0
+    advancedContent:Hide()
+    canvas.advancedContent = advancedContent
+
+    -- Tab switch function
+    local function SwitchTab(tabName)
+        if tabName == "basic" then
+            basicContent:Show()
+            advancedContent:Hide()
+            canvas.activeTab = "basic"
+        else
+            basicContent:Hide()
+            advancedContent:Show()
+            canvas.activeTab = "advanced"
+        end
+    end
+
+    -- Basic tab button
+    local basicTab = CreateFrame("Button", nil, tabContainer)
+    basicTab:SetSize(100, 32)
+    basicTab:SetPoint("LEFT", tabContainer, "LEFT", 4, 0)
+    basicTab:SetNormalFontObject("GameFontNormalLarge")
+    basicTab:SetHighlightFontObject("GameFontHighlightLarge")
+    basicTab:SetText("Basic")
+
+    local basicTabBg = basicTab:CreateTexture(nil, "BACKGROUND")
+    basicTabBg:SetAllPoints()
+    basicTabBg:SetColorTexture(0.2, 0.6, 0.8, 0.3)
+    basicTab.bg = basicTabBg
+
+    basicTab:SetScript("OnClick", function()
+        SwitchTab("basic")
+        basicTab.bg:SetColorTexture(0.2, 0.6, 0.8, 0.5)
+        advancedTab.bg:SetColorTexture(0.2, 0.2, 0.2, 0.3)
+    end)
+
+    -- Advanced tab button
+    local advancedTab = CreateFrame("Button", nil, tabContainer)
+    advancedTab:SetSize(100, 32)
+    advancedTab:SetPoint("LEFT", basicTab, "RIGHT", 4, 0)
+    advancedTab:SetNormalFontObject("GameFontNormalLarge")
+    advancedTab:SetHighlightFontObject("GameFontHighlightLarge")
+    advancedTab:SetText("Advanced")
+
+    local advancedTabBg = advancedTab:CreateTexture(nil, "BACKGROUND")
+    advancedTabBg:SetAllPoints()
+    advancedTabBg:SetColorTexture(0.2, 0.2, 0.2, 0.3)
+    advancedTab.bg = advancedTabBg
+
+    advancedTab:SetScript("OnClick", function()
+        SwitchTab("advanced")
+        advancedTab.bg:SetColorTexture(0.2, 0.6, 0.8, 0.5)
+        basicTab.bg:SetColorTexture(0.2, 0.2, 0.2, 0.3)
+    end)
+
+    -- Set initial tab state
+    basicTab.bg:SetColorTexture(0.2, 0.6, 0.8, 0.5)
+
+    canvas.lastY = 48  -- Account for tabs
+
+    -- === POPULATE BASIC TAB ===
+    self:PopulateBasicUnitFrameSettings(canvas, basicContent)
+
+    -- === POPULATE ADVANCED TAB ===
+    self:PopulateAdvancedUnitFrameSettings(canvas, advancedContent)
+end
+
+-- Helper to add controls to a specific content frame
+function Config:AddControlToContainer(container, control, height)
+    height = height or 32
+    control:SetParent(container)
+    control:SetPoint("TOPLEFT", container, "TOPLEFT", 4, -container.lastY)
+    container.lastY = container.lastY + height
+    container:SetHeight(math.max(container.lastY + 20, 500))
+end
+
+-- Populate Basic Unit Frame Settings
+function Config:PopulateBasicUnitFrameSettings(canvas, container)
     -- === GLOBAL COLORS ===
     local colorsHeader = self:CreateHeader("Colors (All Frames)")
-    self:AddControl(canvas, colorsHeader, 24)
+    self:AddControlToContainer(container, colorsHeader, 24)
 
     -- Info text
-    local colorsInfo = canvas:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
-    colorsInfo:SetPoint("TOPLEFT", canvas.content, "TOPLEFT", 8, -(canvas.lastY))
+    local colorsInfo = container:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+    colorsInfo:SetPoint("TOPLEFT", container, "TOPLEFT", 8, -(container.lastY))
     colorsInfo:SetWidth(560)
     colorsInfo:SetJustifyH("LEFT")
     colorsInfo:SetText("Set default colors for health and power bars across all unit frames:")
     colorsInfo:SetTextColor(0.8, 0.8, 0.8)
-    self:AddControl(canvas, CreateFrame("Frame"), 24)
+    self:AddControlToContainer(container, CreateFrame("Frame"), 24)
 
     -- Health Bar Color picker
     local healthColorPicker = self:CreateColorPicker(
@@ -526,7 +623,7 @@ function Config:PopulateUnitFramesSettings(canvas)
         true,
         "Default color for all health bars"
     )
-    self:AddControl(canvas, healthColorPicker, 32)
+    self:AddControlToContainer(container, healthColorPicker, 32)
 
     -- Power Bar Color picker
     local powerColorPicker = self:CreateColorPicker(
@@ -545,28 +642,26 @@ function Config:PopulateUnitFramesSettings(canvas)
         true,
         "Default color for all power bars"
     )
-    self:AddControl(canvas, powerColorPicker, 32)
+    self:AddControlToContainer(container, powerColorPicker, 32)
 
     -- Spacer
-    self:AddControl(canvas, CreateFrame("Frame"), 16)
+    self:AddControlToContainer(container, CreateFrame("Frame"), 16)
 
     -- === GLOBAL FONT ===
     local fontHeader = self:CreateHeader("Font (All Frames)")
-    self:AddControl(canvas, fontHeader, 24)
+    self:AddControlToContainer(container, fontHeader, 24)
 
     -- Font dropdown
     local fontDropdown = self:CreateDropdown(
         "Font Family",
         {"Pixel", "Arial", "Friz Quadrata", "Morpheus"},
         function()
-            -- Check player frame first, fallback to "Pixel"
             if DivinicalUI.db.profile.unitframes.player and DivinicalUI.db.profile.unitframes.player.font then
                 return DivinicalUI.db.profile.unitframes.player.font
             end
             return "Pixel"
         end,
         function(value)
-            -- Apply to all frames
             if DivinicalUI.db.profile.unitframes.player then
                 DivinicalUI.db.profile.unitframes.player.font = value
             end
@@ -580,16 +675,15 @@ function Config:PopulateUnitFramesSettings(canvas)
         end,
         "Font used for all text on unit frames"
     )
-    self:AddControl(canvas, fontDropdown, 50)
+    self:AddControlToContainer(container, fontDropdown, 50)
 
     -- Spacer
-    self:AddControl(canvas, CreateFrame("Frame"), 16)
+    self:AddControlToContainer(container, CreateFrame("Frame"), 16)
 
-    -- === PLAYER FRAME ===
+    -- === PLAYER FRAME SIZE ===
     local playerHeader = self:CreateHeader("Player Frame Size")
-    self:AddControl(canvas, playerHeader, 24)
+    self:AddControlToContainer(container, playerHeader, 24)
 
-    -- Player frame width
     local playerWidth = self:CreateSlider(
         "Width",
         100, 400, 10,
@@ -602,9 +696,8 @@ function Config:PopulateUnitFramesSettings(canvas)
         end,
         "Player frame width in pixels"
     )
-    self:AddControl(canvas, playerWidth, 48)
+    self:AddControlToContainer(container, playerWidth, 48)
 
-    -- Player frame height
     local playerHeight = self:CreateSlider(
         "Height",
         20, 100, 5,
@@ -617,16 +710,15 @@ function Config:PopulateUnitFramesSettings(canvas)
         end,
         "Player frame height in pixels"
     )
-    self:AddControl(canvas, playerHeight, 48)
+    self:AddControlToContainer(container, playerHeight, 48)
 
     -- Spacer
-    self:AddControl(canvas, CreateFrame("Frame"), 16)
+    self:AddControlToContainer(container, CreateFrame("Frame"), 16)
 
-    -- === TARGET FRAME ===
+    -- === TARGET FRAME SIZE ===
     local targetHeader = self:CreateHeader("Target Frame Size")
-    self:AddControl(canvas, targetHeader, 24)
+    self:AddControlToContainer(container, targetHeader, 24)
 
-    -- Target frame width
     local targetWidth = self:CreateSlider(
         "Width",
         100, 400, 10,
@@ -639,9 +731,8 @@ function Config:PopulateUnitFramesSettings(canvas)
         end,
         "Target frame width in pixels"
     )
-    self:AddControl(canvas, targetWidth, 48)
+    self:AddControlToContainer(container, targetWidth, 48)
 
-    -- Target frame height
     local targetHeight = self:CreateSlider(
         "Height",
         20, 100, 5,
@@ -654,125 +745,256 @@ function Config:PopulateUnitFramesSettings(canvas)
         end,
         "Target frame height in pixels"
     )
-    self:AddControl(canvas, targetHeight, 48)
+    self:AddControlToContainer(container, targetHeight, 48)
+end
 
-    -- === ADVANCED MODE: PER-FRAME CUSTOMIZATION ===
-    if DivinicalUI.db.profile.advancedMode then
-        -- Spacer
-        self:AddControl(canvas, CreateFrame("Frame"), 24)
+-- Populate Advanced Unit Frame Settings
+function Config:PopulateAdvancedUnitFrameSettings(canvas, container)
+    -- Info text
+    local advancedInfo = container:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+    advancedInfo:SetPoint("TOPLEFT", container, "TOPLEFT", 8, -(container.lastY))
+    advancedInfo:SetWidth(560)
+    advancedInfo:SetJustifyH("LEFT")
+    advancedInfo:SetText("Per-frame customization for power users. Override global settings for individual frames.")
+    advancedInfo:SetTextColor(1, 0.8, 0.2)
+    self:AddControlToContainer(container, CreateFrame("Frame"), 32)
 
-        -- Advanced header
-        local advancedHeader = self:CreateHeader("Advanced: Per-Frame Color Overrides")
-        self:AddControl(canvas, advancedHeader, 24)
+    -- ========== PLAYER FRAME ==========
+    local playerHeader = self:CreateHeader("Player Frame")
+    self:AddControlToContainer(container, playerHeader, 24)
 
-        -- Info text
-        local advancedInfo = canvas:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
-        advancedInfo:SetPoint("TOPLEFT", canvas.content, "TOPLEFT", 8, -(canvas.lastY))
-        advancedInfo:SetWidth(560)
-        advancedInfo:SetJustifyH("LEFT")
-        advancedInfo:SetText("Override global colors for specific frames. Leave unset to use global colors.")
-        advancedInfo:SetTextColor(1, 0.8, 0.2) -- Yellow/gold to indicate advanced
-        self:AddControl(canvas, CreateFrame("Frame"), 32)
+    -- Enable/Disable
+    local playerEnabled = self:CreateCheckbox(
+        "Enable Player Frame",
+        function() return DivinicalUI.db.profile.unitframes.player.enabled ~= false end,
+        function(value)
+            DivinicalUI.db.profile.unitframes.player.enabled = value
+            if DivinicalUI.modules.UnitFrames then
+                DivinicalUI.modules.UnitFrames:UpdatePlayerFrame()
+            end
+        end,
+        "Show or hide the player frame"
+    )
+    self:AddControlToContainer(container, playerEnabled, 32)
 
-        -- Player frame override colors
-        local playerAdvHeader = self:CreateHeader("Player Frame Colors")
-        self:AddControl(canvas, playerAdvHeader, 20)
+    -- Position X
+    local playerX = self:CreateSlider(
+        "Position X",
+        -2000, 2000, 1,
+        function() return DivinicalUI.db.profile.unitframes.player.x or -350 end,
+        function(value)
+            DivinicalUI.db.profile.unitframes.player.x = value
+            if DivinicalUI.modules.UnitFrames then
+                DivinicalUI.modules.UnitFrames:UpdatePlayerFrame()
+            end
+        end,
+        "Horizontal position offset"
+    )
+    self:AddControlToContainer(container, playerX, 48)
 
-        local playerHealthColor = self:CreateColorPicker(
-            "Health Bar Color Override",
-            function()
-                local c = DivinicalUI.db.profile.unitframes.player.healthColor
-                if c then
-                    return c[1], c[2], c[3], c[4] or 1
-                end
-                -- Return global default if no override
-                local gc = DivinicalUI.db.profile.colors.health
-                return gc[1], gc[2], gc[3], gc[4] or 1
-            end,
-            function(r, g, b, a)
-                DivinicalUI.db.profile.unitframes.player.healthColor = {r, g, b, a}
-                if DivinicalUI.modules.UnitFrames then
-                    DivinicalUI.modules.UnitFrames:UpdatePlayerFrame()
-                end
-            end,
-            true,
-            "Custom health color for player frame only"
-        )
-        self:AddControl(canvas, playerHealthColor, 32)
+    -- Position Y
+    local playerY = self:CreateSlider(
+        "Position Y",
+        -2000, 2000, 1,
+        function() return DivinicalUI.db.profile.unitframes.player.y or -200 end,
+        function(value)
+            DivinicalUI.db.profile.unitframes.player.y = value
+            if DivinicalUI.modules.UnitFrames then
+                DivinicalUI.modules.UnitFrames:UpdatePlayerFrame()
+            end
+        end,
+        "Vertical position offset"
+    )
+    self:AddControlToContainer(container, playerY, 48)
 
-        local playerPowerColor = self:CreateColorPicker(
-            "Power Bar Color Override",
-            function()
-                local c = DivinicalUI.db.profile.unitframes.player.powerColor
-                if c then
-                    return c[1], c[2], c[3], c[4] or 1
-                end
-                -- Return global default if no override
-                local gc = DivinicalUI.db.profile.colors.power
-                return gc[1], gc[2], gc[3], gc[4] or 1
-            end,
-            function(r, g, b, a)
-                DivinicalUI.db.profile.unitframes.player.powerColor = {r, g, b, a}
-                if DivinicalUI.modules.UnitFrames then
-                    DivinicalUI.modules.UnitFrames:UpdatePlayerFrame()
-                end
-            end,
-            true,
-            "Custom power color for player frame only"
-        )
-        self:AddControl(canvas, playerPowerColor, 32)
+    -- Scale
+    local playerScale = self:CreateSlider(
+        "Scale",
+        0.5, 2.0, 0.05,
+        function() return DivinicalUI.db.profile.unitframes.player.scale or 1.0 end,
+        function(value)
+            DivinicalUI.db.profile.unitframes.player.scale = value
+            if DivinicalUI.modules.UnitFrames then
+                DivinicalUI.modules.UnitFrames:UpdatePlayerFrame()
+            end
+        end,
+        "Frame scale multiplier"
+    )
+    self:AddControlToContainer(container, playerScale, 48)
 
-        -- Spacer
-        self:AddControl(canvas, CreateFrame("Frame"), 16)
+    -- Font Size
+    local playerFontSize = self:CreateSlider(
+        "Font Size",
+        8, 24, 1,
+        function() return DivinicalUI.db.profile.unitframes.player.fontSize or 12 end,
+        function(value)
+            DivinicalUI.db.profile.unitframes.player.fontSize = value
+            if DivinicalUI.modules.UnitFrames then
+                DivinicalUI.modules.UnitFrames:UpdatePlayerFrame()
+            end
+        end,
+        "Text font size in pixels"
+    )
+    self:AddControlToContainer(container, playerFontSize, 48)
 
-        -- Target frame override colors
-        local targetAdvHeader = self:CreateHeader("Target Frame Colors")
-        self:AddControl(canvas, targetAdvHeader, 20)
+    -- Color Overrides
+    local playerHealthColor = self:CreateColorPicker(
+        "Health Color Override",
+        function()
+            local c = DivinicalUI.db.profile.unitframes.player.healthColor
+            if c then return c[1], c[2], c[3], c[4] or 1 end
+            local gc = DivinicalUI.db.profile.colors.health
+            return gc[1], gc[2], gc[3], gc[4] or 1
+        end,
+        function(r, g, b, a)
+            DivinicalUI.db.profile.unitframes.player.healthColor = {r, g, b, a}
+            if DivinicalUI.modules.UnitFrames then
+                DivinicalUI.modules.UnitFrames:UpdatePlayerFrame()
+            end
+        end,
+        true,
+        "Override global health color for player frame"
+    )
+    self:AddControlToContainer(container, playerHealthColor, 32)
 
-        local targetHealthColor = self:CreateColorPicker(
-            "Health Bar Color Override",
-            function()
-                local c = DivinicalUI.db.profile.unitframes.target.healthColor
-                if c then
-                    return c[1], c[2], c[3], c[4] or 1
-                end
-                -- Return global default if no override
-                local gc = DivinicalUI.db.profile.colors.health
-                return gc[1], gc[2], gc[3], gc[4] or 1
-            end,
-            function(r, g, b, a)
-                DivinicalUI.db.profile.unitframes.target.healthColor = {r, g, b, a}
-                if DivinicalUI.modules.UnitFrames then
-                    DivinicalUI.modules.UnitFrames:UpdateTargetFrame()
-                end
-            end,
-            true,
-            "Custom health color for target frame only"
-        )
-        self:AddControl(canvas, targetHealthColor, 32)
+    local playerPowerColor = self:CreateColorPicker(
+        "Power Color Override",
+        function()
+            local c = DivinicalUI.db.profile.unitframes.player.powerColor
+            if c then return c[1], c[2], c[3], c[4] or 1 end
+            local gc = DivinicalUI.db.profile.colors.power
+            return gc[1], gc[2], gc[3], gc[4] or 1
+        end,
+        function(r, g, b, a)
+            DivinicalUI.db.profile.unitframes.player.powerColor = {r, g, b, a}
+            if DivinicalUI.modules.UnitFrames then
+                DivinicalUI.modules.UnitFrames:UpdatePlayerFrame()
+            end
+        end,
+        true,
+        "Override global power color for player frame"
+    )
+    self:AddControlToContainer(container, playerPowerColor, 32)
 
-        local targetPowerColor = self:CreateColorPicker(
-            "Power Bar Color Override",
-            function()
-                local c = DivinicalUI.db.profile.unitframes.target.powerColor
-                if c then
-                    return c[1], c[2], c[3], c[4] or 1
-                end
-                -- Return global default if no override
-                local gc = DivinicalUI.db.profile.colors.power
-                return gc[1], gc[2], gc[3], gc[4] or 1
-            end,
-            function(r, g, b, a)
-                DivinicalUI.db.profile.unitframes.target.powerColor = {r, g, b, a}
-                if DivinicalUI.modules.UnitFrames then
-                    DivinicalUI.modules.UnitFrames:UpdateTargetFrame()
-                end
-            end,
-            true,
-            "Custom power color for target frame only"
-        )
-        self:AddControl(canvas, targetPowerColor, 32)
-    end
+    -- Spacer
+    self:AddControlToContainer(container, CreateFrame("Frame"), 24)
+
+    -- ========== TARGET FRAME ==========
+    local targetHeader = self:CreateHeader("Target Frame")
+    self:AddControlToContainer(container, targetHeader, 24)
+
+    -- Enable/Disable
+    local targetEnabled = self:CreateCheckbox(
+        "Enable Target Frame",
+        function() return DivinicalUI.db.profile.unitframes.target.enabled ~= false end,
+        function(value)
+            DivinicalUI.db.profile.unitframes.target.enabled = value
+            if DivinicalUI.modules.UnitFrames then
+                DivinicalUI.modules.UnitFrames:UpdateTargetFrame()
+            end
+        end,
+        "Show or hide the target frame"
+    )
+    self:AddControlToContainer(container, targetEnabled, 32)
+
+    -- Position X
+    local targetX = self:CreateSlider(
+        "Position X",
+        -2000, 2000, 1,
+        function() return DivinicalUI.db.profile.unitframes.target.x or 350 end,
+        function(value)
+            DivinicalUI.db.profile.unitframes.target.x = value
+            if DivinicalUI.modules.UnitFrames then
+                DivinicalUI.modules.UnitFrames:UpdateTargetFrame()
+            end
+        end,
+        "Horizontal position offset"
+    )
+    self:AddControlToContainer(container, targetX, 48)
+
+    -- Position Y
+    local targetY = self:CreateSlider(
+        "Position Y",
+        -2000, 2000, 1,
+        function() return DivinicalUI.db.profile.unitframes.target.y or -200 end,
+        function(value)
+            DivinicalUI.db.profile.unitframes.target.y = value
+            if DivinicalUI.modules.UnitFrames then
+                DivinicalUI.modules.UnitFrames:UpdateTargetFrame()
+            end
+        end,
+        "Vertical position offset"
+    )
+    self:AddControlToContainer(container, targetY, 48)
+
+    -- Scale
+    local targetScale = self:CreateSlider(
+        "Scale",
+        0.5, 2.0, 0.05,
+        function() return DivinicalUI.db.profile.unitframes.target.scale or 1.0 end,
+        function(value)
+            DivinicalUI.db.profile.unitframes.target.scale = value
+            if DivinicalUI.modules.UnitFrames then
+                DivinicalUI.modules.UnitFrames:UpdateTargetFrame()
+            end
+        end,
+        "Frame scale multiplier"
+    )
+    self:AddControlToContainer(container, targetScale, 48)
+
+    -- Font Size
+    local targetFontSize = self:CreateSlider(
+        "Font Size",
+        8, 24, 1,
+        function() return DivinicalUI.db.profile.unitframes.target.fontSize or 12 end,
+        function(value)
+            DivinicalUI.db.profile.unitframes.target.fontSize = value
+            if DivinicalUI.modules.UnitFrames then
+                DivinicalUI.modules.UnitFrames:UpdateTargetFrame()
+            end
+        end,
+        "Text font size in pixels"
+    )
+    self:AddControlToContainer(container, targetFontSize, 48)
+
+    -- Color Overrides
+    local targetHealthColor = self:CreateColorPicker(
+        "Health Color Override",
+        function()
+            local c = DivinicalUI.db.profile.unitframes.target.healthColor
+            if c then return c[1], c[2], c[3], c[4] or 1 end
+            local gc = DivinicalUI.db.profile.colors.health
+            return gc[1], gc[2], gc[3], gc[4] or 1
+        end,
+        function(r, g, b, a)
+            DivinicalUI.db.profile.unitframes.target.healthColor = {r, g, b, a}
+            if DivinicalUI.modules.UnitFrames then
+                DivinicalUI.modules.UnitFrames:UpdateTargetFrame()
+            end
+        end,
+        true,
+        "Override global health color for target frame"
+    )
+    self:AddControlToContainer(container, targetHealthColor, 32)
+
+    local targetPowerColor = self:CreateColorPicker(
+        "Power Color Override",
+        function()
+            local c = DivinicalUI.db.profile.unitframes.target.powerColor
+            if c then return c[1], c[2], c[3], c[4] or 1 end
+            local gc = DivinicalUI.db.profile.colors.power
+            return gc[1], gc[2], gc[3], gc[4] or 1
+        end,
+        function(r, g, b, a)
+            DivinicalUI.db.profile.unitframes.target.powerColor = {r, g, b, a}
+            if DivinicalUI.modules.UnitFrames then
+                DivinicalUI.modules.UnitFrames:UpdateTargetFrame()
+            end
+        end,
+        true,
+        "Override global power color for target frame"
+    )
+    self:AddControlToContainer(container, targetPowerColor, 32)
 end
 
 -- Populate Raid settings (placeholder)
