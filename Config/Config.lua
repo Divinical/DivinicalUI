@@ -533,12 +533,185 @@ function Config:PopulateThemesSettings(canvas)
     placeholder:SetTextColor(0.6, 0.6, 0.6)
 end
 
--- Populate Profiles settings (placeholder)
+-- Populate Profiles settings
 function Config:PopulateProfilesSettings(canvas)
-    local placeholder = canvas:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-    placeholder:SetPoint("TOPLEFT", canvas.content, "TOPLEFT", 8, -8)
-    placeholder:SetText("Profile management coming soon...")
-    placeholder:SetTextColor(0.6, 0.6, 0.6)
+    -- Active Profile header
+    local activeHeader = self:CreateHeader("Active Profile")
+    self:AddControl(canvas, activeHeader, 24)
+
+    -- Profile info text
+    local profileInfo = canvas:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+    profileInfo:SetPoint("TOPLEFT", canvas.content, "TOPLEFT", 8, -(canvas.lastY))
+    profileInfo:SetJustifyH("LEFT")
+    profileInfo:SetWidth(560)
+    local currentProfile = DivinicalUI.db:GetCurrentProfile() or "Default"
+    profileInfo:SetText("Current Profile: |cff33ff99" .. currentProfile .. "|r")
+    self:AddControl(canvas, CreateFrame("Frame"), 24)
+
+    -- Profile management buttons
+    local newProfileBtn = self:CreateButton("New Profile", function()
+        StaticPopupDialogs["DIVINICALUI_NEW_PROFILE"] = {
+            text = "Enter new profile name:",
+            button1 = "Create",
+            button2 = "Cancel",
+            hasEditBox = true,
+            OnAccept = function(self)
+                local profileName = self.editBox:GetText()
+                if profileName and profileName ~= "" then
+                    DivinicalUI.db:SetProfile(profileName)
+                    print("|cff33ff99DivinicalUI|r: Created and switched to profile: " .. profileName)
+                    ReloadUI()
+                end
+            end,
+            EditBoxOnEnterPressed = function(self)
+                local parent = self:GetParent()
+                local profileName = self:GetText()
+                if profileName and profileName ~= "" then
+                    DivinicalUI.db:SetProfile(profileName)
+                    print("|cff33ff99DivinicalUI|r: Created and switched to profile: " .. profileName)
+                    parent:Hide()
+                    ReloadUI()
+                end
+            end,
+            timeout = 0,
+            whileDead = true,
+            hideOnEscape = true,
+            preferredIndex = 3,
+        }
+        StaticPopup_Show("DIVINICALUI_NEW_PROFILE")
+    end, 120, 25)
+    newProfileBtn:SetPoint("TOPLEFT", canvas.content, "TOPLEFT", 4, -(canvas.lastY))
+    canvas.lastY = canvas.lastY + 32
+
+    local deleteProfileBtn = self:CreateButton("Delete Profile", function()
+        local currentProfile = DivinicalUI.db:GetCurrentProfile()
+        if currentProfile == "Default" then
+            print("|cff33ff99DivinicalUI|r: Cannot delete Default profile.")
+            return
+        end
+        StaticPopupDialogs["DIVINICALUI_DELETE_PROFILE"] = {
+            text = "Delete profile '" .. currentProfile .. "'?\n\n|cffff0000This cannot be undone!|r",
+            button1 = "Delete",
+            button2 = "Cancel",
+            OnAccept = function()
+                DivinicalUI.db:DeleteProfile(currentProfile)
+                print("|cff33ff99DivinicalUI|r: Deleted profile: " .. currentProfile)
+                ReloadUI()
+            end,
+            timeout = 0,
+            whileDead = true,
+            hideOnEscape = true,
+            preferredIndex = 3,
+        }
+        StaticPopup_Show("DIVINICALUI_DELETE_PROFILE")
+    end, 120, 25)
+    deleteProfileBtn:SetPoint("LEFT", newProfileBtn, "RIGHT", 8, 0)
+
+    local copyProfileBtn = self:CreateButton("Copy Profile", function()
+        local currentProfile = DivinicalUI.db:GetCurrentProfile()
+        StaticPopupDialogs["DIVINICALUI_COPY_PROFILE"] = {
+            text = "Enter name for profile copy:",
+            button1 = "Copy",
+            button2 = "Cancel",
+            hasEditBox = true,
+            OnAccept = function(self)
+                local profileName = self.editBox:GetText()
+                if profileName and profileName ~= "" then
+                    DivinicalUI.db:CopyProfile(profileName)
+                    DivinicalUI.db:SetProfile(profileName)
+                    print("|cff33ff99DivinicalUI|r: Copied to new profile: " .. profileName)
+                    ReloadUI()
+                end
+            end,
+            timeout = 0,
+            whileDead = true,
+            hideOnEscape = true,
+            preferredIndex = 3,
+        }
+        StaticPopup_Show("DIVINICALUI_COPY_PROFILE")
+    end, 120, 25)
+    copyProfileBtn:SetPoint("LEFT", deleteProfileBtn, "RIGHT", 8, 0)
+
+    -- Spacer
+    self:AddControl(canvas, CreateFrame("Frame"), 16)
+
+    -- Preset Profiles header
+    local presetHeader = self:CreateHeader("Preset Profiles")
+    self:AddControl(canvas, presetHeader, 24)
+
+    -- Info text
+    local presetInfo = canvas:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+    presetInfo:SetPoint("TOPLEFT", canvas.content, "TOPLEFT", 8, -(canvas.lastY))
+    presetInfo:SetWidth(560)
+    presetInfo:SetJustifyH("LEFT")
+    presetInfo:SetText("Apply a preset configuration optimized for your role:")
+    presetInfo:SetTextColor(0.8, 0.8, 0.8)
+    self:AddControl(canvas, CreateFrame("Frame"), 24)
+
+    -- Preset profile buttons (row 1)
+    local tankBtn = self:CreateButton("Tank", function()
+        Config:ApplyPresetProfile("Tank")
+    end, 100, 25)
+    tankBtn:SetPoint("TOPLEFT", canvas.content, "TOPLEFT", 4, -(canvas.lastY))
+
+    local healerBtn = self:CreateButton("Healer", function()
+        Config:ApplyPresetProfile("Healer")
+    end, 100, 25)
+    healerBtn:SetPoint("LEFT", tankBtn, "RIGHT", 8, 0)
+
+    local dpsBtn = self:CreateButton("DPS", function()
+        Config:ApplyPresetProfile("DPS")
+    end, 100, 25)
+    dpsBtn:SetPoint("LEFT", healerBtn, "RIGHT", 8, 0)
+
+    self:AddControl(canvas, CreateFrame("Frame"), 32)
+
+    -- Preset profile buttons (row 2)
+    local pvpBtn = self:CreateButton("PvP", function()
+        Config:ApplyPresetProfile("PvP")
+    end, 100, 25)
+    pvpBtn:SetPoint("TOPLEFT", canvas.content, "TOPLEFT", 4, -(canvas.lastY))
+
+    local simpleBtn = self:CreateButton("Simple", function()
+        Config:ApplyPresetProfile("Simple")
+    end, 100, 25)
+    simpleBtn:SetPoint("LEFT", pvpBtn, "RIGHT", 8, 0)
+
+    local advancedBtn = self:CreateButton("Advanced", function()
+        Config:ApplyPresetProfile("Advanced")
+    end, 100, 25)
+    advancedBtn:SetPoint("LEFT", simpleBtn, "RIGHT", 8, 0)
+
+    self:AddControl(canvas, CreateFrame("Frame"), 32)
+
+    -- Spacer
+    self:AddControl(canvas, CreateFrame("Frame"), 16)
+
+    -- Import/Export header
+    local importExportHeader = self:CreateHeader("Import / Export")
+    self:AddControl(canvas, importExportHeader, 24)
+
+    -- Import/Export info
+    local importExportInfo = canvas:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+    importExportInfo:SetPoint("TOPLEFT", canvas.content, "TOPLEFT", 8, -(canvas.lastY))
+    importExportInfo:SetWidth(560)
+    importExportInfo:SetJustifyH("LEFT")
+    importExportInfo:SetText("Share your configuration with others:")
+    importExportInfo:SetTextColor(0.8, 0.8, 0.8)
+    self:AddControl(canvas, CreateFrame("Frame"), 24)
+
+    -- Import/Export buttons
+    local exportBtn = self:CreateButton("Export Profile", function()
+        Config:ShowExportDialog()
+    end, 120, 25)
+    exportBtn:SetPoint("TOPLEFT", canvas.content, "TOPLEFT", 4, -(canvas.lastY))
+
+    local importBtn = self:CreateButton("Import Profile", function()
+        Config:ShowImportDialog()
+    end, 120, 25)
+    importBtn:SetPoint("LEFT", exportBtn, "RIGHT", 8, 0)
+
+    self:AddControl(canvas, CreateFrame("Frame"), 32)
 end
 
 -- Populate Advanced settings
@@ -575,6 +748,146 @@ function Config:PopulateAdvancedSettings(canvas)
     placeholder:SetPoint("TOPLEFT", canvas.content, "TOPLEFT", 8, -(canvas.lastY))
     placeholder:SetText("Additional advanced settings coming soon...")
     placeholder:SetTextColor(0.6, 0.6, 0.6)
+end
+
+-- Apply a preset profile configuration
+function Config:ApplyPresetProfile(presetName)
+    StaticPopupDialogs["DIVINICALUI_APPLY_PRESET"] = {
+        text = "Apply '" .. presetName .. "' preset profile?\n\nThis will overwrite your current settings.",
+        button1 = "Apply",
+        button2 = "Cancel",
+        OnAccept = function()
+            -- TODO: Implement preset profile data and application logic
+            -- For now, just show a message
+            print("|cff33ff99DivinicalUI|r: Applied " .. presetName .. " preset profile.")
+            print("|cff33ff99DivinicalUI|r: Preset profiles coming soon in full implementation!")
+        end,
+        timeout = 0,
+        whileDead = true,
+        hideOnEscape = true,
+        preferredIndex = 3,
+    }
+    StaticPopup_Show("DIVINICALUI_APPLY_PRESET")
+end
+
+-- Show export dialog
+function Config:ShowExportDialog()
+    -- Create export frame if it doesn't exist
+    if not self.exportFrame then
+        local frame = CreateFrame("Frame", "DivinicalUIExportFrame", UIParent, "DialogBoxFrame")
+        frame:SetSize(500, 400)
+        frame:SetPoint("CENTER")
+        frame:SetMovable(true)
+        frame:EnableMouse(true)
+        frame:RegisterForDrag("LeftButton")
+        frame:SetScript("OnDragStart", frame.StartMoving)
+        frame:SetScript("OnDragStop", frame.StopMovingOrSizing)
+        frame:SetFrameStrata("DIALOG")
+
+        -- Title
+        local title = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
+        title:SetPoint("TOP", 0, -16)
+        title:SetText("Export Profile")
+
+        -- Scroll frame for export string
+        local scrollFrame = CreateFrame("ScrollFrame", nil, frame, "UIPanelScrollFrameTemplate")
+        scrollFrame:SetPoint("TOPLEFT", 16, -40)
+        scrollFrame:SetPoint("BOTTOMRIGHT", -32, 50)
+
+        local editBox = CreateFrame("EditBox", nil, scrollFrame)
+        editBox:SetMultiLine(true)
+        editBox:SetSize(460, 300)
+        editBox:SetFontObject(GameFontHighlight)
+        editBox:SetAutoFocus(false)
+        editBox:SetScript("OnEscapePressed", function() frame:Hide() end)
+        scrollFrame:SetScrollChild(editBox)
+
+        frame.editBox = editBox
+
+        -- Close button
+        local closeBtn = CreateFrame("Button", nil, frame, "UIPanelButtonTemplate")
+        closeBtn:SetSize(100, 25)
+        closeBtn:SetPoint("BOTTOM", 0, 16)
+        closeBtn:SetText("Close")
+        closeBtn:SetScript("OnClick", function() frame:Hide() end)
+
+        self.exportFrame = frame
+    end
+
+    -- Generate export string
+    local exportString = "DivinicalUI_Export_v1\n"
+    exportString = exportString .. "Profile: " .. (DivinicalUI.db:GetCurrentProfile() or "Default") .. "\n"
+    exportString = exportString .. "Data: [Profile data will be serialized here]\n"
+    exportString = exportString .. "-- Export functionality coming soon in full implementation"
+
+    self.exportFrame.editBox:SetText(exportString)
+    self.exportFrame.editBox:HighlightText()
+    self.exportFrame:Show()
+end
+
+-- Show import dialog
+function Config:ShowImportDialog()
+    -- Create import frame if it doesn't exist
+    if not self.importFrame then
+        local frame = CreateFrame("Frame", "DivinicalUIImportFrame", UIParent, "DialogBoxFrame")
+        frame:SetSize(500, 400)
+        frame:SetPoint("CENTER")
+        frame:SetMovable(true)
+        frame:EnableMouse(true)
+        frame:RegisterForDrag("LeftButton")
+        frame:SetScript("OnDragStart", frame.StartMoving)
+        frame:SetScript("OnDragStop", frame.StopMovingOrSizing)
+        frame:SetFrameStrata("DIALOG")
+
+        -- Title
+        local title = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
+        title:SetPoint("TOP", 0, -16)
+        title:SetText("Import Profile")
+
+        -- Scroll frame for import string
+        local scrollFrame = CreateFrame("ScrollFrame", nil, frame, "UIPanelScrollFrameTemplate")
+        scrollFrame:SetPoint("TOPLEFT", 16, -40)
+        scrollFrame:SetPoint("BOTTOMRIGHT", -32, 50)
+
+        local editBox = CreateFrame("EditBox", nil, scrollFrame)
+        editBox:SetMultiLine(true)
+        editBox:SetSize(460, 300)
+        editBox:SetFontObject(GameFontHighlight)
+        editBox:SetAutoFocus(true)
+        editBox:SetScript("OnEscapePressed", function() frame:Hide() end)
+        scrollFrame:SetScrollChild(editBox)
+
+        frame.editBox = editBox
+
+        -- Import button
+        local importBtn = CreateFrame("Button", nil, frame, "UIPanelButtonTemplate")
+        importBtn:SetSize(100, 25)
+        importBtn:SetPoint("BOTTOM", -55, 16)
+        importBtn:SetText("Import")
+        importBtn:SetScript("OnClick", function()
+            local importString = frame.editBox:GetText()
+            if importString and importString ~= "" then
+                -- TODO: Implement import parsing and validation
+                print("|cff33ff99DivinicalUI|r: Import functionality coming soon!")
+                frame:Hide()
+            else
+                print("|cff33ff99DivinicalUI|r: Please paste an export string.")
+            end
+        end)
+
+        -- Close button
+        local closeBtn = CreateFrame("Button", nil, frame, "UIPanelButtonTemplate")
+        closeBtn:SetSize(100, 25)
+        closeBtn:SetPoint("BOTTOM", 55, 16)
+        closeBtn:SetText("Close")
+        closeBtn:SetScript("OnClick", function() frame:Hide() end)
+
+        self.importFrame = frame
+    end
+
+    self.importFrame.editBox:SetText("")
+    self.importFrame:Show()
+    self.importFrame.editBox:SetFocus()
 end
 
 -- Open configuration panel

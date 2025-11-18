@@ -171,8 +171,8 @@
               1,
               2
             ],
-            "details": "Implement profile dropdown, create preset profiles (Tank/Healer/DPS/PvP/Simple/Advanced), add import/export buttons",
-            "status": "pending",
+            "details": "Implement profile dropdown, create preset profiles (Tank/Healer/DPS/PvP/Simple/Advanced), add import/export buttons\n<info added on 2025-11-18T16:30:00.000Z>\nImplemented complete profile management UI in Profiles settings category. Created profile management buttons (New/Delete/Copy) with StaticPopupDialogs for user input. Added 6 preset profile buttons (Tank/Healer/DPS/PvP/Simple/Advanced) with confirmation dialogs. Built export dialog with scrollable text area showing generated export strings. Built import dialog with paste functionality and validation. All UI elements properly positioned and styled. Placeholder implementations added for preset application and import/export logic (full backend to be implemented in Task 5: Profile Management System).\n</info added on 2025-11-18T16:30:00.000Z>",
+            "status": "done",
             "testStrategy": "Test profile switching performance and verify preset configurations apply correctly"
           },
           {
@@ -1670,7 +1670,7 @@
     ],
     "metadata": {
       "created": "2025-10-29T17:49:44.992Z",
-      "updated": "2025-11-18T16:00:00.000Z",
+      "updated": "2025-11-18T16:30:00.000Z",
       "description": "Tasks for master context - Updated to incorporate full MASTER_UPGRADE_PLAN.md vision"
     }
   }
