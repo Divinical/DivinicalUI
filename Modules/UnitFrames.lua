@@ -33,7 +33,7 @@ function UnitFrames:CreateStyle()
         self.Health:SetAllPoints()
         self.Health:SetStatusBarTexture("Interface\\TargetingFrame\\UI-StatusBar") -- Using default texture for now
         self.Health:GetStatusBarTexture():SetDrawLayer("ARTWORK")
-        self.Health:SetSmoothProgress(true) -- Enable smooth transitions
+        -- Note: SetSmoothProgress removed - not available in WoW 11.0.2+
         
         -- Health background with multi-layer effect
         self.Health.bg = self.Health:CreateTexture(nil, "BORDER")
@@ -72,7 +72,7 @@ function UnitFrames:CreateStyle()
         self.Power:SetHeight(10) -- Slightly taller for better visibility
         self.Power:SetStatusBarTexture("Interface\\TargetingFrame\\UI-StatusBar")
         self.Power:GetStatusBarTexture():SetDrawLayer("ARTWORK")
-        self.Power:SetSmoothProgress(true) -- Enable smooth transitions
+        -- Note: SetSmoothProgress removed - not available in WoW 11.0.2+
         
         -- Power background
         self.Power.bg = self.Power:CreateTexture(nil, "BORDER")
@@ -529,20 +529,20 @@ function UnitFrames:CreateStyle()
             r, g, b = 0.4, 0.2, 0.2
         elseif UnitIsPlayer(unit) then
             local class = select(2, UnitClass(unit))
-            r, g, b = DivinicalUI.Utils.Colors.GetClassColor(class)
+            r, g, b = DivinicalUI.modules.Utils.Colors.GetClassColor(class)
         elseif UnitIsFriend(unit, "player") then
             r, g, b = 0.2, 0.8, 0.2
         else
             local reaction = UnitReaction(unit, "player")
-            r, g, b = DivinicalUI.Utils.Colors.GetReactionColor(reaction)
+            r, g, b = DivinicalUI.modules.Utils.Colors.GetReactionColor(reaction)
         end
         
         -- Smooth color transitions
         if self.Health.currentColor then
             local oldR, oldG, oldB = self.Health.currentColor.r, self.Health.currentColor.g, self.Health.currentColor.b
-            r, g, b = DivinicalUI.Utils.Math.Lerp(oldR, r, 0.3), 
-                     DivinicalUI.Utils.Math.Lerp(oldG, g, 0.3), 
-                     DivinicalUI.Utils.Math.Lerp(oldB, b, 0.3)
+            r, g, b = DivinicalUI.modules.Utils.Math.Lerp(oldR, r, 0.3), 
+                     DivinicalUI.modules.Utils.Math.Lerp(oldG, g, 0.3), 
+                     DivinicalUI.modules.Utils.Math.Lerp(oldB, b, 0.3)
         end
         
         self.Health:SetStatusBarColor(r, g, b)
@@ -561,7 +561,7 @@ function UnitFrames:CreateStyle()
     
     local function PostUpdatePower(self, unit, min, max)
         local powerType = UnitPowerType(unit)
-        local r, g, b = DivinicalUI.Utils.Colors.GetPowerColor(powerType)
+        local r, g, b = DivinicalUI.modules.Utils.Colors.GetPowerColor(powerType)
         
         -- Enhanced power colors with better visibility
         if powerType == "MANA" then
@@ -598,7 +598,7 @@ function UnitFrames:CreateStyle()
         if health == maxHealth then
             return ""
         else
-            return DivinicalUI.Utils.Strings.FormatNumber(health) .. " / " .. DivinicalUI.Utils.Strings.FormatNumber(maxHealth)
+            return DivinicalUI.modules.Utils.Strings.FormatNumber(health) .. " / " .. DivinicalUI.modules.Utils.Strings.FormatNumber(maxHealth)
         end
     end
     
@@ -611,7 +611,7 @@ function UnitFrames:CreateStyle()
             return "??"
         end
         
-        local healthPercent = DivinicalUI.Utils.Math.Round((health / maxHealth) * 100)
+        local healthPercent = DivinicalUI.modules.Utils.Math.Round((health / maxHealth) * 100)
         return healthPercent .. "%"
     end
     
@@ -627,7 +627,7 @@ function UnitFrames:CreateStyle()
         if power == 0 then
             return ""
         else
-            return DivinicalUI.Utils.Strings.FormatNumber(power) .. " / " .. DivinicalUI.Utils.Strings.FormatNumber(maxPower)
+            return DivinicalUI.modules.Utils.Strings.FormatNumber(power) .. " / " .. DivinicalUI.modules.Utils.Strings.FormatNumber(maxPower)
         end
     end
     
@@ -660,7 +660,7 @@ end
 -- Spawn unit frames with comprehensive testing
 function UnitFrames:SpawnFrames()
     if not oUF then
-        DivinicalUI.Utils.Debug.Print("oUF not available, cannot spawn frames", "ERROR")
+        DivinicalUI.modules.Utils.Debug.Print("oUF not available, cannot spawn frames", "ERROR")
         return
     end
     
@@ -671,7 +671,7 @@ function UnitFrames:SpawnFrames()
         playerFrame:SetSize(DivinicalUI.db.profile.unitframes.player.width, 
                            DivinicalUI.db.profile.unitframes.player.height)
         frames.player = playerFrame
-        DivinicalUI.Utils.Debug.Print("Player frame spawned", "DEBUG")
+        DivinicalUI.modules.Utils.Debug.Print("Player frame spawned", "DEBUG")
         
         -- Test player frame elements
         self:TestFrameElements(playerFrame, "player")
@@ -684,7 +684,7 @@ function UnitFrames:SpawnFrames()
         targetFrame:SetSize(DivinicalUI.db.profile.unitframes.target.width, 
                            DivinicalUI.db.profile.unitframes.target.height)
         frames.target = targetFrame
-        DivinicalUI.Utils.Debug.Print("Target frame spawned", "DEBUG")
+        DivinicalUI.modules.Utils.Debug.Print("Target frame spawned", "DEBUG")
         
         -- Test target frame elements
         self:TestFrameElements(targetFrame, "target")
@@ -695,7 +695,7 @@ function UnitFrames:SpawnFrames()
     totFrame:SetPoint("TOPLEFT", frames.target, "TOPRIGHT", 5, 0)
     totFrame:SetSize(100, 30)
     frames.targettarget = totFrame
-    DivinicalUI.Utils.Debug.Print("Target of Target frame spawned", "DEBUG")
+    DivinicalUI.modules.Utils.Debug.Print("Target of Target frame spawned", "DEBUG")
     self:TestFrameElements(totFrame, "targettarget")
     
     -- Focus frame
@@ -703,7 +703,7 @@ function UnitFrames:SpawnFrames()
     focusFrame:SetPoint("TOPLEFT", frames.player, "BOTTOMLEFT", 0, -50)
     focusFrame:SetSize(150, 35)
     frames.focus = focusFrame
-    DivinicalUI.Utils.Debug.Print("Focus frame spawned", "DEBUG")
+    DivinicalUI.modules.Utils.Debug.Print("Focus frame spawned", "DEBUG")
     self:TestFrameElements(focusFrame, "focus")
     
     -- Focus target
@@ -711,7 +711,7 @@ function UnitFrames:SpawnFrames()
     focustargetFrame:SetPoint("TOPLEFT", frames.focus, "TOPRIGHT", 5, 0)
     focustargetFrame:SetSize(100, 25)
     frames.focustarget = focustargetFrame
-    DivinicalUI.Utils.Debug.Print("Focus target frame spawned", "DEBUG")
+    DivinicalUI.modules.Utils.Debug.Print("Focus target frame spawned", "DEBUG")
     self:TestFrameElements(focustargetFrame, "focustarget")
     
     -- Pet frame
@@ -719,7 +719,7 @@ function UnitFrames:SpawnFrames()
     petFrame:SetPoint("TOPLEFT", frames.player, "TOPRIGHT", 5, 0)
     petFrame:SetSize(100, 25)
     frames.pet = petFrame
-    DivinicalUI.Utils.Debug.Print("Pet frame spawned", "DEBUG")
+    DivinicalUI.modules.Utils.Debug.Print("Pet frame spawned", "DEBUG")
     self:TestFrameElements(petFrame, "pet")
     
     -- Pet target
@@ -727,7 +727,7 @@ function UnitFrames:SpawnFrames()
     pettargetFrame:SetPoint("TOPLEFT", frames.pet, "TOPRIGHT", 5, 0)
     pettargetFrame:SetSize(80, 20)
     frames.pettarget = pettargetFrame
-    DivinicalUI.Utils.Debug.Print("Pet target frame spawned", "DEBUG")
+    DivinicalUI.modules.Utils.Debug.Print("Pet target frame spawned", "DEBUG")
     self:TestFrameElements(pettargetFrame, "pettarget")
     
     -- Boss frames (1-5)
@@ -741,7 +741,7 @@ function UnitFrames:SpawnFrames()
         end
         bossFrame:SetSize(120, 35)
         frames.boss[i] = bossFrame
-        DivinicalUI.Utils.Debug.Print("Boss " .. i .. " frame spawned", "DEBUG")
+        DivinicalUI.modules.Utils.Debug.Print("Boss " .. i .. " frame spawned", "DEBUG")
         self:TestFrameElements(bossFrame, "boss" .. i)
     end
     
@@ -756,7 +756,7 @@ function UnitFrames:SpawnFrames()
         end
         partyFrame:SetSize(120, 30)
         frames.party[i] = partyFrame
-        DivinicalUI.Utils.Debug.Print("Party " .. i .. " frame spawned", "DEBUG")
+        DivinicalUI.modules.Utils.Debug.Print("Party " .. i .. " frame spawned", "DEBUG")
         self:TestFrameElements(partyFrame, "party" .. i)
     end
     
@@ -777,7 +777,7 @@ function UnitFrames:SpawnFrames()
         
         raidFrame:SetSize(60, 25)
         frames.raid[i] = raidFrame
-        DivinicalUI.Utils.Debug.Print("Raid " .. i .. " frame spawned", "DEBUG")
+        DivinicalUI.modules.Utils.Debug.Print("Raid " .. i .. " frame spawned", "DEBUG")
         self:TestFrameElements(raidFrame, "raid" .. i)
     end
     
@@ -792,7 +792,7 @@ function UnitFrames:SpawnFrames()
         end
         arenaFrame:SetSize(120, 30)
         frames.arena[i] = arenaFrame
-        DivinicalUI.Utils.Debug.Print("Arena " .. i .. " frame spawned", "DEBUG")
+        DivinicalUI.modules.Utils.Debug.Print("Arena " .. i .. " frame spawned", "DEBUG")
         self:TestFrameElements(arenaFrame, "arena" .. i)
     end
     
@@ -816,7 +816,7 @@ end
 
 -- Comprehensive testing function
 function UnitFrames:RunComprehensiveTests()
-    DivinicalUI.Utils.Debug.Print("=== DIVINICALUI COMPREHENSIVE TESTING START ===", "INFO")
+    DivinicalUI.modules.Utils.Debug.Print("=== DIVINICALUI COMPREHENSIVE TESTING START ===", "INFO")
     
     -- Test 1: Frame validation
     self:ValidateAllFrames()
@@ -843,17 +843,17 @@ function UnitFrames:RunComprehensiveTests()
     -- Test 7: Aura update testing
     self:TestAuraUpdates()
     
-    DivinicalUI.Utils.Debug.Print("=== DIVINICALUI COMPREHENSIVE TESTING COMPLETE ===", "INFO")
+    DivinicalUI.modules.Utils.Debug.Print("=== DIVINICALUI COMPREHENSIVE TESTING COMPLETE ===", "INFO")
 end
 
 -- Test combat log events
 function UnitFrames:TestCombatLogEvents()
-    DivinicalUI.Utils.Debug.Print("Testing combat log events...", "INFO")
+    DivinicalUI.modules.Utils.Debug.Print("Testing combat log events...", "INFO")
     
     -- Test if combat log events are being received
     local testEvent = function(self, event, ...)
         if event == "COMBAT_LOG_EVENT_UNFILTERED" then
-            DivinicalUI.Utils.Debug.Print("Combat log event received", "DEBUG")
+            DivinicalUI.modules.Utils.Debug.Print("Combat log event received", "DEBUG")
         end
     end
     
@@ -862,12 +862,12 @@ end
 
 -- Test aura updates
 function UnitFrames:TestAuraUpdates()
-    DivinicalUI.Utils.Debug.Print("Testing aura updates...", "INFO")
+    DivinicalUI.modules.Utils.Debug.Print("Testing aura updates...", "INFO")
     
     if frames.player then
         -- Force aura update
         frames.player:UpdateAllElements("UNIT_AURA")
-        DivinicalUI.Utils.Debug.Print("Aura update test completed", "DEBUG")
+        DivinicalUI.modules.Utils.Debug.Print("Aura update test completed", "DEBUG")
     end
 end
 
@@ -935,7 +935,7 @@ end
 -- Test individual frame elements
 function UnitFrames:TestFrameElements(frame, unitType)
     if not frame then
-        DivinicalUI.Utils.Debug.Print("Frame " .. unitType .. " is nil", "ERROR")
+        DivinicalUI.modules.Utils.Debug.Print("Frame " .. unitType .. " is nil", "ERROR")
         return
     end
     
@@ -988,15 +988,15 @@ function UnitFrames:TestFrameElements(frame, unitType)
     
     -- Report errors
     if #errors > 0 then
-        DivinicalUI.Utils.Debug.Print("Frame " .. unitType .. " errors: " .. table.concat(errors, ", "), "ERROR")
+        DivinicalUI.modules.Utils.Debug.Print("Frame " .. unitType .. " errors: " .. table.concat(errors, ", "), "ERROR")
     else
-        DivinicalUI.Utils.Debug.Print("Frame " .. unitType .. " elements validated successfully", "DEBUG")
+        DivinicalUI.modules.Utils.Debug.Print("Frame " .. unitType .. " elements validated successfully", "DEBUG")
     end
 end
 
 -- Validate all spawned frames
 function UnitFrames:ValidateAllFrames()
-    DivinicalUI.Utils.Debug.Print("Starting comprehensive frame validation...", "INFO")
+    DivinicalUI.modules.Utils.Debug.Print("Starting comprehensive frame validation...", "INFO")
     
     local totalFrames = 0
     local validFrames = 0
@@ -1008,9 +1008,9 @@ function UnitFrames:ValidateAllFrames()
                 totalFrames = totalFrames + 1
                 if subFrame and subFrame.UpdateAllElements then
                     validFrames = validFrames + 1
-                    DivinicalUI.Utils.Debug.Print("Frame " .. unitType .. i .. " validated", "DEBUG")
+                    DivinicalUI.modules.Utils.Debug.Print("Frame " .. unitType .. i .. " validated", "DEBUG")
                 else
-                    DivinicalUI.Utils.Debug.Print("Frame " .. unitType .. i .. " validation failed", "ERROR")
+                    DivinicalUI.modules.Utils.Debug.Print("Frame " .. unitType .. i .. " validation failed", "ERROR")
                 end
             end
         else
@@ -1018,19 +1018,19 @@ function UnitFrames:ValidateAllFrames()
             totalFrames = totalFrames + 1
             if frame and frame.UpdateAllElements then
                 validFrames = validFrames + 1
-                DivinicalUI.Utils.Debug.Print("Frame " .. unitType .. " validated", "DEBUG")
+                DivinicalUI.modules.Utils.Debug.Print("Frame " .. unitType .. " validated", "DEBUG")
             else
-                DivinicalUI.Utils.Debug.Print("Frame " .. unitType .. " validation failed", "ERROR")
+                DivinicalUI.modules.Utils.Debug.Print("Frame " .. unitType .. " validation failed", "ERROR")
             end
         end
     end
     
-    DivinicalUI.Utils.Debug.Print("Frame validation complete: " .. validFrames .. "/" .. totalFrames .. " frames valid", "INFO")
+    DivinicalUI.modules.Utils.Debug.Print("Frame validation complete: " .. validFrames .. "/" .. totalFrames .. " frames valid", "INFO")
 end
 
 -- Test oUF callbacks
 function UnitFrames:TestCallbacks()
-    DivinicalUI.Utils.Debug.Print("Testing oUF event callbacks...", "INFO")
+    DivinicalUI.modules.Utils.Debug.Print("Testing oUF event callbacks...", "INFO")
     
     -- Test UNIT_HEALTH callback
     if frames.player then
@@ -1038,7 +1038,7 @@ function UnitFrames:TestCallbacks()
         frames.player:UpdateAllElements("UNIT_HEALTH")
         local newHealth = UnitHealth("player")
         if oldHealth ~= newHealth then
-            DivinicalUI.Utils.Debug.Print("UNIT_HEALTH callback working", "DEBUG")
+            DivinicalUI.modules.Utils.Debug.Print("UNIT_HEALTH callback working", "DEBUG")
         end
     end
     
@@ -1046,7 +1046,7 @@ function UnitFrames:TestCallbacks()
     for unitType, frame in pairs(frames) do
         if type(frame) ~= "table" and frame and frame.UpdateAllElements then
             frame:UpdateAllElements("FORCE_UPDATE")
-            DivinicalUI.Utils.Debug.Print("FORCE_UPDATE callback tested for " .. unitType, "DEBUG")
+            DivinicalUI.modules.Utils.Debug.Print("FORCE_UPDATE callback tested for " .. unitType, "DEBUG")
         end
     end
 end
@@ -1062,33 +1062,33 @@ function UnitFrames:CheckMemoryLeaks()
     local memoryDiff = finalMemory - initialMemory
     
     if memoryDiff > 1000 then -- More than 1000 objects difference
-        DivinicalUI.Utils.Debug.Print("Potential memory leak detected: " .. memoryDiff .. " objects", "WARN")
+        DivinicalUI.modules.Utils.Debug.Print("Potential memory leak detected: " .. memoryDiff .. " objects", "WARN")
     else
-        DivinicalUI.Utils.Debug.Print("Memory usage stable: " .. memoryDiff .. " objects", "DEBUG")
+        DivinicalUI.modules.Utils.Debug.Print("Memory usage stable: " .. memoryDiff .. " objects", "DEBUG")
     end
 end
 
 -- Dynamic tag update testing
 function UnitFrames:TestTagUpdates()
-    DivinicalUI.Utils.Debug.Print("Testing dynamic tag updates...", "INFO")
+    DivinicalUI.modules.Utils.Debug.Print("Testing dynamic tag updates...", "INFO")
     
     if frames.player then
         -- Test health tag updates
         local healthTag = frames.player.Health.value
         if healthTag then
-            DivinicalUI.Utils.Debug.Print("Health tag found and functional", "DEBUG")
+            DivinicalUI.modules.Utils.Debug.Print("Health tag found and functional", "DEBUG")
         end
         
         -- Test power tag updates
         local powerTag = frames.player.Power.value
         if powerTag then
-            DivinicalUI.Utils.Debug.Print("Power tag found and functional", "DEBUG")
+            DivinicalUI.modules.Utils.Debug.Print("Power tag found and functional", "DEBUG")
         end
         
         -- Test name tag updates
         local nameTag = frames.player.Name
         if nameTag then
-            DivinicalUI.Utils.Debug.Print("Name tag found and functional", "DEBUG")
+            DivinicalUI.modules.Utils.Debug.Print("Name tag found and functional", "DEBUG")
         end
     end
 end

@@ -65,12 +65,12 @@ function Targeting:PLAYER_TARGET_CHANGED()
         -- Print target info (optional)
         if DivinicalUI.db.profile.targeting and DivinicalUI.db.profile.targeting.showTargetInfo then
             local level = UnitLevel("target")
-            local classification = DivinicalUI.Utils.Units.GetClassification("target")
-            local health = DivinicalUI.Utils.Units.GetHealthPercent("target")
+            local classification = DivinicalUI.modules.Utils.Units.GetClassification("target")
+            local health = DivinicalUI.modules.Utils.Units.GetHealthPercent("target")
             
             print("|cff33ff99DivinicalUI|r Target: " .. targetName .. 
                   " (Level " .. level .. " " .. classification .. 
-                  ", " .. DivinicalUI.Utils.Math.Round(health) .. "% HP)")
+                  ", " .. DivinicalUI.modules.Utils.Math.Round(health) .. "% HP)")
         end
     end
 end
@@ -145,7 +145,7 @@ end
 -- Cycle through target history
 function Targeting:CycleTarget()
     if #targetHistory < 2 then
-        DivinicalUI.Utils.Debug.Print("Not enough targets in history to cycle", "WARN")
+        DivinicalUI.modules.Utils.Debug.Print("Not enough targets in history to cycle", "WARN")
         return
     end
     
@@ -179,9 +179,9 @@ end
 function Targeting:FocusTarget()
     if UnitExists("target") then
         FocusUnit("target")
-        DivinicalUI.Utils.Debug.Print("Focused: " .. UnitName("target"), "INFO")
+        DivinicalUI.modules.Utils.Debug.Print("Focused: " .. UnitName("target"), "INFO")
     else
-        DivinicalUI.Utils.Debug.Print("No target to focus", "WARN")
+        DivinicalUI.modules.Utils.Debug.Print("No target to focus", "WARN")
     end
 end
 
@@ -193,9 +193,9 @@ function Targeting:MarkTarget(raidIcon)
         SetRaidTarget("target", raidIcon)
         local iconNames = {"Star", "Circle", "Diamond", "Triangle", "Moon", "Square", "Cross", "Skull"}
         local iconName = iconNames[raidIcon] or "Unknown"
-        DivinicalUI.Utils.Debug.Print("Marked " .. UnitName("target") .. " with " .. iconName, "INFO")
+        DivinicalUI.modules.Utils.Debug.Print("Marked " .. UnitName("target") .. " with " .. iconName, "INFO")
     else
-        DivinicalUI.Utils.Debug.Print("Cannot mark target (no target or target is player)", "WARN")
+        DivinicalUI.modules.Utils.Debug.Print("Cannot mark target (no target or target is player)", "WARN")
     end
 end
 
@@ -233,7 +233,7 @@ function Targeting:TargetLowestHealth()
     for i = 1, 40 do
         local unit = "nameplate" .. i
         if UnitExists(unit) and UnitCanAttack("player", unit) and not UnitIsDead(unit) then
-            local health = DivinicalUI.Utils.Units.GetHealthPercent(unit)
+            local health = DivinicalUI.modules.Utils.Units.GetHealthPercent(unit)
             if health < lowestHealth then
                 lowestHealth = health
                 lowestUnit = unit
@@ -306,7 +306,7 @@ function Targeting:TargetInRange(range)
     for i = 1, 40 do
         local unit = "nameplate" .. i
         if UnitExists(unit) and UnitCanAttack("player", unit) and not UnitIsDead(unit) then
-            local distance = DivinicalUI.Utils.Units.IsInRange(unit, 1) and 0 or range + 1
+            local distance = DivinicalUI.modules.Utils.Units.IsInRange(unit, 1) and 0 or range + 1
             if distance < closestDistance then
                 closestDistance = distance
                 closestUnit = unit
@@ -325,7 +325,7 @@ end
 -- Profile change handler
 function Targeting:OnProfileChanged(profileName)
     -- Update targeting settings when profile changes
-    DivinicalUI.Utils.Debug.Print("Targeting module profile changed to: " .. profileName, "DEBUG")
+    DivinicalUI.modules.Utils.Debug.Print("Targeting module profile changed to: " .. profileName, "DEBUG")
 end
 
 -- Register module

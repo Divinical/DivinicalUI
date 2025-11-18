@@ -163,7 +163,9 @@ function DivinicalUI:InitializeSoundSystem()
         eventFrame:RegisterEvent("UNIT_HEALTH")
         eventFrame:RegisterEvent("PLAYER_TARGET_CHANGED")
         eventFrame:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
-        DivinicalUI.Utils.Debug.Print("Sound system initialized", "INFO")
+        if self.modules.Utils then
+            self.modules.Utils.Debug.Print("Sound system initialized", "INFO")
+        end
     end
 end
 
