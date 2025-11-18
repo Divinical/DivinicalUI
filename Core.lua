@@ -76,10 +76,14 @@ local function InitializeDatabase()
     -- Set active profile reference
     DivinicalDB.profile = DivinicalDB.profiles[DivinicalDB.currentProfile]
 
-    -- Merge defaults into active profile
+    -- Merge defaults into active profile (deep copy to avoid shared references)
     for key, value in pairs(defaults.profile) do
         if DivinicalDB.profile[key] == nil then
-            DivinicalDB.profile[key] = value
+            if type(value) == "table" then
+                DivinicalDB.profile[key] = CopyTable(value)
+            else
+                DivinicalDB.profile[key] = value
+            end
         end
     end
 
@@ -156,6 +160,17 @@ function CopyTable(src, seen)
         return src
     end
 
+    -- Don't copy frames, widgets, or objects with metatables that might be Blizzard objects
+    -- These should be preserved as references, not deep copied
+    local mt = getmetatable(src)
+    if mt then
+        -- If it has a metatable, check if it's a frame/widget or special object
+        if type(mt) == "table" and (mt.__index or src.GetObjectType or src.GetNumPoints) then
+            -- This is likely a frame or Blizzard object, return it as-is
+            return src
+        end
+    end
+
     -- Ensure seen is a valid table (handle nil or invalid values)
     if type(seen) ~= "table" then
         seen = {}
@@ -172,10 +187,14 @@ function CopyTable(src, seen)
     seen[src] = dest
 
     for k, v in pairs(src) do
-        -- Skip metatables to avoid circular references
+        -- Skip metatable keys to avoid circular references
         if k ~= "__index" and k ~= "__newindex" then
-            -- Recursively copy all values (handles both tables and primitives)
-            dest[k] = CopyTable(v, seen)
+            local vType = type(v)
+            -- Skip functions and userdata (can't be saved to SavedVariables anyway)
+            if vType ~= "function" and vType ~= "userdata" and vType ~= "thread" then
+                -- Recursively copy values
+                dest[k] = CopyTable(v, seen)
+            end
         end
     end
 
