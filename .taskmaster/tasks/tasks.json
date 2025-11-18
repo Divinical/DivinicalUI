@@ -769,9 +769,9 @@
       {
         "id": 15,
         "title": "Unit Frame System Implementation",
-        "description": "Create all 11 unit frame types",
-        "details": "Implement player/target/focus/pet/party/raid/arena/boss/ToT/pet target/focus target frames with all required elements (cast bars, auras, indicators), smart buff/debuff filtering with class/role/content-type rules",
-        "testStrategy": "Test all frame types, verify real-time updates, validate performance metrics (<0.1% CPU), confirm class/spec compatibility",
+        "description": "Create all 11 unit frame types with full customization",
+        "details": "Complete production-ready unit frames with all elements. Current state: oUF framework loads without errors, basic player/target frames spawn, config panel opens, fonts working, media module registered. Needed: Fix frame styling consistency, add missing frame types (focus, ToT, boss, party, raid), implement smart aura filtering, add class-specific resource displays, working settings panel, profile save/load",
+        "testStrategy": "Test all frame types, verify real-time updates, validate performance metrics (<0.1% CPU), confirm class/spec compatibility, test in solo/party/raid/arena contexts",
         "priority": "high",
         "dependencies": [
           1,
@@ -781,58 +781,109 @@
         "subtasks": [
           {
             "id": 1,
-            "title": "Implement Unit Frame Types",
-            "description": "Create all 11 unit frame types with base layout and positioning",
+            "title": "Fix Frame Styling Consistency",
+            "description": "Standardize health/power/cast bar styling across all frames",
             "dependencies": [],
-            "details": "Implement player/target/focus/pet/party/raid/arena/boss/ToT/pet target/focus target frames with position anchors, sizing, and visibility logic",
+            "details": "Fix health/power bars to use proper colors from config, improve cast bar visual feedback with latency indicators, fix aura icon sizing/positioning, ensure consistent borders and textures across all frame types",
             "status": "pending",
-            "testStrategy": "Test frame visibility in different contexts (solo/raid/PvP), verify layout alignment"
+            "testStrategy": "Verify color application from settings, test cast bar feedback during interrupts, validate aura layout consistency"
           },
           {
             "id": 2,
-            "title": "Develop Shared Element System",
-            "description": "Create reusable components for all frames",
+            "title": "Implement Missing Frame Types",
+            "description": "Add focus, ToT, FocusTarget, PetTarget, and boss frames",
             "dependencies": [
               1
             ],
-            "details": "Implement modular cast bars, aura containers, health/mana indicators, and status indicators that can be dynamically attached to any frame type",
+            "details": "Focus frame (clone target frame), ToT/FocusTarget/PetTarget (mini versions), Boss frames (1-5) with important debuffs only and cast bars. Use existing player/target frame as template",
             "status": "pending",
-            "testStrategy": "Test element functionality across multiple frame types, verify cross-frame compatibility"
+            "testStrategy": "Test frame visibility in different contexts (solo/raid/PvP), verify boss frame display in raid encounters"
           },
           {
             "id": 3,
-            "title": "Build Filtering Engine",
-            "description": "Implement smart buff/debuff filtering system",
+            "title": "Implement Smart Aura Filtering",
+            "description": "Complete the aura filtering system with whitelist/blacklist config",
             "dependencies": [
-              2
+              1
             ],
-            "details": "Create rule-based filtering with class/role/content-type conditions, including priority sorting and duration-based hiding",
+            "details": "Use existing filtering logic in UnitFrames.lua, add whitelist/blacklist config in settings, implement class/role/content-type rules, priority sorting, duration-based hiding",
             "status": "pending",
-            "testStrategy": "Test filtering with different class specs, validate dungeon/raid-specific rules, verify duration thresholds"
+            "testStrategy": "Test filtering with different class specs, validate dungeon/raid-specific rules, verify whitelist/blacklist functionality"
           },
           {
             "id": 4,
-            "title": "Optimize Performance",
-            "description": "Ensure system meets performance requirements",
+            "title": "Add Class-Specific Resource Displays",
+            "description": "Implement combo points, soul shards, runes, chi, holy power, etc.",
             "dependencies": [
-              1,
-              2,
-              3
+              1
             ],
-            "details": "Implement object pooling, optimize event handling, reduce texture memory usage, and minimize CPU usage through efficient update mechanisms",
+            "details": "Create resource displays for all classes using Utils.Colors.GetPowerColor(), position above/below player frame, support all class power types (combo points, soul shards, runes, chi, holy power, arcane charges, etc.)",
             "status": "pending",
-            "testStrategy": "Stress test with 40+ raid frames, monitor CPU usage, verify frame rate stability"
+            "testStrategy": "Test with all 13 classes, verify proper color coding, validate positioning and scaling"
           },
           {
             "id": 5,
-            "title": "Implement Class Handling",
-            "description": "Add class-specific visual indicators",
+            "title": "Implement Party Frames",
+            "description": "Create party frames (1-5) with healer support",
             "dependencies": [
-              3
+              2
             ],
-            "details": "Create special indicators for class-specific mechanics (paladin auras, warlock shards, monk stagger, etc.) and role-based status icons",
+            "details": "Compact layout (horizontal or vertical), role icons, dispellable debuff highlighting, range fading, ready check icons, resurrection indicators, mouse-over casting support (Clique compat), incoming heals prediction",
             "status": "pending",
-            "testStrategy": "Test class-specific indicators with all frame types, verify role-based visuals in group settings"
+            "testStrategy": "Test in 5-man content, verify role icons display, validate range fading accuracy, test click-casting integration"
+          },
+          {
+            "id": 6,
+            "title": "Implement Raid Frames",
+            "description": "Create raid frames (1-40) with grid layout",
+            "dependencies": [
+              5
+            ],
+            "details": "Grid-style layout (8 groups x 5), role sorting (tanks -> healers -> dps), range-based opacity, health deficit mode, incoming heals prediction, threat coloring, group indicators, separate 10/20/40 layouts",
+            "status": "pending",
+            "testStrategy": "Stress test with 40-player raid, monitor CPU usage, verify role sorting, validate health deficit accuracy"
+          },
+          {
+            "id": 7,
+            "title": "Implement Arena Frames",
+            "description": "Create arena frames (1-5) with PvP features",
+            "dependencies": [
+              2
+            ],
+            "details": "Trinket tracking (visual only, no automation), DR (diminishing returns) tracker, spec detection, cast bar with interrupt tracking, large debuff display",
+            "status": "pending",
+            "testStrategy": "Test in arena skirmishes, verify trinket cooldown display, validate DR tracking accuracy"
+          },
+          {
+            "id": 8,
+            "title": "Build Working Settings Panel for Frames",
+            "description": "Create functional UI for per-frame customization",
+            "dependencies": [],
+            "details": "Per-frame positioning controls with drag-and-drop, color pickers for health/power, font/texture selection from media library, enable/disable toggles, scale sliders, aura filter settings",
+            "status": "pending",
+            "testStrategy": "Test real-time preview of settings changes, verify settings persistence, validate color picker functionality"
+          },
+          {
+            "id": 9,
+            "title": "Implement Profile Save/Load for Frames",
+            "description": "Make Profiles.lua functional for unit frame settings",
+            "dependencies": [
+              8
+            ],
+            "details": "Integrate with existing Profiles.lua, save all frame positions/colors/settings, implement profile switching, add default profiles (Tank/Healer/DPS/PvP)",
+            "status": "pending",
+            "testStrategy": "Test profile save/load cycles, verify profile switching without reload, validate default profile application"
+          },
+          {
+            "id": 10,
+            "title": "Performance Optimization",
+            "description": "Ensure system meets performance requirements",
+            "dependencies": [
+              6
+            ],
+            "details": "Implement frame pooling for raid frames, optimize event handling with throttling, reduce texture memory usage, minimize CPU usage through efficient update mechanisms, target <0.1% CPU",
+            "status": "pending",
+            "testStrategy": "Profile with 40+ raid frames active, monitor CPU usage during combat, verify frame rate stability"
           }
         ]
       },
@@ -1107,12 +1158,520 @@
             "testStrategy": "Test bank access integration, verify currency tracking accuracy, validate cross-container operations"
           }
         ]
+      },
+      {
+        "id": 21,
+        "title": "Tooltip Enhancement System",
+        "description": "Implement enhanced tooltips with additional information",
+        "details": "Add item level on gear, vendor price, already known (transmog/toys/pets), guild rank, Mythic+ score for players, health values (numerical), target information, spell ID for developers, anchor position (cursor/top/bottom), custom styling (colors/borders/backdrop)",
+        "testStrategy": "Test tooltip display for items/players/NPCs, verify information accuracy, validate custom styling, confirm anchor positioning",
+        "priority": "medium",
+        "dependencies": [
+          2,
+          18
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Item Information Enhancement",
+            "description": "Add item level, vendor price, and collection status to tooltips",
+            "dependencies": [],
+            "details": "Implement item level display on gear tooltips, show vendor price for sellable items, add 'already known' indicators for transmogs/toys/pets/recipes, integrate with collection API",
+            "status": "pending",
+            "testStrategy": "Test with various item types, verify collection status accuracy, validate vendor price calculations"
+          },
+          {
+            "id": 2,
+            "title": "Player/NPC Information Display",
+            "description": "Add guild rank, M+ score, health values, and target info",
+            "dependencies": [],
+            "details": "Display guild rank for guild members, show Mythic+ score using Raider.IO or native API, add numerical health values, show target information (who they're targeting)",
+            "status": "pending",
+            "testStrategy": "Test player tooltips in various contexts, verify M+ score accuracy, validate target information display"
+          },
+          {
+            "id": 3,
+            "title": "Developer Information Mode",
+            "description": "Add spell IDs and frame information for developers",
+            "dependencies": [],
+            "details": "Implement debug mode toggle that shows spell IDs on abilities, frame names on UI elements, item IDs on items, useful for addon development",
+            "status": "pending",
+            "testStrategy": "Toggle debug mode on/off, verify ID display accuracy, confirm no performance impact"
+          },
+          {
+            "id": 4,
+            "title": "Tooltip Styling and Positioning",
+            "description": "Implement custom anchor positioning and visual styling",
+            "dependencies": [
+              18
+            ],
+            "details": "Add anchor position options (cursor, top, bottom, custom), implement custom colors/borders/backdrop using theme system, add fade animations, support for tooltip scaling",
+            "status": "pending",
+            "testStrategy": "Test all anchor positions, verify theme integration, validate styling consistency"
+          }
+        ]
+      },
+      {
+        "id": 22,
+        "title": "Chat Enhancement System",
+        "description": "Implement enhanced chat features",
+        "details": "Move and resize chat frames, custom channel colors, chat copy (Ctrl+C), URL detection (clickable links), spam filter, chat fading options, custom timestamps, chat history (persist between sessions), tab management",
+        "testStrategy": "Test chat positioning, verify URL detection, validate spam filtering, confirm history persistence",
+        "priority": "medium",
+        "dependencies": [
+          3,
+          18
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Chat Frame Customization",
+            "description": "Implement chat frame positioning, resizing, and styling",
+            "dependencies": [
+              3,
+              18
+            ],
+            "details": "Add drag-and-drop chat repositioning, resizable chat frames, custom background colors and transparency, integration with theme system",
+            "status": "pending",
+            "testStrategy": "Test chat frame movement and resizing, verify theme integration, validate settings persistence"
+          },
+          {
+            "id": 2,
+            "title": "Chat Copy and URL Detection",
+            "description": "Add text copying and clickable link functionality",
+            "dependencies": [],
+            "details": "Implement Ctrl+C to copy chat text, detect URLs and make them clickable, support for Discord/Battle.net links, highlight links visually",
+            "status": "pending",
+            "testStrategy": "Test text copying from chat, verify URL detection accuracy, validate link clicking functionality"
+          },
+          {
+            "id": 3,
+            "title": "Chat Filtering and History",
+            "description": "Implement spam filter and persistent chat history",
+            "dependencies": [],
+            "details": "Create spam detection and filtering system, save chat history to disk, restore history on login, configurable history length, channel-specific filtering",
+            "status": "pending",
+            "testStrategy": "Test spam filter effectiveness, verify history restoration on reload, validate storage efficiency"
+          },
+          {
+            "id": 4,
+            "title": "Chat Visual Features",
+            "description": "Add timestamps, fading, and tab management",
+            "dependencies": [],
+            "details": "Custom timestamp formats (12hr/24hr/elapsed), configurable chat fade timing, enhanced tab management with colors, tab dragging and reordering",
+            "status": "pending",
+            "testStrategy": "Test timestamp formats, verify fade timing accuracy, validate tab management functionality"
+          }
+        ]
+      },
+      {
+        "id": 23,
+        "title": "Mythic+ UI Elements (Midnight-Compliant)",
+        "description": "Implement information display for Mythic+ content",
+        "details": "Dungeon progress bar to 100%, timer display with milestone markers (+3/+2/+1 thresholds), death counter with visual warnings, current affix display (icons and tooltips), pull count tracker, dungeon map integration, enemy forces % tooltips, custom nameplate styling for priority targets, objective tracker styling. Focus: Information display only, no automation",
+        "testStrategy": "Test in Mythic+ dungeons, verify progress calculation accuracy, validate timer thresholds, confirm affix display",
+        "priority": "medium",
+        "dependencies": [
+          15,
+          16
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Progress and Timer Display",
+            "description": "Implement dungeon progress bar and timer with milestones",
+            "dependencies": [],
+            "details": "Create progress bar showing % to 100% completion, timer display with color-coded thresholds (+3 green, +2 yellow, +1 orange, depleted red), death counter with visual warnings, configurable positioning",
+            "status": "pending",
+            "testStrategy": "Test progress calculation accuracy in multiple dungeons, verify timer milestone thresholds, validate death counter updates"
+          },
+          {
+            "id": 2,
+            "title": "Affix and Enemy Information",
+            "description": "Display current affixes and enemy force information",
+            "dependencies": [],
+            "details": "Show current affix icons with tooltips, enemy forces % on nameplate mouseover, pull count tracker, priority target highlighting on nameplates",
+            "status": "pending",
+            "testStrategy": "Verify affix detection for current week, test enemy % calculation accuracy, validate priority target identification"
+          },
+          {
+            "id": 3,
+            "title": "Objective Tracker Integration",
+            "description": "Style and position the objective tracker for M+ content",
+            "dependencies": [
+              3
+            ],
+            "details": "Custom objective tracker styling, repositioning options, integration with main UI theme, display relevant M+ objectives clearly",
+            "status": "pending",
+            "testStrategy": "Test tracker visibility in dungeons, verify styling consistency, validate positioning options"
+          }
+        ]
+      },
+      {
+        "id": 24,
+        "title": "Raid UI Tools (Midnight-Compliant)",
+        "description": "Implement information display for raid content",
+        "details": "Cooldown tracking display (visual representation of used cooldowns), consumable status indicators (who has buffs), ready check visualization, pull timer integration (DBM/BigWigs), loot roll tracking, loot history display, item level comparison tooltips. Focus: Information presentation, not automation",
+        "testStrategy": "Test in raid environments, verify cooldown tracking accuracy, validate consumable detection, confirm DBM/BigWigs integration",
+        "priority": "medium",
+        "dependencies": [
+          15,
+          21
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Cooldown and Buff Tracking Display",
+            "description": "Visual display of raid cooldowns and consumable buffs",
+            "dependencies": [],
+            "details": "Create visual indicators for used raid cooldowns (no automation, display only), show consumable status (flasks, food, runes) on raid frames, ready check visualization with response status",
+            "status": "pending",
+            "testStrategy": "Test cooldown tracking in raid scenarios, verify consumable detection accuracy, validate ready check display"
+          },
+          {
+            "id": 2,
+            "title": "Pull Timer Integration",
+            "description": "Integrate with DBM/BigWigs pull timers",
+            "dependencies": [],
+            "details": "Display pull timer countdown prominently, integrate with DBM and BigWigs APIs, custom positioning and styling, sound alerts configurable",
+            "status": "pending",
+            "testStrategy": "Test with both DBM and BigWigs, verify timer synchronization, validate visual countdown accuracy"
+          },
+          {
+            "id": 3,
+            "title": "Loot Information System",
+            "description": "Track loot rolls and display loot history",
+            "dependencies": [
+              21
+            ],
+            "details": "Display active loot rolls with player responses, maintain loot history for session, show item level comparisons in tooltips, highlight upgrades",
+            "status": "pending",
+            "testStrategy": "Test loot roll tracking in raids, verify history persistence, validate item level comparison accuracy"
+          }
+        ]
+      },
+      {
+        "id": 25,
+        "title": "PvP UI Tools (Midnight-Compliant)",
+        "description": "Implement information display for PvP content",
+        "details": "Arena UI elements: enemy spec display, trinket status indicators (visual only), arena preparation timer, enemy health percentage displays. Battleground UI: objective status displays, flag carrier information, score tracking, map integration. Focus: Visual information only, no automation",
+        "testStrategy": "Test in arena and battlegrounds, verify spec detection, validate trinket cooldown display, confirm objective tracking",
+        "priority": "medium",
+        "dependencies": [
+          15,
+          16
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Arena UI Elements",
+            "description": "Implement arena-specific information displays",
+            "dependencies": [
+              15
+            ],
+            "details": "Enemy spec detection and display, trinket cooldown indicators (visual only), arena preparation timer, enemy health percentage displays, DR (diminishing returns) tracker",
+            "status": "pending",
+            "testStrategy": "Test in arena skirmishes and rated arenas, verify spec detection accuracy, validate trinket cooldown display"
+          },
+          {
+            "id": 2,
+            "title": "Battleground UI Elements",
+            "description": "Implement battleground objective and status displays",
+            "dependencies": [],
+            "details": "Objective status indicators (flags, bases, orbs), flag carrier information display, score tracking panel, map integration showing objectives, base timer displays",
+            "status": "pending",
+            "testStrategy": "Test in multiple battleground types, verify objective tracking accuracy, validate map integration"
+          }
+        ]
+      },
+      {
+        "id": 26,
+        "title": "Comprehensive Performance Optimization",
+        "description": "Optimize entire addon for minimal resource usage",
+        "details": "Lazy loading (raid frames when in raid, arena frames when in arena, M+ tools when in dungeon), event throttling (batch UNIT_HEALTH events, throttle OnUpdate to 0.1s), frame pooling (reuse raid frames, pool buff icons), texture optimization (compress all textures, use shared textures, texture atlas), database optimization (local variables, cache values, minimize SavedVariables), code optimization (profile hot paths, remove debug code), memory management (GC hints, nil unused references). Target: <3MB memory, <0.5% CPU in combat",
+        "testStrategy": "Profile memory/CPU usage across all content types, verify lazy loading effectiveness, validate frame pooling efficiency, confirm target metrics achieved",
+        "priority": "high",
+        "dependencies": [
+          15,
+          16,
+          17,
+          19,
+          20
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Implement Lazy Loading System",
+            "description": "Load modules only when needed based on context",
+            "dependencies": [],
+            "details": "Lazy load raid frames when entering raid, arena frames when in arena, M+ tools in dungeons, conditional module initialization based on content type, unload unused modules",
+            "status": "pending",
+            "testStrategy": "Monitor module loading in different contexts, verify memory reduction on login, test module availability when needed"
+          },
+          {
+            "id": 2,
+            "title": "Event Throttling and Batching",
+            "description": "Optimize event handling to reduce CPU usage",
+            "dependencies": [],
+            "details": "Batch multiple UNIT_HEALTH events into single update, throttle OnUpdate handlers to 0.1s intervals, implement event filtering to ignore irrelevant events, use event queueing for non-critical updates",
+            "status": "pending",
+            "testStrategy": "Profile event handler CPU usage, verify update throttling accuracy, validate visual smoothness with throttling"
+          },
+          {
+            "id": 3,
+            "title": "Frame and Object Pooling",
+            "description": "Implement object pooling to reduce memory allocation",
+            "dependencies": [],
+            "details": "Create frame pool for raid frames (reuse instead of create/destroy), pool buff icons and aura buttons, pool nameplate frames, implement proper pool cleanup",
+            "status": "pending",
+            "testStrategy": "Monitor memory allocation during raid frame creation, verify pool reuse efficiency, test pool cleanup on logout"
+          },
+          {
+            "id": 4,
+            "title": "Texture and Asset Optimization",
+            "description": "Optimize textures and media assets for minimal size",
+            "dependencies": [
+              2
+            ],
+            "details": "Compress all texture files, create texture atlas for frequently used textures, use shared textures where possible, convert to optimal formats (TGA/BLP), target <5MB total asset size",
+            "status": "pending",
+            "testStrategy": "Measure total asset size, verify texture quality after compression, validate atlas functionality"
+          },
+          {
+            "id": 5,
+            "title": "Code and Database Optimization",
+            "description": "Optimize Lua code and database access patterns",
+            "dependencies": [],
+            "details": "Cache frequently accessed values, use local variables instead of global lookups, minimize SavedVariables writes (batch updates), remove debug code in release, profile and optimize hot paths",
+            "status": "pending",
+            "testStrategy": "Profile addon with WoW's built-in profiler, measure SavedVariables write frequency, verify performance improvement"
+          },
+          {
+            "id": 6,
+            "title": "Memory Management",
+            "description": "Implement proper garbage collection and memory cleanup",
+            "dependencies": [
+              3
+            ],
+            "details": "Add garbage collection hints after large operations, nil unused references properly, clear old combat logs and temporary data, implement memory usage monitoring and warnings",
+            "status": "pending",
+            "testStrategy": "Monitor memory usage over extended play session, verify GC effectiveness, test for memory leaks"
+          }
+        ]
+      },
+      {
+        "id": 27,
+        "title": "Quality of Life Features",
+        "description": "Implement convenience features for better user experience",
+        "details": "Auto-repair (with guild bank if available), auto-summon pet (hunter/warlock), auto-screenshot on achievements, vendor greys automatically, durability warning, low health/mana warning, combat state indicator, AFK mode (dim screen)",
+        "testStrategy": "Test auto-repair at vendors, verify auto-summon pet functionality, validate achievement screenshot capture, confirm warning thresholds",
+        "priority": "low",
+        "dependencies": [
+          3
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Automation Features",
+            "description": "Implement auto-repair, auto-summon, auto-vendor",
+            "dependencies": [],
+            "details": "Auto-repair equipment at vendors (guild bank first if available), auto-summon pet for hunters/warlocks on login or after dismiss, auto-vendor grey items at merchants, configurable toggles for each feature",
+            "status": "pending",
+            "testStrategy": "Test auto-repair with and without guild funds, verify pet summoning logic, validate grey item vendoring"
+          },
+          {
+            "id": 2,
+            "title": "Warning and Notification Systems",
+            "description": "Implement visual and audio warnings for various states",
+            "dependencies": [],
+            "details": "Durability warning when below threshold, low health/mana warnings with configurable thresholds, combat state indicator (entering/leaving combat), achievement screenshot capture",
+            "status": "pending",
+            "testStrategy": "Test warning triggers at various thresholds, verify screenshot capture on achievements, validate combat indicators"
+          },
+          {
+            "id": 3,
+            "title": "AFK and Convenience Features",
+            "description": "Implement AFK mode and other convenience features",
+            "dependencies": [],
+            "details": "AFK mode that dims screen after inactivity, auto-accept group invites from friends/guild (optional), repair status display, consumable warning (missing flask/food in raid)",
+            "status": "pending",
+            "testStrategy": "Test AFK mode activation and deactivation, verify screen dimming functionality, validate consumable warnings"
+          }
+        ]
+      },
+      {
+        "id": 28,
+        "title": "Installation Wizard System",
+        "description": "Implement comprehensive first-time setup wizard",
+        "details": "Welcome screen with addon info, role selection (Tank/Healer/DPS/PvP), preset layout based on role, resolution detection and auto-positioning, feature tour (highlight each UI element), quick settings overview, links to documentation/Discord, skip option for advanced users. Goes beyond action bar wizard to configure entire UI",
+        "testStrategy": "Test first-load detection, verify role-based preset application, validate resolution detection, confirm skip functionality",
+        "priority": "medium",
+        "dependencies": [
+          3,
+          15,
+          18
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Welcome and Role Selection",
+            "description": "Create welcome screen and role selection interface",
+            "dependencies": [],
+            "details": "Welcome screen introducing DivinicalUI features, role selection screen (Tank/Healer/DPS/PvP), class-specific recommendations, preset profile selection",
+            "status": "pending",
+            "testStrategy": "Test first-load detection, verify welcome screen display, validate role selection logic"
+          },
+          {
+            "id": 2,
+            "title": "Auto-Configuration System",
+            "description": "Implement automatic UI setup based on selections",
+            "dependencies": [
+              1
+            ],
+            "details": "Resolution detection (1080p/1440p/4K), auto-positioning of frames based on resolution and role, apply role-based presets for unit frames and action bars, configure settings for optimal experience",
+            "status": "pending",
+            "testStrategy": "Test on multiple resolutions, verify role-based configuration accuracy, validate preset application"
+          },
+          {
+            "id": 3,
+            "title": "Feature Tour System",
+            "description": "Create interactive tour highlighting UI elements",
+            "dependencies": [
+              2
+            ],
+            "details": "Step-by-step tour of main UI elements, highlight and explain each component, interactive tooltips, ability to revisit tour from settings, skip option available",
+            "status": "pending",
+            "testStrategy": "Test tour flow, verify highlight positioning, validate skip functionality"
+          },
+          {
+            "id": 4,
+            "title": "Quick Settings and Resources",
+            "description": "Provide overview of settings and helpful links",
+            "dependencies": [],
+            "details": "Quick settings panel showing most important options, links to documentation, Discord invite, support resources, video tutorials, finish button to complete setup",
+            "status": "pending",
+            "testStrategy": "Verify all links functional, test settings panel access, validate completion state persistence"
+          }
+        ]
+      },
+      {
+        "id": 29,
+        "title": "Import/Export System",
+        "description": "Implement comprehensive profile sharing and backup system",
+        "details": "Export current profile to string (base64 encoded with compression), import profile from string with validation, share profiles via Discord/forums, online profile repository integration (like WeakAuras), version compatibility checking, automatic backup/restore settings, cloud sync (optional, via external service), support for exporting individual modules (unit frames only, action bars only, etc.)",
+        "testStrategy": "Test export string generation, verify import validation, confirm version compatibility checks, validate backup/restore functionality",
+        "priority": "medium",
+        "dependencies": [
+          13
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Profile Export System",
+            "description": "Implement profile serialization and export to string",
+            "dependencies": [],
+            "details": "Serialize profile data to Lua table, encode to base64 with compression, generate shareable string, support for exporting full profile or individual modules, include version metadata",
+            "status": "pending",
+            "testStrategy": "Test export string generation, verify compression effectiveness, validate string length for sharing"
+          },
+          {
+            "id": 2,
+            "title": "Profile Import System",
+            "description": "Implement profile import with validation and error handling",
+            "dependencies": [
+              1
+            ],
+            "details": "Decode and decompress import strings, validate profile data structure, check version compatibility, merge or replace existing settings, handle import errors gracefully with user feedback",
+            "status": "pending",
+            "testStrategy": "Test import with valid/invalid strings, verify version compatibility checking, validate error handling"
+          },
+          {
+            "id": 3,
+            "title": "Backup and Restore System",
+            "description": "Implement automatic backup and manual restore",
+            "dependencies": [],
+            "details": "Automatic backup before major changes or updates, maintain multiple backup versions with timestamps, manual backup creation, restore from any backup point, backup cleanup for old backups",
+            "status": "pending",
+            "testStrategy": "Verify automatic backup creation, test manual backup/restore, validate backup rotation"
+          },
+          {
+            "id": 4,
+            "title": "Online Repository Integration",
+            "description": "Integrate with community profile sharing platform",
+            "dependencies": [
+              1,
+              2
+            ],
+            "details": "Browse community-shared profiles, filter by role/class/rating, one-click profile import from repository, upload your profiles to share (optional), profile rating and comments system",
+            "status": "pending",
+            "testStrategy": "Test repository browsing, verify profile import from repository, validate upload functionality"
+          }
+        ]
+      },
+      {
+        "id": 30,
+        "title": "Developer Tools Suite",
+        "description": "Implement developer and power user tools",
+        "details": "/fstack equivalent (frame stack tool), event logger (see all events firing), performance profiler with real-time stats, memory usage tracker with leak detection, Lua error handler (BugSack-style), reload UI button, reset profile button, debug mode toggle with verbose logging, command-line tools for testing",
+        "testStrategy": "Test frame stack tool functionality, verify event logger accuracy, validate performance profiler, confirm error handler integration",
+        "priority": "low",
+        "dependencies": [
+          3
+        ],
+        "status": "pending",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Frame and Event Inspection Tools",
+            "description": "Implement frame stack and event logging tools",
+            "dependencies": [],
+            "details": "Frame stack tool (/fstack equivalent) showing frame hierarchy on mouseover, event logger displaying all registered events with timestamps and data, filter events by type/unit, export event log",
+            "status": "pending",
+            "testStrategy": "Test frame stack display accuracy, verify event logging completeness, validate filtering functionality"
+          },
+          {
+            "id": 2,
+            "title": "Performance Monitoring Tools",
+            "description": "Implement real-time performance profiler and memory tracker",
+            "dependencies": [],
+            "details": "Real-time CPU usage per module display, memory usage tracker with leak detection, frame time monitoring, visual performance overlay, export performance reports",
+            "status": "pending",
+            "testStrategy": "Validate CPU measurement accuracy, test memory leak detection, verify overlay performance impact"
+          },
+          {
+            "id": 3,
+            "title": "Error Handling and Debug Tools",
+            "description": "Implement Lua error handler and debug mode",
+            "dependencies": [],
+            "details": "Lua error handler with stack traces (BugSack-style), debug mode toggle with verbose logging, error reporting to file, error suppression for known issues, integration with Bugsack if installed",
+            "status": "pending",
+            "testStrategy": "Test error catching and display, verify debug logging output, validate file export"
+          },
+          {
+            "id": 4,
+            "title": "Utility Commands",
+            "description": "Implement quick access utility commands",
+            "dependencies": [],
+            "details": "Reload UI command, reset profile command with confirmation, quick access to common settings, command-line interface for testing, macro support for common actions",
+            "status": "pending",
+            "testStrategy": "Test all utility commands, verify reset functionality, validate command-line parsing"
+          }
+        ]
       }
     ],
     "metadata": {
       "created": "2025-10-29T17:49:44.992Z",
-      "updated": "2025-10-29T18:47:42.926Z",
-      "description": "Tasks for master context"
+      "updated": "2025-11-18T00:00:00.000Z",
+      "description": "Tasks for master context - Updated to incorporate full MASTER_UPGRADE_PLAN.md vision"
     }
   }
 }
