@@ -957,18 +957,9 @@ function UnitFrames:ApplyFrameSettings(frame, frameType)
         frame:SetSize(settings.width, settings.height)
     end
 
-    -- Apply position
-    if settings.x or settings.y then
-        frame:ClearAllPoints()
-        local x = settings.x or 0
-        local y = settings.y or 0
-        frame:SetPoint("CENTER", UIParent, "CENTER", x, y)
-    end
-
-    -- Apply scale
-    if settings.scale then
-        frame:SetScale(settings.scale)
-    end
+    -- Note: Position and scale changes require manual frame movement or drag-and-drop
+    -- We cannot programmatically move frames as it triggers protected function violations
+    -- These settings are stored for future drag-and-drop implementation
 
     -- Apply health bar color (use per-frame color or fall back to global color)
     if frame.Health then
