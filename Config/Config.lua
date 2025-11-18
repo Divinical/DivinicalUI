@@ -118,10 +118,10 @@ function Config:RegisterSettingsPanel()
     generalCanvas.desc:SetText("General addon settings and basic configuration.")
     self:PopulateGeneralSettings(generalCanvas)
 
-    -- Register General category
+    -- Register General as root category (only call RegisterAddOnCategory once)
     local generalCategory = Settings.RegisterCanvasLayoutCategory(generalCanvas, "DivinicalUI")
     generalCategory.ID = "DivinicalUI_General"
-    Settings.RegisterAddOnCategory(generalCategory)
+    Settings.RegisterAddOnCategory(generalCategory) -- Only the root category uses this
     self.categories.general = generalCategory
     self.panels.general = generalCanvas
 
@@ -130,10 +130,9 @@ function Config:RegisterSettingsPanel()
     unitFramesCanvas.desc:SetText("Configure unit frame appearance, positioning, and elements.")
     self:PopulateUnitFramesSettings(unitFramesCanvas)
 
-    -- Register Unit Frames as main category
+    -- Register Unit Frames as subcategory (no RegisterAddOnCategory call)
     local unitFramesCategory = Settings.RegisterCanvasLayoutCategory(unitFramesCanvas, "Unit Frames", "DivinicalUI")
     unitFramesCategory.ID = "DivinicalUI_UnitFrames"
-    Settings.RegisterAddOnCategory(unitFramesCategory)
     self.categories.unitframes = unitFramesCategory
     self.panels.unitframes = unitFramesCanvas
 
@@ -150,7 +149,6 @@ function Config:RegisterSettingsPanel()
 
     local raidCategory = Settings.RegisterCanvasLayoutCategory(raidCanvas, "Raid Frames", "DivinicalUI")
     raidCategory.ID = "DivinicalUI_Raid"
-    Settings.RegisterAddOnCategory(raidCategory)
     self.categories.raid = raidCategory
     self.panels.raid = raidCanvas
 
@@ -161,7 +159,6 @@ function Config:RegisterSettingsPanel()
 
     local actionBarsCategory = Settings.RegisterCanvasLayoutCategory(actionBarsCanvas, "Action Bars", "DivinicalUI")
     actionBarsCategory.ID = "DivinicalUI_ActionBars"
-    Settings.RegisterAddOnCategory(actionBarsCategory)
     self.categories.actionbars = actionBarsCategory
     self.panels.actionbars = actionBarsCanvas
 
@@ -172,7 +169,6 @@ function Config:RegisterSettingsPanel()
 
     local themesCategory = Settings.RegisterCanvasLayoutCategory(themesCanvas, "Themes", "DivinicalUI")
     themesCategory.ID = "DivinicalUI_Themes"
-    Settings.RegisterAddOnCategory(themesCategory)
     self.categories.themes = themesCategory
     self.panels.themes = themesCanvas
 
@@ -183,7 +179,6 @@ function Config:RegisterSettingsPanel()
 
     local profilesCategory = Settings.RegisterCanvasLayoutCategory(profilesCanvas, "Profiles", "DivinicalUI")
     profilesCategory.ID = "DivinicalUI_Profiles"
-    Settings.RegisterAddOnCategory(profilesCategory)
     self.categories.profiles = profilesCategory
     self.panels.profiles = profilesCanvas
 
@@ -194,7 +189,6 @@ function Config:RegisterSettingsPanel()
 
     local advancedCategory = Settings.RegisterCanvasLayoutCategory(advancedCanvas, "Advanced", "DivinicalUI")
     advancedCategory.ID = "DivinicalUI_Advanced"
-    Settings.RegisterAddOnCategory(advancedCategory)
     self.categories.advanced = advancedCategory
     self.panels.advanced = advancedCanvas
 end
@@ -207,10 +201,9 @@ function Config:CreateUnitFrameSubcategory(frameName, parentID)
     -- Populate with frame-specific settings
     self:PopulateFrameTypeSettings(canvas, frameName:lower())
 
-    -- Register as subcategory under Unit Frames
+    -- Register as subcategory under Unit Frames (no RegisterAddOnCategory call)
     local category = Settings.RegisterCanvasLayoutCategory(canvas, frameName, parentID)
     category.ID = "DivinicalUI_UnitFrames_" .. frameName
-    Settings.RegisterAddOnCategory(category)
 
     -- Store references
     self.categories["unitframes_" .. frameName:lower()] = category
@@ -473,22 +466,6 @@ end
 
 -- Populate General settings
 function Config:PopulateGeneralSettings(canvas)
-    -- Enable addon checkbox
-    local enableAddon = self:CreateCheckbox(
-        "Enable DivinicalUI",
-        function() return DivinicalUI.db.profile.enabled end,
-        function(value)
-            DivinicalUI.db.profile.enabled = value
-            if value then
-                print("|cff33ff99DivinicalUI|r: Addon enabled. Reload UI for changes to take effect.")
-            else
-                print("|cff33ff99DivinicalUI|r: Addon disabled. Reload UI for changes to take effect.")
-            end
-        end,
-        "Enable or disable the entire addon"
-    )
-    self:AddControl(canvas, enableAddon, 32)
-
     -- Debug mode checkbox
     local debugMode = self:CreateCheckbox(
         "Enable Debug Mode",

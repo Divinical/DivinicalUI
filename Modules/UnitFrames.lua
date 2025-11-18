@@ -61,13 +61,15 @@ function UnitFrames:CreateStyle()
         -- Note: SetGradientAlpha replaced with SetGradient for WoW 11.0.2+
         self.Health.gradient:SetGradient("HORIZONTAL", CreateColor(1, 1, 1, 0.2), CreateColor(1, 1, 1, 0))
         
-        -- Health text with enhanced formatting
-        self.Health.value = self.Health:CreateFontString(nil, "OVERLAY")
-        self.Health.value:SetPoint("RIGHT", self.Health, "RIGHT", -2, 0)
-        self.Health.value:SetFont("Interface\\AddOns\\DivinicalUI\\Media\\Fonts\\Pixel.ttf", healthFontSize, "OUTLINE")
-        self.Health.value:SetShadowColor(0, 0, 0, 0.5)
-        self.Health.value:SetShadowOffset(1, -1)
-        self:Tag(self.Health.value, "[divinical:health]")
+        -- Health text with enhanced formatting (hide on small frames to save space)
+        if not isSmallFrame then
+            self.Health.value = self.Health:CreateFontString(nil, "OVERLAY")
+            self.Health.value:SetPoint("RIGHT", self.Health, "RIGHT", -2, 0)
+            self.Health.value:SetFont("Interface\\AddOns\\DivinicalUI\\Media\\Fonts\\Pixel.ttf", healthFontSize, "OUTLINE")
+            self.Health.value:SetShadowColor(0, 0, 0, 0.5)
+            self.Health.value:SetShadowOffset(1, -1)
+            self:Tag(self.Health.value, "[divinical:health]")
+        end
 
         -- Health percentage text
         self.Health.percentage = self.Health:CreateFontString(nil, "OVERLAY")
@@ -102,21 +104,23 @@ function UnitFrames:CreateStyle()
         -- Note: SetGradientAlpha replaced with SetGradient for WoW 11.0.2+
         self.Power.gradient:SetGradient("HORIZONTAL", CreateColor(1, 1, 1, 0.2), CreateColor(1, 1, 1, 0))
         
-        -- Power text with enhanced formatting
-        self.Power.value = self.Power:CreateFontString(nil, "OVERLAY")
-        self.Power.value:SetPoint("RIGHT", self.Power, "RIGHT", -2, 0)
-        self.Power.value:SetFont("Interface\\AddOns\\DivinicalUI\\Media\\Fonts\\Pixel.ttf", powerFontSize, "OUTLINE")
-        self.Power.value:SetShadowColor(0, 0, 0, 0.5)
-        self.Power.value:SetShadowOffset(1, -1)
-        self:Tag(self.Power.value, "[divinical:power]")
+        -- Power text with enhanced formatting (hide on small frames to save space)
+        if not isSmallFrame then
+            self.Power.value = self.Power:CreateFontString(nil, "OVERLAY")
+            self.Power.value:SetPoint("RIGHT", self.Power, "RIGHT", -2, 0)
+            self.Power.value:SetFont("Interface\\AddOns\\DivinicalUI\\Media\\Fonts\\Pixel.ttf", powerFontSize, "OUTLINE")
+            self.Power.value:SetShadowColor(0, 0, 0, 0.5)
+            self.Power.value:SetShadowOffset(1, -1)
+            self:Tag(self.Power.value, "[divinical:power]")
 
-        -- Power type indicator
-        self.Power.type = self.Power:CreateFontString(nil, "OVERLAY")
-        self.Power.type:SetPoint("LEFT", self.Power, "LEFT", 2, 0)
-        self.Power.type:SetFont("Interface\\AddOns\\DivinicalUI\\Media\\Fonts\\Pixel.ttf", powerTypeFontSize, "OUTLINE")
-        self.Power.type:SetShadowColor(0, 0, 0, 0.5)
-        self.Power.type:SetShadowOffset(1, -1)
-        self:Tag(self.Power.type, "[divinical:powertype]")
+            -- Power type indicator
+            self.Power.type = self.Power:CreateFontString(nil, "OVERLAY")
+            self.Power.type:SetPoint("LEFT", self.Power, "LEFT", 2, 0)
+            self.Power.type:SetFont("Interface\\AddOns\\DivinicalUI\\Media\\Fonts\\Pixel.ttf", powerTypeFontSize, "OUTLINE")
+            self.Power.type:SetShadowColor(0, 0, 0, 0.5)
+            self.Power.type:SetShadowOffset(1, -1)
+            self:Tag(self.Power.type, "[divinical:powertype]")
+        end
         
         -- Name text using oUF tags
         self.Name = self:CreateFontString(nil, "OVERLAY")
