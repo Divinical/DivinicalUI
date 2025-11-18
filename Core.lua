@@ -52,24 +52,118 @@ local defaults = {
     }
 }
 
--- Initialize database
+-- Initialize database with profile support
 local function InitializeDatabase()
     if not DivinicalDB then
         DivinicalDB = {}
     end
-    
-    if not DivinicalDB.profile then
-        DivinicalDB.profile = {}
+
+    -- Initialize profiles structure
+    if not DivinicalDB.profiles then
+        DivinicalDB.profiles = {}
     end
-    
-    -- Merge defaults
+
+    -- Set current profile (default to "Default")
+    if not DivinicalDB.currentProfile then
+        DivinicalDB.currentProfile = "Default"
+    end
+
+    -- Ensure current profile exists
+    if not DivinicalDB.profiles[DivinicalDB.currentProfile] then
+        DivinicalDB.profiles[DivinicalDB.currentProfile] = {}
+    end
+
+    -- Set active profile reference
+    DivinicalDB.profile = DivinicalDB.profiles[DivinicalDB.currentProfile]
+
+    -- Merge defaults into active profile
     for key, value in pairs(defaults.profile) do
         if DivinicalDB.profile[key] == nil then
             DivinicalDB.profile[key] = value
         end
     end
-    
-    DivinicalUI.db = DivinicalDB
+
+    -- Create database object with profile management methods
+    local db = {
+        profile = DivinicalDB.profile,
+        profiles = DivinicalDB.profiles,
+
+        -- Get current profile name
+        GetCurrentProfile = function(self)
+            return DivinicalDB.currentProfile
+        end,
+
+        -- Set/switch to a profile
+        SetProfile = function(self, profileName)
+            if not DivinicalDB.profiles[profileName] then
+                -- Create new profile with defaults
+                DivinicalDB.profiles[profileName] = {}
+                for key, value in pairs(defaults.profile) do
+                    DivinicalDB.profiles[profileName][key] = CopyTable(value)
+                end
+            end
+
+            DivinicalDB.currentProfile = profileName
+            DivinicalDB.profile = DivinicalDB.profiles[profileName]
+            self.profile = DivinicalDB.profile
+        end,
+
+        -- Delete a profile
+        DeleteProfile = function(self, profileName)
+            if profileName == "Default" then
+                return false
+            end
+
+            DivinicalDB.profiles[profileName] = nil
+
+            -- Switch to Default if deleting current profile
+            if DivinicalDB.currentProfile == profileName then
+                self:SetProfile("Default")
+            end
+
+            return true
+        end,
+
+        -- Copy a profile
+        CopyProfile = function(self, targetName, sourceName)
+            sourceName = sourceName or DivinicalDB.currentProfile
+
+            if not DivinicalDB.profiles[sourceName] then
+                return false
+            end
+
+            DivinicalDB.profiles[targetName] = CopyTable(DivinicalDB.profiles[sourceName])
+            return true
+        end,
+
+        -- Get list of all profile names
+        GetProfiles = function(self)
+            local profileList = {}
+            for name, _ in pairs(DivinicalDB.profiles) do
+                table.insert(profileList, name)
+            end
+            return profileList
+        end
+    }
+
+    DivinicalUI.db = db
+end
+
+-- Deep copy a table
+function CopyTable(src, dest)
+    if type(src) ~= "table" then
+        return src
+    end
+
+    dest = dest or {}
+    for k, v in pairs(src) do
+        if type(v) == "table" then
+            dest[k] = CopyTable(v)
+        else
+            dest[k] = v
+        end
+    end
+    return dest
 end
 
 -- Module registration

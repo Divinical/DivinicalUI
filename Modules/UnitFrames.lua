@@ -908,21 +908,75 @@ function UnitFrames:PLAYER_TARGET_CHANGED()
     end
 end
 
+-- Apply visual settings to a frame from database
+function UnitFrames:ApplyFrameSettings(frame, frameType)
+    if not frame or not DivinicalUI.db.profile.unitframes[frameType] then
+        return
+    end
+
+    local settings = DivinicalUI.db.profile.unitframes[frameType]
+
+    -- Apply size
+    if settings.width and settings.height then
+        frame:SetSize(settings.width, settings.height)
+    end
+
+    -- Apply health bar color
+    if frame.Health and settings.healthColor then
+        local c = settings.healthColor
+        frame.Health:SetStatusBarColor(c[1], c[2], c[3], c[4] or 1)
+    end
+
+    -- Apply power bar color
+    if frame.Power and settings.powerColor then
+        local c = settings.powerColor
+        frame.Power:SetStatusBarColor(c[1], c[2], c[3], c[4] or 1)
+    end
+
+    -- Apply font (would need font path mapping)
+    if settings.font then
+        local fontPath = "Interface\\AddOns\\DivinicalUI\\Media\\Fonts\\Pixel.ttf"
+        if settings.font == "Arial" then
+            fontPath = "Fonts\\ARIALN.ttf"
+        elseif settings.font == "Friz Quadrata" then
+            fontPath = "Fonts\\FRIZQT__.ttf"
+        elseif settings.font == "Morpheus" then
+            fontPath = "Fonts\\MORPHEUS.ttf"
+        end
+
+        -- Update all text elements
+        if frame.Health and frame.Health.value then
+            frame.Health.value:SetFont(fontPath, 12, "OUTLINE")
+        end
+        if frame.Health and frame.Health.percentage then
+            frame.Health.percentage:SetFont(fontPath, 11, "OUTLINE")
+        end
+        if frame.Power and frame.Power.value then
+            frame.Power.value:SetFont(fontPath, 10, "OUTLINE")
+        end
+        if frame.Name then
+            frame.Name:SetFont(fontPath, 13, "OUTLINE")
+        end
+        if frame.Level then
+            frame.Level:SetFont(fontPath, 12, "OUTLINE")
+        end
+    end
+
+    -- Force update
+    frame:UpdateAllElements("RefreshUnit")
+end
+
 -- Update player frame
 function UnitFrames:UpdatePlayerFrame()
     if frames.player then
-        frames.player:SetSize(DivinicalUI.db.profile.unitframes.player.width,
-                             DivinicalUI.db.profile.unitframes.player.height)
-        frames.player:UpdateAllElements("RefreshUnit")
+        self:ApplyFrameSettings(frames.player, "player")
     end
 end
 
 -- Update target frame
 function UnitFrames:UpdateTargetFrame()
     if frames.target then
-        frames.target:SetSize(DivinicalUI.db.profile.unitframes.target.width,
-                             DivinicalUI.db.profile.unitframes.target.height)
-        frames.target:UpdateAllElements("RefreshUnit")
+        self:ApplyFrameSettings(frames.target, "target")
     end
 end
 
