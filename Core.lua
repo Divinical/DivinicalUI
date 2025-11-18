@@ -150,7 +150,8 @@ local function InitializeDatabase()
 end
 
 -- Deep copy a table with circular reference protection
-function CopyTable(src, dest, seen)
+function CopyTable(src, seen)
+    -- Return primitives immediately
     if type(src) ~= "table" then
         return src
     end
@@ -161,17 +162,16 @@ function CopyTable(src, dest, seen)
         return seen[src]
     end
 
-    dest = dest or {}
+    -- Always create new table (never use passed dest parameter)
+    local dest = {}
+    -- Store table reference in seen before recursing
     seen[src] = dest
 
     for k, v in pairs(src) do
         -- Skip metatables to avoid circular references
         if k ~= "__index" and k ~= "__newindex" then
-            if type(v) == "table" then
-                dest[k] = CopyTable(v, nil, seen)
-            else
-                dest[k] = v
-            end
+            -- Recursively copy all values (handles both tables and primitives)
+            dest[k] = CopyTable(v, seen)
         end
     end
 

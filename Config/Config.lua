@@ -665,7 +665,10 @@ function Config:PopulateProfilesSettings(canvas)
     profileInfo:SetText("Current Profile: |cff33ff99" .. currentProfile .. "|r")
     self:AddControl(canvas, CreateFrame("Frame"), 24)
 
-    -- Profile management buttons
+    -- Profile management buttons (create container for button row)
+    local profileButtonContainer = CreateFrame("Frame")
+    profileButtonContainer:SetSize(560, 32)
+
     local newProfileBtn = self:CreateButton("New Profile", function()
         StaticPopupDialogs["DIVINICALUI_NEW_PROFILE"] = {
             text = "Enter new profile name:",
@@ -697,8 +700,8 @@ function Config:PopulateProfilesSettings(canvas)
         }
         StaticPopup_Show("DIVINICALUI_NEW_PROFILE")
     end, 120, 25)
-    newProfileBtn:SetPoint("TOPLEFT", canvas.content, "TOPLEFT", 4, -(canvas.lastY))
-    canvas.lastY = canvas.lastY + 32
+    newProfileBtn:SetParent(profileButtonContainer)
+    newProfileBtn:SetPoint("LEFT", profileButtonContainer, "LEFT", 0, 0)
 
     local deleteProfileBtn = self:CreateButton("Delete Profile", function()
         local currentProfile = DivinicalUI.db:GetCurrentProfile()
@@ -722,6 +725,7 @@ function Config:PopulateProfilesSettings(canvas)
         }
         StaticPopup_Show("DIVINICALUI_DELETE_PROFILE")
     end, 120, 25)
+    deleteProfileBtn:SetParent(profileButtonContainer)
     deleteProfileBtn:SetPoint("LEFT", newProfileBtn, "RIGHT", 8, 0)
 
     local copyProfileBtn = self:CreateButton("Copy Profile", function()
@@ -747,7 +751,10 @@ function Config:PopulateProfilesSettings(canvas)
         }
         StaticPopup_Show("DIVINICALUI_COPY_PROFILE")
     end, 120, 25)
+    copyProfileBtn:SetParent(profileButtonContainer)
     copyProfileBtn:SetPoint("LEFT", deleteProfileBtn, "RIGHT", 8, 0)
+
+    self:AddControl(canvas, profileButtonContainer, 32)
 
     -- Spacer
     self:AddControl(canvas, CreateFrame("Frame"), 16)
@@ -766,40 +773,52 @@ function Config:PopulateProfilesSettings(canvas)
     self:AddControl(canvas, CreateFrame("Frame"), 24)
 
     -- Preset profile buttons (row 1)
+    local presetRow1Container = CreateFrame("Frame")
+    presetRow1Container:SetSize(560, 32)
+
     local tankBtn = self:CreateButton("Tank", function()
         Config:ApplyPresetProfile("Tank")
     end, 100, 25)
-    tankBtn:SetPoint("TOPLEFT", canvas.content, "TOPLEFT", 4, -(canvas.lastY))
+    tankBtn:SetParent(presetRow1Container)
+    tankBtn:SetPoint("LEFT", presetRow1Container, "LEFT", 0, 0)
 
     local healerBtn = self:CreateButton("Healer", function()
         Config:ApplyPresetProfile("Healer")
     end, 100, 25)
+    healerBtn:SetParent(presetRow1Container)
     healerBtn:SetPoint("LEFT", tankBtn, "RIGHT", 8, 0)
 
     local dpsBtn = self:CreateButton("DPS", function()
         Config:ApplyPresetProfile("DPS")
     end, 100, 25)
+    dpsBtn:SetParent(presetRow1Container)
     dpsBtn:SetPoint("LEFT", healerBtn, "RIGHT", 8, 0)
 
-    self:AddControl(canvas, CreateFrame("Frame"), 32)
+    self:AddControl(canvas, presetRow1Container, 32)
 
     -- Preset profile buttons (row 2)
+    local presetRow2Container = CreateFrame("Frame")
+    presetRow2Container:SetSize(560, 32)
+
     local pvpBtn = self:CreateButton("PvP", function()
         Config:ApplyPresetProfile("PvP")
     end, 100, 25)
-    pvpBtn:SetPoint("TOPLEFT", canvas.content, "TOPLEFT", 4, -(canvas.lastY))
+    pvpBtn:SetParent(presetRow2Container)
+    pvpBtn:SetPoint("LEFT", presetRow2Container, "LEFT", 0, 0)
 
     local simpleBtn = self:CreateButton("Simple", function()
         Config:ApplyPresetProfile("Simple")
     end, 100, 25)
+    simpleBtn:SetParent(presetRow2Container)
     simpleBtn:SetPoint("LEFT", pvpBtn, "RIGHT", 8, 0)
 
     local advancedBtn = self:CreateButton("Advanced", function()
         Config:ApplyPresetProfile("Advanced")
     end, 100, 25)
+    advancedBtn:SetParent(presetRow2Container)
     advancedBtn:SetPoint("LEFT", simpleBtn, "RIGHT", 8, 0)
 
-    self:AddControl(canvas, CreateFrame("Frame"), 32)
+    self:AddControl(canvas, presetRow2Container, 32)
 
     -- Spacer
     self:AddControl(canvas, CreateFrame("Frame"), 16)
@@ -818,17 +837,22 @@ function Config:PopulateProfilesSettings(canvas)
     self:AddControl(canvas, CreateFrame("Frame"), 24)
 
     -- Import/Export buttons
+    local importExportContainer = CreateFrame("Frame")
+    importExportContainer:SetSize(560, 32)
+
     local exportBtn = self:CreateButton("Export Profile", function()
         Config:ShowExportDialog()
     end, 120, 25)
-    exportBtn:SetPoint("TOPLEFT", canvas.content, "TOPLEFT", 4, -(canvas.lastY))
+    exportBtn:SetParent(importExportContainer)
+    exportBtn:SetPoint("LEFT", importExportContainer, "LEFT", 0, 0)
 
     local importBtn = self:CreateButton("Import Profile", function()
         Config:ShowImportDialog()
     end, 120, 25)
+    importBtn:SetParent(importExportContainer)
     importBtn:SetPoint("LEFT", exportBtn, "RIGHT", 8, 0)
 
-    self:AddControl(canvas, CreateFrame("Frame"), 32)
+    self:AddControl(canvas, importExportContainer, 32)
 end
 
 -- Populate Advanced settings
